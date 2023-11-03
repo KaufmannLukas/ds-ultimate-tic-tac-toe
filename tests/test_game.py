@@ -47,7 +47,24 @@ class TestGame(unittest.TestCase):
         self.assertEqual(self.game.white.history, [(0, 0)])
         self.assertEqual(len(self.game.black.history), 0)
 
-    # Add more test methods as needed
+    def test_illegal_move(self):
+        """Test the reaction on illegal moves."""
+        self.game.play(4, 4) #w
+        # blocked by former move
+        self.assertRaises(ValueError, self.game.play, 4, 4)
+        # blocked by game restriction
+        self.assertRaises(ValueError, self.game.play, 6, 4)
+
+        self.game.play(4, 6) #b
+        self.game.play(6, 6) #w
+        self.game.play(6, 4) #b
+        self.game.play(4, 0) #w
+        self.game.play(0, 4) #b
+        self.game.play(4, 8) # white winns game 4
+        #blocked by finished local game
+        self.assertRaises(ValueError, self.game.play, 4, 7)
+        
+    
 
 if __name__ == '__main__':
     unittest.main()
