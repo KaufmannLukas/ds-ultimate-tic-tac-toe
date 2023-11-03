@@ -1,0 +1,18 @@
+name: ds-uttt
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python
+  - anaconda
+  - pip
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+  - jupyter
+  - scikit-learn
+  - Pillow
+  - tensorflow
+  - Keras
+  - gymnasium

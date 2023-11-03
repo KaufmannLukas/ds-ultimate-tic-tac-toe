@@ -14,7 +14,23 @@ The project ... (description)
 
 ## Setup Environment
 
-...
+To set up with anaconda / mamba:
+
+``` bash
+conda env create --file environment.yml
+```
+
+To update the environment:
+
+``` bash
+conda env update --file environment.yml
+```
+
+To activate the environment:
+
+``` bash
+conda activate ds-uttt
+```
 
 ## Interface Example
 
