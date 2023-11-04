@@ -92,11 +92,18 @@ class Game:
         # if self.black.wins[game_idx] == True or self.white.wins[game_idx] == True:
         #     return None
 
+        win_local_game = False
+        win_global_game = False
+
         if Game.check_win(current_player.board[game_idx]):
             current_player.wins[game_idx] = True
+            win_local_game = True
             print(f"{current_player.color} wins local game {game_idx}")
             if Game.check_win(current_player.wins):
+                win_global_game = True
                 print(f"{current_player.color} wins global game") # TODO: what do we make with wins?
+
+        return win_local_game, win_global_game
 
 
     def _reshape_board(board):
