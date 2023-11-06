@@ -2,6 +2,7 @@ import gymnasium as gym
 from gymnasium import spaces
 from matplotlib.pylab import get_state
 import numpy as np
+
 from environments.game import Game
 
 
@@ -22,7 +23,7 @@ class UltimateTicTacToeEnv(gym.Env):
         # Calculate the reward and whether the game is done
 
         action[self.game.blocked_fields] = 0
-        index = np.unravel_index(np.argmax(action), action.shape)
+        index = np.unravel_index(np.argmax(action), action.shape) # game_idx, field_idx
 
         win_state = self.game.play(*index)
         new_state = self.get_state()
@@ -54,6 +55,6 @@ class UltimateTicTacToeEnv(gym.Env):
 
 def random_policy(state):
     white_board, black_board, legal_moves, last_move = tuple(state[i] for i in range(4))
-    move_probabilitys = np.where(legal_moves, np.random.random(81).reshape((9,9)), 0)
-    return move_probabilitys
+    move_probabilities = np.where(legal_moves, np.random.random(81).reshape((9,9)), 0)
+    return move_probabilities
 
