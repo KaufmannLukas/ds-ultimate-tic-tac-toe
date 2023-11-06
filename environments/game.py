@@ -85,6 +85,7 @@ class Game:
 
     def play(self, game_idx, field_idx):
         if not self.check_valid_move(game_idx, field_idx):
+            print(self)
             raise ValueError(f"You tried to play on a blocked field ({game_idx}, {field_idx})!")
         
         current_player = self.current_player
@@ -100,10 +101,10 @@ class Game:
         if Game.check_win(current_player.board[game_idx]):
             current_player.wins[game_idx] = True
             win_local_game = True
-            print(f"{current_player.color} wins local game {game_idx}")
+            #print(f"{current_player.color} wins local game {game_idx}")
             if Game.check_win(current_player.wins):
                 win_global_game = True
-                print(f"{current_player.color} wins global game")
+                #print(f"{current_player.color} wins global game")
                 self.done = True
         
         # check for a draw
