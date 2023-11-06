@@ -24,8 +24,8 @@ if __name__ == "__main__":
     reward_history_black = []
     counter = 0
 
-    move_history = pd.DataFrame(columns=[i for i in range(81)])
-    games_data = []
+    games_data_history = []
+    games_data_wins = []
 
     start_time = time.time()
     print("start: ", start_time)
@@ -51,20 +51,28 @@ if __name__ == "__main__":
             # print("-"*31)
             # print("")
             counter = counter + 1
+        wins = [
+            env.game.white.wins.sum(),
+            env.game.black.wins.sum(),
+            env.game.winner,
+
+        ]
         
+        games_data_wins.append(wins)
 
         game_moves = combine_moves(env.game.white.history, env.game.black.history)
-        games_data.append(game_moves)
+        games_data_history.append(game_moves)
         
-    df_games = pd.DataFrame(games_data, columns=[str(i) for i in range(81)])
-
+    df_games = pd.DataFrame(games_data_history, columns=[str(i) for i in range(81)])
+    df_wins = pd.DataFrame(games_data_wins, columns=["white_locals", "black_locals", "winner"])
 
     end_time = time.time()
     print("end:", end_time)
     duration = end_time - start_time
     print("duration: ", duration)
 
-    df_games.to_csv("history.csv")
+    df_games.to_csv("data/history.csv")
+    df_wins.to_csv("data/wins.csv")
     #move_history.to_csv("history.csv")
 
 
