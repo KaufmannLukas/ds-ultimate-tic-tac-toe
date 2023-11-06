@@ -16,3 +16,4 @@ dependencies:
   - tensorflow
   - Keras
   - gymnasium
+  - tqdm
