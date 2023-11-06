@@ -2,6 +2,7 @@
 from gym_envs.uttt_env import UltimateTicTacToeEnv, random_policy
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 
 import time
 
@@ -30,7 +31,7 @@ if __name__ == "__main__":
     print("start: ", start_time)
 
 
-    for i in range(1000):
+    for i in tqdm(range(1000)):
 
         done = False
         state = env.reset()
@@ -56,7 +57,7 @@ if __name__ == "__main__":
         games_data.append(game_moves)
         
     df_games = pd.DataFrame(games_data, columns=[str(i) for i in range(81)])
-    
+
 
     end_time = time.time()
     print("end:", end_time)
