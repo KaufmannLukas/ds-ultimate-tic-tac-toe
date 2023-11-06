@@ -1,5 +1,5 @@
 
-from gym_envs.test_env import UltimateTicTacToeEnv, random_policy
+from gym_envs.uttt_env import UltimateTicTacToeEnv, random_policy
 
 if __name__ == "__main__":
     
