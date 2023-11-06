@@ -28,7 +28,7 @@ class UltimateTicTacToeEnv(gym.Env):
         win_state = self.game.play(*index)
         new_state = self.get_state()
         reward = int(win_state[0]) + int(win_state[1]) * 5
-        done = win_state[1]
+        done = self.game.done
 
         return new_state, reward, done, {}
 
