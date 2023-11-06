@@ -27,6 +27,8 @@ class Game:
     def __init__(self):
         self.white = Game._Player("white") # white is O and starts
         self.black = Game._Player("black") # black is X
+
+        self.done = False
     
 
     @property
@@ -101,7 +103,12 @@ class Game:
             print(f"{current_player.color} wins local game {game_idx}")
             if Game.check_win(current_player.wins):
                 win_global_game = True
-                print(f"{current_player.color} wins global game") # TODO: what do we make with wins?
+                print(f"{current_player.color} wins global game")
+                self.done = True
+        
+        # check for a draw
+        if np.all(self.blocked_fields):
+            self.done = True
 
         return win_local_game, win_global_game
 
