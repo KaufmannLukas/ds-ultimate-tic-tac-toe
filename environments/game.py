@@ -27,7 +27,7 @@ class Game:
     def __init__(self):
         self.white = Game._Player("white") # white is O and starts
         self.black = Game._Player("black") # black is X
-
+        self.winner = None
         self.done = False
     
 
@@ -104,6 +104,7 @@ class Game:
             #print(f"{current_player.color} wins local game {game_idx}")
             if Game.check_win(current_player.wins):
                 win_global_game = True
+                self.winner = self.current_player.color
                 #print(f"{current_player.color} wins global game")
                 self.done = True
         
