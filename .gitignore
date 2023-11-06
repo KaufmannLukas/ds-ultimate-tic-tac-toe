@@ -133,3 +133,6 @@ dmypy.json
 
 # vscode Stuff
 .vscode
+
+# folders
+_research_references/
