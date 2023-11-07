@@ -18,8 +18,8 @@ class TestGame(unittest.TestCase):
         """Test that the game is initialized correctly."""
         self.assertIsInstance(self.game.white, Game._Player)
         self.assertIsInstance(self.game.black, Game._Player)
-        self.assertEqual(self.game.white.color, "white")
-        self.assertEqual(self.game.black.color, "black")
+        self.assertEqual(self.game.white.color, "white (X)")
+        self.assertEqual(self.game.black.color, "black (O)")
         self.assertEqual(len(self.game.white.history), 0)
         self.assertEqual(len(self.game.black.history), 0)
         self.assertTrue(np.all(self.game.white.board == 0))
@@ -27,9 +27,9 @@ class TestGame(unittest.TestCase):
 
     def test_current_player(self):
         """Test the current player property."""
-        self.assertEqual(self.game.current_player.color, "white")
+        self.assertEqual(self.game.current_player.color, "white (X)")
         self.game.white.history.append((0, 0))
-        self.assertEqual(self.game.current_player.color, "black")
+        self.assertEqual(self.game.current_player.color, "black (O)")
 
     def test_last_move(self):
         """Test the last move property."""
