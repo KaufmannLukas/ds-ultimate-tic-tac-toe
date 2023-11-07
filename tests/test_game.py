@@ -34,10 +34,10 @@ class TestGame(unittest.TestCase):
     def test_last_move(self):
         """Test the last move property."""
         self.assertIsNone(self.game.last_move)
-        self.game.white.history.append((0, 0))
+        self.game.play(0, 0)
         self.assertEqual(self.game.last_move, (0, 0))
-        self.game.black.history.append((1, 1))
-        self.assertEqual(self.game.last_move, (1, 1))
+        self.game.play(0, 1)
+        self.assertEqual(self.game.last_move, (0, 1))
 
     def test_play(self):
         """Test the play method."""

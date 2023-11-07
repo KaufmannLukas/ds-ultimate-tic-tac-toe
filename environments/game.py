@@ -29,6 +29,7 @@ class Game:
         self.black = Game._Player("black (O)") 
         self.winner = None
         self.done = False
+        self.last_move = None
     
 
     @property
@@ -38,14 +39,14 @@ class Game:
         return self.black
     
 
-    @property
-    def last_move(self):
-        if not self.white.history and not self.black.history:
-            return None
-        if len(self.white.history) == len(self.black.history):
-            return self.black.history[-1]
-        else:
-            return self.white.history[-1]
+    # @property
+    # def last_move(self):
+    #     if not self.white.history and not self.black.history:
+    #         return None
+    #     if len(self.white.history) == len(self.black.history):
+    #         return self.black.history[-1]
+    #     else:
+    #         return self.white.history[-1]
 
     
     @property
@@ -90,6 +91,7 @@ class Game:
         
         current_player = self.current_player
         current_player.history.append((game_idx, field_idx))
+        self.last_move = (game_idx, field_idx)
         current_player.board[game_idx, field_idx] = True
 
         # if self.black.wins[game_idx] == True or self.white.wins[game_idx] == True:
