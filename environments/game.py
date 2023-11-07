@@ -68,9 +68,19 @@ class Game:
         blocked_fields = blocked_fields | blocked_games
         return blocked_fields
 
-
+    def get_valid_moves(self):
+        '''
+        Returns a list of all possible game moves as tuples of (game_idx, field_idx)
+        '''
+        valid_fields = ~self.blocked_fields
+        # Get all indexes where the matrix is True
+        valid_indexes = np.argwhere(valid_fields)
+        return valid_indexes.tolist()
 
     def check_valid_move(self, game_idx, field_idx):
+        '''
+        Returns True if the move (game_idx, field_idx) is valid / not blocked
+        '''
         return not self.blocked_fields[game_idx, field_idx]
 
 
