@@ -1,4 +1,5 @@
 import numpy as np
+from copy import deepcopy
 
 class Game:
     WINNING_COMBINATIONS = np.array([
@@ -30,7 +31,26 @@ class Game:
         self.winner = None
         self.done = False
         self.last_move = None
+
+    def __key(self):
+        return (
+            hash(str(self.white.board)),
+            hash(str(self.black.board)),
+            self.winner,
+            self.done,
+            self.last_move,
+        )
+
+    def __hash__(self) -> int:
+        return hash(self.__key())
     
+
+    def copy(self):
+        return deepcopy(self)
+
+    def __eq__(self, other):
+        return self.__key() == other.__key()
+
 
     @property
     def current_player(self):
@@ -68,14 +88,14 @@ class Game:
         blocked_fields = blocked_fields | blocked_games
         return blocked_fields
 
-    def get_valid_moves(self):
+    def get_valid_moves(self)->set:
         '''
         Returns a list of all possible game moves as tuples of (game_idx, field_idx)
         '''
         valid_fields = ~self.blocked_fields
         # Get all indexes where the matrix is True
         valid_indexes = np.argwhere(valid_fields)
-        return valid_indexes.tolist()
+        return set(map(tuple, valid_indexes))
 
     def check_valid_move(self, game_idx, field_idx):
         '''
