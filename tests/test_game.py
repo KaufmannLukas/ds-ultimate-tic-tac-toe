@@ -1,3 +1,4 @@
+from typing import assert_type
 import unittest
 import numpy as np
 from environments.game import Game  # Replace with your actual module name
@@ -93,6 +94,19 @@ class TestGame(unittest.TestCase):
 
         #self.game.play(0, 4) #b
 
+    def test_game_copy(self):
+
+        cp = self.game.copy()
+        self.assertEqual(cp, self.game)
+        self.assertFalse(cp is self.game)
+
+    def test_set(self):
+        self.assertTrue(bool({self.game}))
+
+    def test_get_valid_moves(self):
+        assert_type(self.game.get_valid_moves(), set)
+        valid_first_moves = {(x, y) for x in range(9) for y in range(9)}
+        self.assertEqual(self.game.get_valid_moves(), valid_first_moves)
         
     
 
