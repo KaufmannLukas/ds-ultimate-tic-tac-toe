@@ -1,5 +1,5 @@
 from math import log, sqrt
-from random import choice
+from random import sample
 
 import numpy as np
 
@@ -51,17 +51,11 @@ class Node:
         MCTS begins by selecting a node to expand from the root. This selection process typically involves a balance
         between exploration and exploitation. It uses heuristics or policies to determine which child node to explore.
         '''
-        if len(self.children) == 0:  # checks if the game is won, or if they are no valid moves,
-            if self.game.done:      # if this is the case, it makes sense that there are no children.
-                return None
-
-        if not self.is_fully_expanded:  # double check later
-            self.expand()
-
-        assert len(self.children) > 0   # safety net
+        if len(self.children) == 0:
+            return None
 
         best_child = max(self.children, key=ucb_score)
-        return best_child   # what are wo doing with the best child?
+        return best_child
 
     def expand(self):
         '''
@@ -70,30 +64,26 @@ class Node:
         The selected node is expanded by adding one or more child nodes corresponding to possible actions
         that can be taken from the current state. These child nodes are added to the tree.
         '''
+        if self.is_fully_expanded == True:
+            return None
+
         # creates a set of all possible / valid moves for current game / state.
         valid_moves = self.possible_actions
-
         # keeps track of last moves, that already have been played / explored in this state.
         explored_moves = {child.game.last_move for child in self.children}
 
         unexplored_moves = valid_moves.difference(explored_moves)
-        if len(unexplored_moves) == 0:
-            self.is_fully_expanded = True
-            return None
 
         # chooses random tuple (move)
-        move = choice(unexplored_moves)
+        move = sample(sorted(unexplored_moves), 1)[0]
         new_game = self.game.copy()
         new_game.play(*move)
         # creates new child for one valid move
         new_child = Node(game=new_game, parent=self)
         self.children.append(new_child)
 
-        # -> simulate random game(s) from the new child
-        winner = simulate(new_child.game)
-
-        # -> backpropagate the result/winner of the simulation back to the root node
-        new_child.backpropagate(winner)
+        if len(unexplored_moves) == 1:
+            self.is_fully_expanded = True
 
         return new_child
 
@@ -105,6 +95,7 @@ class Node:
         from the root to the newly expanded node. This update is based on the outcomes of the simulated episodes.
         '''
         if self.parent is None:
+            self.visit_count += 1
             return None
 
         self.visit_count += 1
@@ -135,7 +126,7 @@ def simulate(game: Game):
         # check for winning player (white/black)
         return game.winner
 
-    random_move = choice(game.get_valid_moves())
+    random_move = sample(sorted(game.get_valid_moves()), 1)[0]
     # TODO: maybe later play x random moves at once
 
     new_game = game.copy()
@@ -147,5 +138,13 @@ class MCTS(Agent):
     '''
     '''
     # player=1 ...
+
     def __init__(self):
         super.__init__()
+
+    # if not self.is_fully_expanded:
+    # new_child = self.expand()
+    # # -> simulate random game(s) from the new child
+    # winner = simulate(new_child.game)
+    # # -> backpropagate the result/winner of the simulation back to the root node
+    # new_child.backpropagate(winner)
