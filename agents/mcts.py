@@ -78,6 +78,7 @@ class Node:
         unexplored_moves = valid_moves.difference(explored_moves)
         if len(unexplored_moves) == 0:
             self.is_fully_expanded = True
+            return None
 
         # chooses random tuple (move)
         move = choice(unexplored_moves)
@@ -87,47 +88,33 @@ class Node:
         new_child = Node(game=new_game, parent=self)
         self.children.append(new_child)
 
+        # -> simulate random game(s) from the new child
+        winner = simulate(new_child.game)
+
+        # -> backpropagate the result/winner of the simulation back to the root node
+        new_child.backpropagate(winner)
+
         return new_child
 
-        # implement change of perspectives (player switch)
-
-    # def expand(self):
-    #         action = np.random.choice(np.where(self.expandable_moves == 1)[0])
-    #         self.expandable_moves[action] = 0
-
-    #         child_state = self.state.copy()
-    #         child_state = self.game.get_next_state(child_state, action, 1)
-    #         child_state = self.game.change_perspective(child_state, player=-1)
-
-    #         child = Node(self.game, self.args, child_state, self, action)
-    #         self.children.append(child)
-    #         return child
-
-    def backpropagate(self, Node, reward):
+    def backpropagate(self, winner):
         '''
         Update the statistics of nodes as you backpropagate the results of rollouts to their parent nodes.
         ---
         The results of the rollout are backpropagated to update the values of the nodes along the path
         from the root to the newly expanded node. This update is based on the outcomes of the simulated episodes.
         '''
-        # while Node is not None:
-        #     Node.value_sum += reward
-        #     Node.visit_count  += 1
-        #     Node = Node.parent
+        if self.parent is None:
+            return None
 
-    # def backpropogate(self, node, reward):
-    #     while node is not None:
-    #         node.numVisits += 1
-    #         node.totalReward += reward
-    #         node = node.parent
+        self.visit_count += 1
 
+        if winner is not None:
+            if self.parent.game.current_player.color == winner:
+                self.value_sum += 1
+            else:
+                self.value_sum -= 1
 
-#    def _backpropagate(self, path, reward):
-#         "Send the reward back up to the ancestors of the leaf"
-#         for node in reversed(path):
-#             self.N[node] += 1
-#             self.Q[node] += reward
-#             reward = 1 - reward  # 1 for me is 0 for my enemy, and vice versa
+        self.parent.backpropagate(winner)
 
 
 def simulate(game: Game):
@@ -143,14 +130,12 @@ def simulate(game: Game):
     # simulate a random game for the new child
     if game.done:
         if game.winner is None:
-            return 0
-        # check rewards for player (white/black, etc.)
-        if game.winner.color == "white (X)":
-            return 1
-        else:
-            return -1
+            return None
+        # check for winning player (white/black)
+        return game.winner
 
     random_move = choice(game.get_valid_moves())
+    # TODO: maybe later play x random moves at once
 
     new_game = game.copy()
     new_game.play(*random_move)
