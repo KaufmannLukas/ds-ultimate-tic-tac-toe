@@ -1,6 +1,7 @@
 import numpy as np
 from copy import deepcopy
 
+
 class Game:
     WINNING_COMBINATIONS = np.array([
         # rows
@@ -16,18 +17,16 @@ class Game:
         [True, False, False, False, True, False, False, False, True],
     ])
 
-
     class _Player:
         def __init__(self, color):
             self.history = []
-            self.board = np.zeros((9,9), dtype=bool)
+            self.board = np.zeros((9, 9), dtype=bool)
             self.wins = np.zeros((9,), dtype=bool)
             self.color = color
 
-
     def __init__(self):
-        self.white = Game._Player("white (X)") 
-        self.black = Game._Player("black (O)") 
+        self.white = Game._Player("white (X)")
+        self.black = Game._Player("black (O)")
         self.winner = None
         self.done = False
         self.last_move = None
@@ -43,7 +42,6 @@ class Game:
 
     def __hash__(self) -> int:
         return hash(self.__key())
-    
 
     def copy(self):
         return deepcopy(self)
@@ -51,13 +49,11 @@ class Game:
     def __eq__(self, other):
         return self.__key() == other.__key()
 
-
     @property
     def current_player(self):
         if len(self.white.history) == len(self.black.history):
             return self.white
         return self.black
-    
 
     # @property
     # def last_move(self):
@@ -68,27 +64,27 @@ class Game:
     #     else:
     #         return self.white.history[-1]
 
-    
     @property
     def blocked_fields(self):
         if self.last_move is None:
             return np.zeros((9, 9), dtype=bool)
 
         blocked_fields = self.white.board | self.black.board
-        finished_games = (self.white.wins | self.black.wins)[:, np.newaxis] * np.ones((9, 9), dtype=bool)
+        finished_games = (self.white.wins | self.black.wins)[
+            :, np.newaxis] * np.ones((9, 9), dtype=bool)
         blocked_fields = blocked_fields | finished_games
-        
+
         # if a whole game is blocked, return the rest of the games as free
         if all(blocked_fields[self.last_move[1]]):
             return blocked_fields
-        
-        blocked_games = np.ones((9,9), dtype=bool)
+
+        blocked_games = np.ones((9, 9), dtype=bool)
         blocked_games[self.last_move[1]] = np.zeros((9,), dtype=bool)
 
         blocked_fields = blocked_fields | blocked_games
         return blocked_fields
 
-    def get_valid_moves(self)->set:
+    def get_valid_moves(self) -> set:
         '''
         Returns a list of all possible game moves as tuples of (game_idx, field_idx)
         '''
@@ -103,22 +99,22 @@ class Game:
         '''
         return not self.blocked_fields[game_idx, field_idx]
 
-
     def check_win(board):
         '''
         Get a 3x3 board and checks if there is a winning combination hit.
         '''
-        win_combs = Game.WINNING_COMBINATIONS # get all combinations to win a game
-        win_mask = win_combs & board # get just the moves that hits a winning combination
-        win_list = np.all(win_mask == win_combs, axis=1) # check if all hits for a winning combination were made
-        return np.any(win_list) # determine if a winning combination was hit
-    
+        win_combs = Game.WINNING_COMBINATIONS  # get all combinations to win a game
+        win_mask = win_combs & board  # get just the moves that hits a winning combination
+        # check if all hits for a winning combination were made
+        win_list = np.all(win_mask == win_combs, axis=1)
+        return np.any(win_list)  # determine if a winning combination was hit
 
     def play(self, game_idx, field_idx):
         if not self.check_valid_move(game_idx, field_idx):
             print(self)
-            raise ValueError(f"You tried to play on a blocked field ({game_idx}, {field_idx})!")
-        
+            raise ValueError(
+                f"You tried to play on a blocked field ({game_idx}, {field_idx})!")
+
         current_player = self.current_player
         current_player.history.append((game_idx, field_idx))
         self.last_move = (game_idx, field_idx)
@@ -133,19 +129,18 @@ class Game:
         if Game.check_win(current_player.board[game_idx]):
             current_player.wins[game_idx] = True
             win_local_game = True
-            #print(f"{current_player.color} wins local game {game_idx}")
+            # print(f"{current_player.color} wins local game {game_idx}")
             if Game.check_win(current_player.wins):
                 win_global_game = True
                 self.winner = current_player.color
-                #print(f"{current_player.color} wins global game")
+                # print(f"{current_player.color} wins global game")
                 self.done = True
-        
+
         # check for a draw
         if np.all(self.blocked_fields):
             self.done = True
 
         return win_local_game, win_global_game
-
 
     def _reshape_board(board):
         # 3x3x9-Array reshape
@@ -154,7 +149,6 @@ class Game:
         # reorder axis
         return reshaped.transpose(0, 2, 1, 3).reshape(9, 9)
 
-
     def __repr__(self):
         game = np.zeros((9, 9))
         game[self.black.board] = -1
@@ -162,7 +156,7 @@ class Game:
         reshaped_board = Game._reshape_board(game)
 
         blocked_fields = Game._reshape_board(self.blocked_fields)
-        
+
         rows = []
         for i in range(9):
 
@@ -188,4 +182,3 @@ class Game:
 
         # reorder axis
         return repr
-    

@@ -6,7 +6,7 @@ import numpy as np
 from environments.game import Game
 
 parameters = {
-    "C": 2, # exploration parameter
+    "C": 2,  # exploration parameter
 }
 
 
@@ -18,30 +18,30 @@ def ucb_score(child):
     c is the exploration parameter—theoretically equal to √2; in practice usually chosen empirically
     '''
     w = child.value_sum   # #simulations of this node wich resulted in a win
-    s = child.visit_count # total # of simulations
+    s = child.visit_count  # total # of simulations
     c = parameters["C"]
     s_p = child.parent.visit_count
 
     return w/s + c*sqrt(log(s_p)/s)
-    
-    
+
+
 class Node:
     '''
     Each node stores information such as the number of visits, the total reward, and the possible actions.
     '''
-    def __init__(self, game: Game=None, parent=None):
+
+    def __init__(self, game: Game = None, parent: 'Node' = None):
         if game is None:
             self.game = Game()
         else:
             self.game = game
-        
+
         self.visit_count = 0
         self.value_sum = 0
         self.possible_actions = self.game.get_valid_moves()
         self.children = []
         self.parent = parent
         self.is_fully_expanded = False
-
 
     def select_child(self):
         '''
@@ -50,18 +50,17 @@ class Node:
         MCTS begins by selecting a node to expand from the root. This selection process typically involves a balance
         between exploration and exploitation. It uses heuristics or policies to determine which child node to explore.
         '''
-        if len(self.children) == 0: # checks if the game is won, or if they are no valid moves, 
+        if len(self.children) == 0:  # checks if the game is won, or if they are no valid moves,
             if self.game.done:      # if this is the case, it makes sense that there are no children.
                 return None
-            
+
         if not self.is_fully_expanded:  # double check later
-            self.expand()       
+            self.expand()
 
         assert len(self.children) > 0   # safety net
 
         best_child = max(self.children, key=ucb_score)
         return best_child   # what are wo doing with the best child?
-
 
     def expand(self):
         '''
@@ -71,40 +70,38 @@ class Node:
         that can be taken from the current state. These child nodes are added to the tree.
         '''
         # creates a set of all possible / valid moves for current game / state.
-        valid_moves = self.possible_actions      
+        valid_moves = self.possible_actions
 
         # keeps track of last moves, that already have been played / explored in this state.
         explored_moves = {child.game.last_move for child in self.children}
 
         unexplored_moves = valid_moves.difference(explored_moves)
         if len(unexplored_moves) == 0:
-            self.is_fully_expanded = True 
-        
+            self.is_fully_expanded = True
+
         # chooses random tuple (move)
-        move = choice(unexplored_moves) 
+        move = choice(unexplored_moves)
         new_game = self.game.copy()
         new_game.play(*move)
         # creates new child for one valid move
-        new_child = Node(game=new_game, parent=self) 
-        self.children.append(new_child)      
+        new_child = Node(game=new_game, parent=self)
+        self.children.append(new_child)
 
         return new_child
-        
+
         # implement change of perspectives (player switch)
-        
-            
+
     # def expand(self):
     #         action = np.random.choice(np.where(self.expandable_moves == 1)[0])
     #         self.expandable_moves[action] = 0
-            
+
     #         child_state = self.state.copy()
     #         child_state = self.game.get_next_state(child_state, action, 1)
     #         child_state = self.game.change_perspective(child_state, player=-1)
-            
+
     #         child = Node(self.game, self.args, child_state, self, action)
     #         self.children.append(child)
     #         return child
-
 
     def backpropagate(self, Node, reward):
         '''
@@ -118,21 +115,20 @@ class Node:
         #     Node.visit_count  += 1
         #     Node = Node.parent
 
-
     # def backpropogate(self, node, reward):
     #     while node is not None:
     #         node.numVisits += 1
     #         node.totalReward += reward
     #         node = node.parent
 
-     
+
 #    def _backpropagate(self, path, reward):
 #         "Send the reward back up to the ancestors of the leaf"
 #         for node in reversed(path):
 #             self.N[node] += 1
 #             self.Q[node] += reward
 #             reward = 1 - reward  # 1 for me is 0 for my enemy, and vice versa
-        
+
 
 def simulate(game: Game):
     '''
@@ -148,19 +144,17 @@ def simulate(game: Game):
     if game.done:
         if game.winner is None:
             return 0
-        if game.winner.color == "white (X)": # check rewards for player (white/black, etc.)
+        # check rewards for player (white/black, etc.)
+        if game.winner.color == "white (X)":
             return 1
         else:
             return -1
 
     random_move = choice(game.get_valid_moves())
-    
+
     new_game = game.copy()
     new_game.play(*random_move)
     return simulate(new_game)
-
-
-
 
 
 class MCTS():

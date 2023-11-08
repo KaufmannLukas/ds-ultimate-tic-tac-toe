@@ -2,15 +2,15 @@ from typing import assert_type
 import unittest
 import numpy as np
 from environments.game import Game  # Replace with your actual module name
-#import environments.game
+# import environments.game
 
 
 class TestGame(unittest.TestCase):
-    
+
     def setUp(self):
         """This method is called before each test."""
         self.game = Game()
-        
+
     def tearDown(self):
         """This method is called after each test."""
         pass  # Add any cleanup code here, if necessary
@@ -50,49 +50,48 @@ class TestGame(unittest.TestCase):
 
     def test_illegal_move(self):
         """Test the reaction on illegal moves."""
-        self.game.play(4, 4) #w
+        self.game.play(4, 4)  # w
         # blocked by former move
         self.assertRaises(ValueError, self.game.play, 4, 4)
         # blocked by game restriction
         self.assertRaises(ValueError, self.game.play, 6, 4)
 
-        self.game.play(4, 6) #b
-        self.game.play(6, 6) #w
-        self.game.play(6, 4) #b
-        self.game.play(4, 0) #w
-        self.game.play(0, 4) #b
-        self.game.play(4, 8) # white winns game 4
-        #blocked by finished local game
+        self.game.play(4, 6)  # b
+        self.game.play(6, 6)  # w
+        self.game.play(6, 4)  # b
+        self.game.play(4, 0)  # w
+        self.game.play(0, 4)  # b
+        self.game.play(4, 8)  # white winns game 4
+        # blocked by finished local game
         self.assertRaises(ValueError, self.game.play, 4, 7)
 
     def test_game_win(self):
         result = self.game.play(4, 4)
         self.assertEqual((False, False), result)
 
-        self.game.play(4, 6) #b
-        self.game.play(6, 6) #w
-        self.game.play(6, 4) #b
-        self.game.play(4, 0) #w
-        self.game.play(0, 4) #b
-        result = self.game.play(4, 8) # white winns game 4
+        self.game.play(4, 6)  # b
+        self.game.play(6, 6)  # w
+        self.game.play(6, 4)  # b
+        self.game.play(4, 0)  # w
+        self.game.play(0, 4)  # b
+        result = self.game.play(4, 8)  # white winns game 4
         self.assertEqual((True, False), result)
 
-        self.game.play(8, 4) #b
-        self.game.play(6, 3) #w
-        self.game.play(3, 4) #b
-        result = self.game.play(6, 0) # white winns game 6
+        self.game.play(8, 4)  # b
+        self.game.play(6, 3)  # w
+        self.game.play(3, 4)  # b
+        result = self.game.play(6, 0)  # white winns game 6
         self.assertEqual((True, False), result)
 
-        self.game.play(0, 2) #b
-        self.game.play(2, 4) #w
-        self.game.play(8, 2) #b
-        self.game.play(2, 0) #w
-        self.game.play(0, 6) #b
-        result = self.game.play(2, 8) # white wins game 2
+        self.game.play(0, 2)  # b
+        self.game.play(2, 4)  # w
+        self.game.play(8, 2)  # b
+        self.game.play(2, 0)  # w
+        self.game.play(0, 6)  # b
+        result = self.game.play(2, 8)  # white wins game 2
         self.assertEqual((True, True), result)
 
-
-        #self.game.play(0, 4) #b
+        # self.game.play(0, 4) #b
 
     def test_game_copy(self):
 
@@ -107,8 +106,7 @@ class TestGame(unittest.TestCase):
         assert_type(self.game.get_valid_moves(), set)
         valid_first_moves = {(x, y) for x in range(9) for y in range(9)}
         self.assertEqual(self.game.get_valid_moves(), valid_first_moves)
-        
-    
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -15,9 +15,8 @@ def combine_moves(white_moves, black_moves):
     return moves
 
 
-
 if __name__ == "__main__":
-    
+
     env = UltimateTicTacToeEnv()
 
     reward_history_white = []
@@ -29,7 +28,6 @@ if __name__ == "__main__":
 
     start_time = time.time()
     print("start: ", start_time)
-
 
     for i in tqdm(range(1000)):
 
@@ -57,14 +55,17 @@ if __name__ == "__main__":
             env.game.winner,
 
         ]
-        
+
         games_data_wins.append(wins)
 
-        game_moves = combine_moves(env.game.white.history, env.game.black.history)
+        game_moves = combine_moves(
+            env.game.white.history, env.game.black.history)
         games_data_history.append(game_moves)
-        
-    df_games = pd.DataFrame(games_data_history, columns=[str(i) for i in range(81)])
-    df_wins = pd.DataFrame(games_data_wins, columns=["white_locals", "black_locals", "winner"])
+
+    df_games = pd.DataFrame(games_data_history, columns=[
+                            str(i) for i in range(81)])
+    df_wins = pd.DataFrame(games_data_wins, columns=[
+                           "white_locals", "black_locals", "winner"])
 
     end_time = time.time()
     print("end:", end_time)
@@ -73,13 +74,9 @@ if __name__ == "__main__":
 
     df_games.to_csv("data/history.csv")
     df_wins.to_csv("data/wins.csv")
-    #move_history.to_csv("history.csv")
-
-
+    # move_history.to_csv("history.csv")
 
     print("done")
 
-
-        # print(f"white rewards: {reward_history_white}", sum(reward_history_white))
-        # print(f"black rewards: {reward_history_black}", sum(reward_history_black))
-    
+    # print(f"white rewards: {reward_history_white}", sum(reward_history_white))
+    # print(f"black rewards: {reward_history_black}", sum(reward_history_black))
