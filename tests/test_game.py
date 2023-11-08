@@ -1,7 +1,10 @@
-from typing import assert_type
 import unittest
+from typing import assert_type
+
 import numpy as np
+
 from environments.game import Game  # Replace with your actual module name
+
 # import environments.game
 
 

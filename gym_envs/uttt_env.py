@@ -1,7 +1,7 @@
 import gymnasium as gym
+import numpy as np
 from gymnasium import spaces
 from matplotlib.pylab import get_state
-import numpy as np
 
 from environments.game import Game
 

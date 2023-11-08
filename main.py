@@ -1,10 +1,11 @@
 
-from gym_envs.uttt_env import UltimateTicTacToeEnv, random_policy
-import pandas as pd
+import time
+
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
 
-import time
+from gym_envs.uttt_env import UltimateTicTacToeEnv, random_policy
 
 
 def combine_moves(white_moves, black_moves):
