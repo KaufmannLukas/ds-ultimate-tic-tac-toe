@@ -84,6 +84,16 @@ class Game:
 
         blocked_fields = blocked_fields | blocked_games
         return blocked_fields
+    
+    @property
+    def complete_history(self):
+        white_moves = self.white.history
+        black_moves = self.black.history
+        # Interleave the moves, assuming white starts first
+        moves = [None]*81  # Initialize a list with 81 moves
+        moves[:len(white_moves)*2:2] = white_moves
+        moves[1:len(black_moves)*2:2] = black_moves
+        return moves
 
     def get_valid_moves(self) -> set:
         '''

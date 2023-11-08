@@ -1,11 +1,56 @@
+from random import choice
+from anyio import open_process
 import gymnasium as gym
 import numpy as np
 from gymnasium import spaces
 from matplotlib.pylab import get_state
 
 from environments.game import Game
+from agents.agent import Agent
 
 
+class UltimateTicTacToeEnv(gym.Env):
+    def __init__(self, opponent: Agent = None, opponent_starts=False):
+        super(UltimateTicTacToeEnv, self).__init__()
+        self.action_space = spaces.Discrete(81)  # 9x9 board
+        self.observation_space = spaces.Box(
+            low=0, high=2, shape=(4, 9, 9), dtype=bool)
+        self.game = Game()
+
+
+        self.reset()
+        self.opponent = opponent
+        self.opponent_starts = opponent_starts
+    
+
+    def reset(self):
+        self.game = Game()
+        if self.opponent is not None and self.opponent_starts:
+                opponent_move = self.opponent.play(self.game)
+                self.game.play(*opponent_move)
+        return self.game
+        
+
+    def step(self, action: tuple):
+        '''
+        action: tuple like (game_idx, field_idx)
+        '''
+        self.game.play(*action)
+        if self.opponent is not None:
+            counter_action = self.opponent.play(self.game)
+            self.game.play(*counter_action)
+        new_state = self.game
+        reward = 0
+        done = self.game.done
+
+        return new_state, reward, done, {}
+
+
+    def render(self):
+        print(self.game)
+
+
+'''
 class UltimateTicTacToeEnv(gym.Env):
     def __init__(self):
         super(UltimateTicTacToeEnv, self).__init__()
@@ -60,3 +105,4 @@ def random_policy(state):
     move_probabilities = np.where(
         legal_moves, np.random.random(81).reshape((9, 9)), 0)
     return move_probabilities
+'''
