@@ -4,6 +4,7 @@ from random import choice
 import numpy as np
 
 from environments.game import Game
+from agents.agent import Agent
 
 parameters = {
     "C": 2,  # exploration parameter
@@ -142,8 +143,9 @@ def simulate(game: Game):
     return simulate(new_game)
 
 
-class MCTS():
+class MCTS(Agent):
     '''
     '''
     # player=1 ...
-    pass
+    def __init__(self):
+        super.__init__()
