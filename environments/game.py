@@ -26,8 +26,8 @@ class Game:
             self.color = color
 
     def __init__(self):
-        self.white = Game._Player("white (X)")
-        self.black = Game._Player("black (O)")
+        self.white = Game._Player(color="white (X)")
+        self.black = Game._Player(color="black (O)")
         self.winner = None
         self.done = False
         self.last_move = None
