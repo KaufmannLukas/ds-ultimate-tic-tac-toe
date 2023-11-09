@@ -102,25 +102,31 @@ class TestMCTS(unittest.TestCase):
         pass
 
     def test_select_child(self):
-        """..."""
+        """
+        ucb-scores:
+        child_1 = 2.68
+        child_2 = 2.39
+        child_3 = 2.54
+        """
         root = Node()
         root.visit_count = 6
 
-        child1 = Node(parent=root)
-        child2 = Node(parent=root)
-        child3 = Node(parent=root)
+        child_1 = Node(parent=root)
+        child_2 = Node(parent=root)
+        child_3 = Node(parent=root)
 
-        root.children = [child1, child2, child3]
+        root.children = [child_1, child_2, child_3]
 
-        child1.visit_count = 1
-        child2.visit_count = 2
-        child3.visit_count = 3
+        child_1.visit_count = 1
+        child_2.visit_count = 2
+        child_3.visit_count = 3
 
-        child1.value_sum = 0
-        child2.value_sum = 1
-        child3.value_sum = 3
+        child_1.value_sum = 0
+        child_2.value_sum = 1
+        child_3.value_sum = 3
+        
+        self.assertEqual(root.select_child(), child_1)
 
-        self.assertEqual(root.select_child(), child1)
 
     def test_expand(self):
         """test expanding nodes"""
