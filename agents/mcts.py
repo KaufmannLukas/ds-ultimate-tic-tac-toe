@@ -157,7 +157,7 @@ class MCTS(Agent):
     def play(self, game: Game, num_iterations = 100) -> tuple:       
         root = Node(game)
         current_node = root
-        for _ in tqdm(range(num_iterations)):
+        for _ in tqdm(range(num_iterations), disable=True):
             if current_node.game.done:
                 current_node = root
                 continue
