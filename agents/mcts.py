@@ -2,6 +2,7 @@ from math import log, sqrt
 from random import sample
 
 import numpy as np
+from tqdm import tqdm
 
 from environments.game import Game
 from agents.agent import Agent
@@ -20,9 +21,8 @@ def ucb_score(child):
     '''
     w = child.value_sum   # #simulations of this node wich resulted in a win
     s = child.visit_count  # total # of simulations
-    c = parameters["C"]
     s_p = child.parent.visit_count
-
+    c = parameters['C']
     return w/s + c*sqrt(log(s_p)/s)
 
 
@@ -39,21 +39,23 @@ class Node:
 
         self.visit_count = 0
         self.value_sum = 0
-        self.possible_actions = self.game.get_valid_moves()
+        self.possible_actions = self.game.get_valid_moves() # TODO: Hä
         self.children = []
         self.parent = parent
         self.is_fully_expanded = False
 
-    def select_child(self):
+    def select_child(self) -> 'Node':
         '''
         Develop a selection strategy (e.g., Upper Confidence Bound) to choose nodes in the tree to explore further.
         ---
         MCTS begins by selecting a node to expand from the root. This selection process typically involves a balance
         between exploration and exploitation. It uses heuristics or policies to determine which child node to explore.
         '''
+        # checks if there are children already to choose from
         if len(self.children) == 0:
             return None
 
+        # returns child with highest ucb-score
         best_child = max(self.children, key=ucb_score)
         return best_child
 
@@ -64,6 +66,7 @@ class Node:
         The selected node is expanded by adding one or more child nodes corresponding to possible actions
         that can be taken from the current state. These child nodes are added to the tree.
         '''
+        # check if fully expanded already
         if self.is_fully_expanded == True:
             return None
 
@@ -71,21 +74,22 @@ class Node:
         valid_moves = self.possible_actions
         # keeps track of last moves, that already have been played / explored in this state.
         explored_moves = {child.game.last_move for child in self.children}
-
+        # checks which moves have not been play / expanded
         unexplored_moves = valid_moves.difference(explored_moves)
 
-        # chooses random tuple (move)
+        # chooses one random move (tuple)
         move = sample(sorted(unexplored_moves), 1)[0]
         new_game = self.game.copy()
         new_game.play(*move)
-        # creates new child for one valid move
+        # creates new child for one (valid) move
         new_child = Node(game=new_game, parent=self)
         self.children.append(new_child)
 
-        if len(unexplored_moves) == 1:
+        # TODO: check if there is a better way (update unexplored moves earlier)
+        if len(unexplored_moves) == 1:         
             self.is_fully_expanded = True
 
-        return new_child, move
+        return new_child
 
     def backpropagate(self, winner):
         '''
@@ -94,12 +98,13 @@ class Node:
         The results of the rollout are backpropagated to update the values of the nodes along the path
         from the root to the newly expanded node. This update is based on the outcomes of the simulated episodes.
         '''
+        # visit_count for root node
+        # TODO: check if fixed value of 1, maybe. (calculate)
+        self.visit_count += 1
         if self.parent is None:
-            self.visit_count += 1
             return None
 
-        self.visit_count += 1
-
+        # TODO: double check if correct (+/- signs)
         if winner is not None:
             if self.parent.game.current_player.color == winner:
                 self.value_sum += 1
@@ -120,16 +125,15 @@ def simulate(game: Game):
     During a rollout, random actions or actions determined by a simple policy are taken from
     the newly added node to the end of the episode or until a termination condition is met.
     '''
-    # simulate a random game for the new child
+    # check if game is done (winner or draw)
     if game.done:
-        if game.winner is None:
-            return None
-        # check for winning player (white/black)
+        # check if game has a winner or not (draw = [None])
         return game.winner
 
-    random_move = sample(sorted(game.get_valid_moves()), 1)[0]
     # TODO: maybe later play x random moves at once
-
+    random_move = sample(sorted(game.get_valid_moves()), 1)[0]
+    
+    # simulate a random game for the new child
     new_game = game.copy()
     new_game.play(*random_move)
     return simulate(new_game)
@@ -139,57 +143,41 @@ def simulate(game: Game):
 
 class MCTS(Agent):
     '''
+    player=1
     '''
-    # player=1 ...
 
     def __init__(self):
+        super().__init__()
         self.root = Node()
-        super.__init__()
+        self.current_node = self.root
 
-    def play(self, game: Game) -> tuple:
-        pass
-    
-    def search_best_move():
-        pass
+
+    # TODO: set "C" to 0 before choosing best_child / actual move (done) | check if better way to do that later
+    # TODO: set timer (max. 5 sec / move, etc.)
+    def play(self, game: Game, num_iterations = 100) -> tuple:       
+        root = Node(game)
+        current_node = root
+        for _ in tqdm(range(num_iterations)):
+            if current_node.game.done:
+                current_node = root
+                continue
+            if not current_node.is_fully_expanded:
+                new_child = current_node.expand()
+                value_update = simulate(new_child.game)
+                new_child.backpropagate(value_update)
+                current_node = root
+            
+            best_child = current_node.select_child()
+            assert best_child is not None          
+            current_node = best_child
+
+        old_C = parameters['C']
+        parameters['C'] = 0
+        best_child = root.select_child().game.last_move
+        parameters['C'] = old_C
+
+        return best_child
         
 
     def train(self, num_iterations):
-        
-        self.root.select_child()
-
-
-
-    # if not self.is_fully_expanded:
-    # new_child = self.expand()
-    # # -> simulate random game(s) from the new child
-    # winner = simulate(new_child.game)
-    # # -> backpropagate the result/winner of the simulation back to the root node
-    # new_child.backpropagate(winner)
-
-
-    # import torch
-
-    # from game import Connect2Game
-    # from model import Connect2Model
-    # from trainer import Trainer
-
-    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-    # args = {
-    #     'batch_size': 64,
-    #     'numIters': 500,                                # Total number of training iterations
-    #     'num_simulations': 100,                         # Total number of MCTS simulations to run when deciding on a move to play
-    #     'numEps': 100,                                  # Number of full games (episodes) to run during each iteration
-    #     'numItersForTrainExamplesHistory': 20,
-    #     'epochs': 2,                                    # Number of epochs of training per iteration
-    #     'checkpoint_path': 'latest.pth'                 # location to save latest set of weights
-    # }
-
-    # game = Connect2Game()
-    # board_size = game.get_board_size()
-    # action_size = game.get_action_size()
-
-    # model = Connect2Model(board_size, action_size, device)
-
-    # trainer = Trainer(game, model, args)
-    # trainer.learn()
+        pass
