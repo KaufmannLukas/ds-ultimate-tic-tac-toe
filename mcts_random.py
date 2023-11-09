@@ -1,0 +1,52 @@
+
+from environments.game import Game
+from agents.mcts import MCTS
+from agents.random import Random
+
+import pandas as pd
+from tqdm import tqdm
+
+if __name__ == "__main__":
+
+    num_iterations_list = [
+        10,
+        20,
+        50,
+        100,
+        500,
+        1000
+    ]
+
+    num_of_games = 100
+    mcts_agent = MCTS()
+    random_agent = Random()
+
+    winner_table = []
+
+    for num_iterations in num_iterations_list:
+        print(f"num_iterations: {num_iterations}")
+        for i in tqdm(range(num_of_games)):
+                
+            game = Game()
+            counter = 0
+
+            while not game.done:
+                if (counter+i) % 2 == 0:
+                    next_move = mcts_agent.play(game, num_iterations=num_iterations)
+                else:
+                    next_move = random_agent.play(game)
+                game.play(*next_move)
+                counter += 1
+
+            if i % 2 == 0:
+                # player_x = mcts_agent
+                # player_o = random_agent
+                winner_table.append([i, num_iterations, game.white.color, game.winner])
+            else:
+                winner_table.append([i, num_iterations, game.black.color, game.winner])
+
+        winner_dataframe = pd.DataFrame(winner_table, columns=["game_nr", "num_iter", "mcts_color", "winner"])
+        winner_dataframe.to_csv(f"data/random_vs_mcts_{num_iterations}.csv")
+        winner_table = []
+                
+    
