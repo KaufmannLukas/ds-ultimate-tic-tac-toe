@@ -1,11 +1,15 @@
 from math import log, sqrt
 from random import sample
+import logging
 
 import numpy as np
 from tqdm import tqdm
 
 from environments.game import Game
 from agents.agent import Agent
+
+
+logger = logging.getLogger(__name__)
 
 parameters = {
     "C": 2,  # exploration parameter
@@ -144,6 +148,7 @@ class MCTS(Agent):
     '''
 
     def __init__(self):
+        logger.info("MCTS agent started")
         super().__init__()
         self.root = Node()
         self.current_node = self.root
