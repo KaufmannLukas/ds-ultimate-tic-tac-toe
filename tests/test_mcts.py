@@ -124,9 +124,8 @@ class TestMCTS(unittest.TestCase):
         child_1.value_sum = 0
         child_2.value_sum = 1
         child_3.value_sum = 3
-        
-        self.assertEqual(root.select_child(), child_1)
 
+        self.assertEqual(root.select_child(), child_1)
 
     def test_expand(self):
         """test expanding nodes"""

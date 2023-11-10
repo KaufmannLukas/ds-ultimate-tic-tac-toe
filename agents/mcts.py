@@ -39,7 +39,7 @@ class Node:
 
         self.visit_count = 0
         self.value_sum = 0
-        self.possible_actions = self.game.get_valid_moves() # TODO: Hä
+        self.possible_actions = self.game.get_valid_moves()  # TODO: Hä
         self.children = []
         self.parent = parent
         self.is_fully_expanded = False
@@ -86,7 +86,7 @@ class Node:
         self.children.append(new_child)
 
         # TODO: check if there is a better way (update unexplored moves earlier)
-        if len(unexplored_moves) == 1:         
+        if len(unexplored_moves) == 1:
             self.is_fully_expanded = True
 
         return new_child
@@ -114,7 +114,6 @@ class Node:
         self.parent.backpropagate(winner)
 
 
-
 def simulate(game: Game):
     '''
     Rollout:
@@ -132,13 +131,11 @@ def simulate(game: Game):
 
     # TODO: maybe later play x random moves at once
     random_move = sample(sorted(game.get_valid_moves()), 1)[0]
-    
+
     # simulate a random game for the new child
     new_game = game.copy()
     new_game.play(*random_move)
     return simulate(new_game)
-
-
 
 
 class MCTS(Agent):
@@ -151,10 +148,9 @@ class MCTS(Agent):
         self.root = Node()
         self.current_node = self.root
 
-
     # TODO: set "C" to 0 before choosing best_child / actual move (done) | check if better way to do that later
     # TODO: set timer (max. 5 sec / move, etc.)
-    def play(self, game: Game, num_iterations = 100) -> tuple:       
+    def play(self, game: Game, num_iterations=100) -> tuple:
         root = Node(game)
         current_node = root
         for _ in tqdm(range(num_iterations), disable=True):
@@ -166,9 +162,9 @@ class MCTS(Agent):
                 value_update = simulate(new_child.game)
                 new_child.backpropagate(value_update)
                 current_node = root
-            
+
             best_child = current_node.select_child()
-            assert best_child is not None          
+            assert best_child is not None
             current_node = best_child
 
         old_C = parameters['C']
@@ -177,7 +173,6 @@ class MCTS(Agent):
         parameters['C'] = old_C
 
         return best_child
-        
 
     def train(self, num_iterations):
         pass
