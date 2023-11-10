@@ -9,12 +9,14 @@ from tqdm import tqdm
 if __name__ == "__main__":
 
     num_iterations_list = [
-        10,
-        20,
-        50,
-        100,
-        500,
-        1000
+        #10,
+        #20,
+        #50,
+        #100,
+        #500,
+        #1000,
+        2000,
+        5000
     ]
 
     num_of_games = 100
