@@ -96,11 +96,17 @@ class TestGame(unittest.TestCase):
 
         # self.game.play(0, 4) #b
 
-    def test_game_copy(self):
+    def test_copy_method(self):
+        game_copy = self.game.copy()
 
-        cp = self.game.copy()
-        self.assertEqual(cp, self.game)
-        self.assertFalse(cp is self.game)
+        # Verify that the copy is equal but not the same object
+        self.assertEqual(self.game, game_copy)
+        self.assertIsNot(self.game, game_copy)
+
+        # Verify that modifications to the copy do not affect the original
+        game_copy.white.board[0, 0] = True
+        self.assertNotEqual(self.game.white.board[0, 0], game_copy.white.board[0, 0])
+
 
     def test_set(self):
         self.assertTrue(bool({self.game}))
@@ -109,6 +115,55 @@ class TestGame(unittest.TestCase):
         assert_type(self.game.get_valid_moves(), set)
         valid_first_moves = {(x, y) for x in range(9) for y in range(9)}
         self.assertEqual(self.game.get_valid_moves(), valid_first_moves)
+
+
+    def test_key_method(self):
+        self.game.white.board[0, 0] = True
+        key1 = self.game._Game__key()  # Use the mangled name
+
+        # Change the game state and get a new key
+        self.game.white.board[0, 1] = True
+        key2 = self.game._Game__key()
+
+        # Check that the keys are different
+        self.assertNotEqual(key1, key2)
+
+
+    def test_hash_method(self):
+        initial_hash = hash(self.game)
+
+        # Make a change and check if hash changes
+        self.game.white.board[0, 0] = True
+        new_hash = hash(self.game)
+
+        self.assertNotEqual(initial_hash, new_hash)
+
+    def test_different_states_produce_different_hashes(self):
+        game1 = Game()
+        game2 = Game()
+
+        game1.white.board[0, 0] = True  # Alter the state of game1
+
+        self.assertNotEqual(hash(game1), hash(game2))
+
+    def test_different_states_are_not_equal(self):
+        game1 = Game()
+        game2 = Game()
+
+        game1.white.board[0, 0] = True  # Alter the state of game1
+
+        self.assertNotEqual(game1, game2)
+
+    def test_eq_method(self):
+        game_copy = self.game.copy()
+        self.assertEqual(self.game, game_copy)
+
+        # Make a change and check if they are still considered equal
+        game_copy.white.board[0, 0] = True
+        self.assertNotEqual(self.game, game_copy)
+
+
+
 
 
 if __name__ == '__main__':
