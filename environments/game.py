@@ -1,6 +1,9 @@
-from copy import deepcopy
+import logging
 
 import numpy as np
+
+
+logger = logging.getLogger(__name__)
 
 
 class Game:
@@ -19,23 +22,83 @@ class Game:
     ])
 
     class _Player:
+        """
+        Represents a player in the Ultimate Tic-Tac-Toe game.
+
+        This class holds the state and history of a player's moves, including the
+        current state of their board, the wins in each of the 9 sub-boards, and
+        the player's color.
+
+        Attributes:
+            history (list): A list to record the history of the player's moves.
+            board (numpy.ndarray): A 9x9 numpy array representing the game board,
+                where each element indicates whether the cell is occupied by the player.
+            wins (numpy.ndarray): A 1D numpy array of length 9, where each element
+                represents whether the player has won in the corresponding sub-board.
+            color: The color assigned to the player, used to differentiate between players.
+
+        Args:
+            color: An identifier for the player's color or symbol.
+        """
+
         def __init__(self, color):
+            """
+            Initializes a new player with a given color.
+
+            The player's history is initialized as an empty list, the board is initialized
+            as a 9x9 matrix of zeros (indicating no moves made), and the wins array is
+            initialized indicating no sub-board wins.
+
+            Args:
+                color: An identifier for the player's color or symbol.
+            """
             self.history = []
             self.board = np.zeros((9, 9), dtype=bool)
             self.wins = np.zeros((9,), dtype=bool)
             self.color = color
 
+        def copy(self):
+            """
+            Creates a copy of this player instance.
+
+            Returns a new _Player instance with the same state (history, board, wins, color)
+            as the current instance, but as a separate object.
+
+            Returns:
+                _Player: A new instance of _Player with the same state.
+            """
+            new_player = Game._Player(self.color)
+            new_player.history = self.history.copy()
+            new_player.board = np.copy(self.board)
+            new_player.wins = np.copy(self.wins)
+            return new_player
+
     def __init__(self):
+        """
+        Initializes a new game of Ultimate Tic-Tac-Toe.
+
+        This method sets up the game by initializing two players, white and black,
+        each represented by an instance of the _Player class. The game starts with
+        no winner, not yet finished, and with no moves made.
+
+        Attributes:
+            white (Game._Player): The player playing with white pieces, symbolized as "X".
+            black (Game._Player): The player playing with black pieces, symbolized as "O".
+            winner: Stores the winning player once the game concludes. None if the game is ongoing or a draw.
+            done (bool): Indicates whether the game has finished. False initially.
+            last_move: Stores the last move made in the game. None initially, and updated as the game progresses.
+        """
         self.white = Game._Player(color="white (X)")
         self.black = Game._Player(color="black (O)")
         self.winner = None
         self.done = False
         self.last_move = None
 
+    # TODO: maybe implement immutable game-states later
     def __key(self):
         return (
-            hash(str(self.white.board)),
-            hash(str(self.black.board)),
+            hash(np.ndarray.tobytes(self.white.board)),
+            hash(np.ndarray.tobytes(self.black.board)),
             self.winner,
             self.done,
             self.last_move,
@@ -44,26 +107,26 @@ class Game:
     def __hash__(self) -> int:
         return hash(self.__key())
 
-    def copy(self):
-        return deepcopy(self)
-
     def __eq__(self, other):
         return self.__key() == other.__key()
 
     @property
     def current_player(self):
+        """
+        Determines the current player based on the game's history.
+
+        This property checks the length of the move history for each player. If both players 
+        have made the same number of moves, it is the white player's turn. Otherwise, 
+        it's the black player's turn. This approach assumes the white player always makes 
+        the first move.
+
+        Returns:
+            _Player: The player (either white or black) whose turn it is to make a move.
+        """
         if len(self.white.history) == len(self.black.history):
             return self.white
         return self.black
 
-    # @property
-    # def last_move(self):
-    #     if not self.white.history and not self.black.history:
-    #         return None
-    #     if len(self.white.history) == len(self.black.history):
-    #         return self.black.history[-1]
-    #     else:
-    #         return self.white.history[-1]
 
     @property
     def blocked_fields(self):
@@ -94,6 +157,16 @@ class Game:
         moves[:len(white_moves)*2:2] = white_moves
         moves[1:len(black_moves)*2:2] = black_moves
         return moves
+
+    def copy(self):
+        new_game = Game()
+        # Assuming _Player also has a custom copy method
+        new_game.white = self.white.copy()
+        new_game.black = self.black.copy()
+        new_game.winner = self.winner
+        new_game.done = self.done
+        new_game.last_move = self.last_move
+        return new_game
 
     def get_valid_moves(self) -> set:
         '''
@@ -130,9 +203,6 @@ class Game:
         current_player.history.append((game_idx, field_idx))
         self.last_move = (game_idx, field_idx)
         current_player.board[game_idx, field_idx] = True
-
-        # if self.black.wins[game_idx] == True or self.white.wins[game_idx] == True:
-        #     return None
 
         win_local_game = False
         win_global_game = False
