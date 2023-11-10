@@ -130,6 +130,19 @@ class Game:
 
     @property
     def blocked_fields(self):
+        """
+        Computes the blocked fields of the Ultimate Tic-Tac-Toe board.
+
+        A field is considered blocked if it's either already occupied by a player or part of
+        a sub-game (3x3 grid) that has been won. This property also takes into account the rules
+        for sending a player to a specific sub-game based on the last move. If the targeted
+        sub-game is completed, the player is free to move in any non-completed sub-game.
+
+        Returns:
+            numpy.ndarray: A 9x9 Boolean array where True represents a blocked field and
+            False represents a free field. If the last move is None (i.e., at the start of the game),
+            all fields are unblocked, indicated by an array of False values.
+        """
         if self.last_move is None:
             return np.zeros((9, 9), dtype=bool)
 
@@ -150,6 +163,21 @@ class Game:
 
     @property
     def complete_history(self):
+        """
+        Constructs the complete move history of the game in the order the moves were made.
+
+        This property interleaves the moves made by the white and black players to recreate 
+        the sequence of moves as they happened in the game. It assumes that the white player 
+        makes the first move. The history is represented as a list of moves, where each move 
+        is a tuple indicating the position played.
+
+        If the number of moves made by each player is not equal (i.e., white has made one more move), 
+        the last move in the list will be from the white player.
+
+        Returns:
+            list: A list of up to 81 moves (maximum in a 9x9 Ultimate Tic-Tac-Toe game), 
+            where each element is a move tuple or None if the move slot is unoccupied.
+        """
         white_moves = self.white.history
         black_moves = self.black.history
         # Interleave the moves, assuming white starts first
@@ -169,9 +197,19 @@ class Game:
         return new_game
 
     def get_valid_moves(self) -> set:
-        '''
-        Returns a list of all possible game moves as tuples of (game_idx, field_idx)
-        '''
+        """
+        Identifies and returns all possible valid moves for the current game state.
+
+        This method computes valid moves based on the current state of the board, considering
+        which fields are blocked. A field is valid for a move if it is not blocked. The method
+        checks the `blocked_fields` property to determine the status of each field on the board.
+
+        Returns:
+            set: A set of tuples, where each tuple represents a valid move. Each tuple consists
+            of two integers: `game_idx` and `field_idx`. `game_idx` represents the index of the 
+            sub-game (3x3 grid) on the board, and `field_idx` represents the specific field index 
+            within that sub-game.
+        """
         valid_fields = ~self.blocked_fields
         # Get all indexes where the matrix is True
         valid_indexes = np.argwhere(valid_fields)
@@ -184,9 +222,21 @@ class Game:
         return not self.blocked_fields[game_idx, field_idx]
 
     def check_win(board):
-        '''
-        Get a 3x3 board and checks if there is a winning combination hit.
-        '''
+        """
+        Determines whether a winning combination has been achieved on a given 3x3 board.
+
+        This function assesses the provided board against a set of predefined winning combinations.
+        A winning combination is achieved if any of these combinations is fully matched on the board.
+        The function uses a bitwise AND operation to identify positions on the board that match 
+        any winning combination, then checks if any of these combinations are completely filled.
+
+        Args:
+            board (numpy.ndarray): A 3x3 numpy array representing a Tic-Tac-Toe board, where each cell
+            is a boolean indicating whether it is occupied by the current player.
+
+        Returns:
+            bool: True if a winning combination is found, False otherwise.
+        """
         win_combs = Game.WINNING_COMBINATIONS  # get all combinations to win a game
         win_mask = win_combs & board  # get just the moves that hits a winning combination
         # check if all hits for a winning combination were made
@@ -194,6 +244,25 @@ class Game:
         return np.any(win_list)  # determine if a winning combination was hit
 
     def play(self, game_idx, field_idx):
+        """
+        Executes a move in the game, updates the game state, and checks for wins or draw.
+
+        This method allows a player to make a move at the specified indices, updates the player's
+        history and board state, and then checks for any local or global wins. If a move is made on a 
+        blocked field, a ValueError is raised. The method also checks for a draw if all fields are blocked.
+
+        Args:
+            game_idx (int): The index of the sub-game (3x3 grid) where the move is made.
+            field_idx (int): The index of the field within the specified sub-game where the move is made.
+
+        Returns:
+            tuple: A tuple of two boolean values:
+                - The first boolean indicates if there is a local game win (True if won, False otherwise).
+                - The second boolean indicates if there is a global game win (True if won, False otherwise).
+
+        Raises:
+            ValueError: If a move is attempted on a blocked field.
+        """
         if not self.check_valid_move(game_idx, field_idx):
             print(self)
             raise ValueError(
@@ -224,6 +293,23 @@ class Game:
         return win_local_game, win_global_game
 
     def _reshape_board(board):
+        """
+        Reshapes a 9x9 Ultimate Tic-Tac-Toe board for visual representation purposes.
+
+        The original 9x9 board is structured such that each row represents a single game (3x3 sub-board),
+        and each column within that row represents a field within that game. This method rearranges the board
+        so that it can be visually represented in a format where each 3x3 block corresponds to a sub-game.
+        In the reshaped board, the first row of a whole game (3x3 block) is composed of the first rows of the
+        first three games, and so on, effectively grouping the sub-games into their visual representation.
+
+        Args:
+            board (numpy.ndarray): A 9x9 numpy array representing the original state of the board, where each
+            row corresponds to a single 3x3 sub-game.
+
+        Returns:
+            numpy.ndarray: A 9x9 numpy array representing the reshaped board suitable for visual representation,
+            with each 3x3 block corresponding to one of the nine sub-games.
+        """
         # 3x3x9-Array reshape
         reshaped = board.reshape(3, 3, 3, 3)
 
@@ -237,6 +323,11 @@ class Game:
         reshaped_board = Game._reshape_board(game)
 
         blocked_fields = Game._reshape_board(self.blocked_fields)
+
+        blank_board = np.zeros((9,9))
+        blank_board[self.last_move] = True
+        last_move = Game._reshape_board(blank_board)
+
 
         rows = []
         for i in range(9):
@@ -255,6 +346,9 @@ class Game:
                             row.append("·")
                         else:
                             row.append("•")
+                if last_move[i, j]:
+                    row[-1] = '\033[1m' + row[-1] + '\033[0m'
+                    #row.append('\033[0m')
             if i in (3, 6):
                 rows.append("\n")
             rows.append("  ".join(row) + "\n")
