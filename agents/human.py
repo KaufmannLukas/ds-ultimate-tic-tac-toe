@@ -10,7 +10,8 @@ class Human(Agent):
     def play(self, game: Game) -> tuple:
         valid_move = False
         while not valid_move:
-            inpt = input("Enter your move! >> ") # (e.g., '2 3', or '23', or '2,3')
+            # (e.g., '2 3', or '23', or '2,3')
+            inpt = input("Enter your move! >> ")
             nums = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
             move = []
             counter = 0
@@ -24,6 +25,5 @@ class Human(Agent):
             if game.check_valid_move(*move):
                 break
             print(f"{move} is not a valid move")
-            
+
         return move
-    

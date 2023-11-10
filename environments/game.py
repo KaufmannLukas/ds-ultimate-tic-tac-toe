@@ -84,7 +84,7 @@ class Game:
 
         blocked_fields = blocked_fields | blocked_games
         return blocked_fields
-    
+
     @property
     def complete_history(self):
         white_moves = self.white.history

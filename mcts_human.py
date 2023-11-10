@@ -20,6 +20,5 @@ if __name__ == "__main__":
         print(f"last move: ({next_move[0]+1}, {next_move[1]+1})")
         game.play(*next_move)
         counter += 1
-        
 
     print(game)
