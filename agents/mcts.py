@@ -1,6 +1,7 @@
 from math import log, sqrt
 from random import sample
 import logging
+from time import time
 
 import numpy as np
 from tqdm import tqdm
@@ -152,13 +153,21 @@ class MCTS(Agent):
         super().__init__()
         self.root = Node()
         self.current_node = self.root
+        self.memory = None
 
     # TODO: set "C" to 0 before choosing best_child / actual move (done) | check if better way to do that later
     # TODO: set timer (max. 5 sec / move, etc.)
-    def play(self, game: Game, num_iterations=100) -> tuple:
+    def play(self, game: Game, num_iterations=100, max_time=None, disable_progress_bar=True) -> tuple:
+        start_time = time()
+
         root = Node(game)
+        if self.memory is not None:
+            for child in self.memory.children:
+                if game == child.game:
+                    root = child
+                    break
         current_node = root
-        for _ in tqdm(range(num_iterations), disable=True):
+        for _ in tqdm(range(num_iterations), disable=disable_progress_bar):
             if current_node.game.done:
                 current_node = root
                 continue
@@ -172,12 +181,18 @@ class MCTS(Agent):
             assert best_child is not None
             current_node = best_child
 
+            if time() - start_time > max_time:
+                break
+        
+
         old_C = parameters['C']
         parameters['C'] = 0
-        best_child = root.select_child().game.last_move
+        best_child = root.select_child()
+        next_move = best_child.game.last_move
         parameters['C'] = old_C
 
-        return best_child
+        self.memory = best_child
+        return next_move
 
     def train(self, num_iterations):
         pass
