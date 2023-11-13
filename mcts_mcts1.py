@@ -39,31 +39,31 @@ if __name__ == "__main__":
         memory = pickle.load(file)
 
     num_of_games = 100
-    random_agent = Random()
+    mcts_no_mem = MCTS()
 
     winner_table = []
 
     for num_iterations in num_iterations_list:
         print(f"num_iterations: {num_iterations}")
         for i in tqdm(range(num_of_games)):
-            mcts_agent = MCTS(memory=memory)
+            mcts_agent_01 = MCTS(memory=memory)
 
-            logger.info("Stat new Game")
+            logger.info("Start new Game")
             game = Game()
             counter = 0
 
             while not game.done:
                 if (counter+i) % 2 == 0:
-                    next_move = mcts_agent.play(
+                    next_move = mcts_agent_01.play(
                         game, num_iterations=num_iterations)
                 else:
-                    next_move = random_agent.play(game)
+                    next_move = mcts_no_mem.play(game, num_iterations=1000)
                 game.play(*next_move)
                 counter += 1
             logger.info("Game done")
             if i % 2 == 0:
                 # player_x = mcts_agent
-                # player_o = random_agent
+                # player_o = mcts_no_mem
                 winner_table.append(
                     [i, num_iterations, game.white.color, game.winner])
             else:
@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
         winner_dataframe = pd.DataFrame(
             winner_table, columns=["game_nr", "num_iter", "mcts_color", "winner"])
-        winner_dataframe.to_csv(f"data/random_vs_mcts_{num_iterations}_memory_1.csv")
+        winner_dataframe.to_csv(f"data/mcts_no_mem_vs_mcts_agent_01_{num_iterations}.csv")
         winner_table = []
 
         logger.info("mcts main stopped")
