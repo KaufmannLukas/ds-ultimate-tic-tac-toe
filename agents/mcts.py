@@ -2,6 +2,8 @@ from math import log, sqrt
 from random import sample
 import logging
 from time import time
+import pickle
+
 
 import numpy as np
 from tqdm import tqdm
@@ -148,24 +150,44 @@ class MCTS(Agent):
     player=1
     '''
 
-    def __init__(self):
+    def __init__(self, memory=None):
+        # memory (if given) is stored as a pickle file and initiated here 
         logger.info("MCTS agent started")
         super().__init__()
-        self.root = Node()
-        self.current_node = self.root
-        self.memory = None
+        #self.root = root
+        #self.current_node = self.root
+        '''
+        memory: represents the node itself, but also contains their children with their values at the same time
+        '''
+        self.memory = memory # "big tree"
+        '''
+        st_memory: only remembers the calculation of the path you're currently playing on
+        '''
+        #self.st_memory = None # "small tree"
 
     # TODO: set "C" to 0 before choosing best_child / actual move (done) | check if better way to do that later
     # TODO: set timer (max. 5 sec / move, etc.)
-    def play(self, game: Game, num_iterations=100, max_time=None, disable_progress_bar=True) -> tuple:
+    def play(
+            self, 
+            game: Game, 
+            num_iterations=100, 
+            max_time=None, 
+            disable_progress_bar=True,
+            root = None, # just for training
+            ) -> tuple:
+        
         start_time = time()
 
-        root = Node(game)
         if self.memory is not None:
-            for child in self.memory.children:
-                if game == child.game:
-                    root = child
-                    break
+            if self.memory.game == game:
+                root = self.memory
+            else:
+                for child in self.memory.children:
+                    if game == child.game:
+                        root = child
+                        break   
+        
+
         current_node = root
         for _ in tqdm(range(num_iterations), disable=disable_progress_bar):
             if current_node.game.done:
@@ -181,7 +203,7 @@ class MCTS(Agent):
             assert best_child is not None
             current_node = best_child
 
-            if time() - start_time > max_time:
+            if max_time and time() - start_time > max_time:
                 break
         
 
@@ -193,6 +215,25 @@ class MCTS(Agent):
 
         self.memory = best_child
         return next_move
+    
 
-    def train(self, num_iterations):
-        pass
+
+    def train(self, num_iterations, max_time):
+        game = Game()
+        root = Node()
+
+        next_move = self.play(game,
+                              num_iterations=num_iterations,
+                              max_time=max_time,
+                              disable_progress_bar=False,
+                              root=root)
+        logger.info(f"next move: {next_move}")
+        with open(f"data/mcts_ltmm.pkl", 'wb') as file:
+            pickle.dump(root, file=file)
+        
+
+
+
+
+
+    
