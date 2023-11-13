@@ -183,38 +183,24 @@ class MCTS(Agent):
         logger.info("Start play")
         start_time = time()
 
+        root = Node(game)
+
+        # checking if a memory is available
         if self.memory is not None:
             logger.debug("have memory")
             if self.memory.game == game:
                 logger.debug("memory root is game")
+                # if so, than start first move from board/game state of memory
                 root = self.memory
             else:
                 logger.debug("memory root is parent of game")
+                # if no memory available, 
                 for child in self.memory.children:
                     if game == child.game:
                         logger.debug("child found")
                         root = child
                         break
-                else:
-                    logger.debug("make new root Node")
-                    root = Node(game)
-        else:
-            logger.info("has no memory")
-            root = Node(game)
-
-        # # Original code
-        # if current_node.game.done:
-        #     current_node = root
-        #     continue
-
-        # # Modified code
-        # if current_node is None:
-        #     current_node = root
-        #     continue
-        # if current_node.game.done:
-        #     current_node = root
-        #     continue
-
+                    
         current_node = root
         logger.debug(f"current_node: \n{current_node}" )
         for _ in tqdm(range(num_iterations), disable=disable_progress_bar):
