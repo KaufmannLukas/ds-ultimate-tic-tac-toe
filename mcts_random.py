@@ -3,14 +3,17 @@ from environments.game import Game
 from agents.mcts import MCTS
 from agents.random import Random
 import logging
+import pickle
 
 import pandas as pd
 from tqdm import tqdm
 
 
-logging.basicConfig(level=logging.INFO,
+logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    filename="log.log")
+                    filename="log_mcts_random.log",
+                    filemode='w+'
+                    )
 
 
 logger = logging.getLogger(__name__)
@@ -31,8 +34,11 @@ if __name__ == "__main__":
         # 5000
     ]
 
+    logger.info("load mcts memory")
+    with open("data/mcts_ltmm.pkl", 'rb') as file:
+        memory = pickle.load(file)
+
     num_of_games = 10
-    mcts_agent = MCTS()
     random_agent = Random()
 
     winner_table = []
@@ -40,7 +46,9 @@ if __name__ == "__main__":
     for num_iterations in num_iterations_list:
         print(f"num_iterations: {num_iterations}")
         for i in tqdm(range(num_of_games)):
+            mcts_agent = MCTS(memory=memory)
 
+            logger.info("Stat new Game")
             game = Game()
             counter = 0
 
@@ -52,7 +60,7 @@ if __name__ == "__main__":
                     next_move = random_agent.play(game)
                 game.play(*next_move)
                 counter += 1
-
+            logger.info("Game done")
             if i % 2 == 0:
                 # player_x = mcts_agent
                 # player_o = random_agent

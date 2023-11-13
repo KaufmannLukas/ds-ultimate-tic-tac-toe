@@ -152,18 +152,22 @@ class MCTS(Agent):
 
     def __init__(self, memory=None):
         # memory (if given) is stored as a pickle file and initiated here 
-        logger.info("MCTS agent started")
+        logger.info("MCTS agent initialized")
         super().__init__()
         #self.root = root
         #self.current_node = self.root
         '''
         memory: represents the node itself, but also contains their children with their values at the same time
         '''
-        self.memory = memory # "big tree"
+        if memory is not None:
+            logger.info("load memory")
+            self.memory = memory
+        else:
+            self.memory = None
         '''
         st_memory: only remembers the calculation of the path you're currently playing on
         '''
-        #self.st_memory = None # "small tree"
+        #self.st_memory = None
 
     # TODO: set "C" to 0 before choosing best_child / actual move (done) | check if better way to do that later
     # TODO: set timer (max. 5 sec / move, etc.)
@@ -176,19 +180,43 @@ class MCTS(Agent):
             root = None, # just for training
             ) -> tuple:
         
+        logger.info("Start play")
         start_time = time()
 
         if self.memory is not None:
+            logger.debug("have memory")
             if self.memory.game == game:
+                logger.debug("memory root is game")
                 root = self.memory
             else:
+                logger.debug("memory root is parent of game")
                 for child in self.memory.children:
                     if game == child.game:
+                        logger.debug("child found")
                         root = child
-                        break   
-        
+                        break
+                else:
+                    logger.debug("make new root Node")
+                    root = Node(game)
+        else:
+            logger.info("has no memory")
+            root = Node(game)
+
+        # # Original code
+        # if current_node.game.done:
+        #     current_node = root
+        #     continue
+
+        # # Modified code
+        # if current_node is None:
+        #     current_node = root
+        #     continue
+        # if current_node.game.done:
+        #     current_node = root
+        #     continue
 
         current_node = root
+        logger.debug(f"current_node: \n{current_node}" )
         for _ in tqdm(range(num_iterations), disable=disable_progress_bar):
             if current_node.game.done:
                 current_node = root
