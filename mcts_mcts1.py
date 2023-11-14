@@ -38,7 +38,7 @@ if __name__ == "__main__":
     with open("data/mcts_ltmm.pkl", 'rb') as file:
         memory = pickle.load(file)
 
-    num_of_games = 100
+    num_of_games = 1000
     mcts_no_mem = MCTS()
 
     winner_table = []
@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
         winner_dataframe = pd.DataFrame(
             winner_table, columns=["game_nr", "num_iter", "mcts_color", "winner"])
-        winner_dataframe.to_csv(f"data/mcts_no_mem_vs_mcts_agent_01_{num_iterations}.csv")
+        winner_dataframe.to_csv(f"data/mcts_no_mem_vs_mcts_agent_01_2_{num_iterations}.csv")
         winner_table = []
 
         logger.info("mcts main stopped")
