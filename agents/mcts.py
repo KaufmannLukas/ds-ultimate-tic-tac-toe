@@ -136,12 +136,14 @@ class Node:
 
 
 def count_nodes(node: 'Node'):
+    '''counts number of nodes in MCTS Tree'''
     if len(node.children) == 0:
         return 1
     return 1 + sum(map(count_nodes, node.children))
 
 
 def count_leaves(node: 'Node'):
+    '''counts number of leaf nodes in MCTS Tree'''
     if len(node.children) == 0:
         return 1
     return sum(map(count_leaves, node.children))
@@ -173,24 +175,21 @@ def simulate(game: Game):
 
 class MCTS(Agent):
     '''
-    player=1
+    Agent class for Monte Carlo Tree Search.
     '''
 
     def __init__(self, memory_path=None, update_memory=False):
-        # memory (if given) is stored as a pickle file and initiated here
         logger.info("MCTS agent initialized")
         super().__init__()
-        # self.root = root
-        # self.current_node = self.root
-        '''
-        memory: represents the node itself, but also contains their children with their values at the same time
-        '''
+
+        # memory: represents the node itself, but also contains their children with their values.
         logger.info("load memory")
+        # memory_path represents location of stored memory file.
         self.memory_path = memory_path
-
+        # update_memory: if True, memory file will be overwritten and updated.
         self.update_memory = update_memory
-
         self.memory = Node()
+        # check if memory_path exists.
         if memory_path is not None:
             if os.path.exists(memory_path):
                 self.load_memory()
@@ -226,53 +225,50 @@ class MCTS(Agent):
 
         return node
 
-    # TODO: set "C" to 0 before choosing best_child / actual move (done) | check if better way to do that later
     # TODO: set timer (max. 5 sec / move, etc.)
-
     def play(
             self,
             game: Game,
             num_iterations=100,
             max_time=None,
             disable_progress_bar=True,
-            update_memory=False,
     ) -> tuple:
 
         logger.info("Start play")
         start_time = time()
-
-        self.update_memory = update_memory
 
         # find the current game state in memory
         root = self.find_node_by_game(game)
         current_node = root
         logger.debug(f"current_node: \n{current_node}")
 
+        # play game for x number of iterations
         for _ in tqdm(range(num_iterations), disable=disable_progress_bar):
+            # restart if game is done
             if current_node.game.done:
-                current_node = root  # TODO: do we need that line?
+                current_node = root
                 continue
+            # expand if not fully explored / expanded
             if not current_node.is_fully_expanded:
                 new_child = current_node.expand()
                 value_update = simulate(new_child.game)
                 new_child.backpropagate(value_update)
                 current_node = root
 
+            # select best move
             current_node = current_node.select_child()
 
+            # time limit for calculations
             if max_time and time() - start_time > max_time:
                 break
 
+        # TODO: check if better way than setting "C" to 0 before choosing best_child
         # select the best child with a c value of 0
         old_C = parameters['C']
         parameters['C'] = 0
         best_child = root.select_child()
         next_move = best_child.game.last_move
         parameters['C'] = old_C
-
-        # if save_memory:
-        #     self.memory = best_child
-        #     self.save_memory()  # Save memory after each play
 
         return next_move
 
