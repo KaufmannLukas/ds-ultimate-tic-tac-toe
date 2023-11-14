@@ -207,6 +207,7 @@ class MCTS(Agent):
         """
         node = self.memory
 
+        # TODO: add self.current node to find the node faster.
         for move in game.complete_history:
             found_child = None
             for child in node.children:
@@ -303,23 +304,21 @@ class MCTS(Agent):
 
     def train(self, num_iterations, max_time):
         game = Game()
-        root = Node()
 
         next_move = self.play(game,
                               num_iterations=num_iterations,
                               max_time=max_time,
                               disable_progress_bar=False,
-                              root=root)
+                              )
+        
         logger.info(f"next move: {next_move}")
 
-        # Save the memory at the end of the game
-        with open(f"data/mcts_ltmm.pkl", 'wb') as file:
-            pickle.dump(root, file=file)
+        self.save_memory()
 
-    def __del__(self):
-        logger.info("save memory")
-        if self.update_memory:
-            if self.memory_path is not None:
-                self.save_memory()
-            else:
-                logger.warn("no memory path to store the memory!!!")
+    # def __del__(self):
+    #     logger.info("save memory")
+    #     if self.update_memory:
+    #         if self.memory_path is not None:
+    #             self.save_memory()
+    #         else:
+    #             logger.warn("no memory path to store the memory!!!")
