@@ -1,16 +1,15 @@
+import logging
+import os
+import pickle
 from math import log, sqrt
 from random import sample
-import logging
 from time import time
-import pickle
-
 
 import numpy as np
 from tqdm import tqdm
 
-from environments.game import Game
 from agents.agent import Agent
-
+from environments.game import Game
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +49,9 @@ class Node:
         self.children = []
         self.parent = parent
         self.is_fully_expanded = False
+
+    def __hash__(self) -> int:
+        return hash(self.game)
 
     def select_child(self) -> 'Node':
         '''
@@ -106,19 +108,43 @@ class Node:
         from the root to the newly expanded node. This update is based on the outcomes of the simulated episodes.
         '''
         # visit_count for root node
-        # TODO: check if fixed value of 1, maybe. (calculate)
         self.visit_count += 1
         if self.parent is None:
+            # Handle the root node separately
+            if winner is not None:
+                if self.game.current_player.color == winner:
+                    value_update = 1.0  # Win
+                else:
+                    value_update = 0.0  # Loss
+            else:
+                value_update = 0.5  # Draw
+
+            self.value_sum += value_update
             return None
 
-        # TODO: double check if correct (+/- signs)
+        # Update based on the outcome (win, draw, loss)
         if winner is not None:
             if self.parent.game.current_player.color == winner:
-                self.value_sum += 1
+                value_update = 1.0  # Win
             else:
-                self.value_sum -= 1
+                value_update = 0.0  # Loss
+        else:
+            value_update = 0.5  # Draw
 
+        self.value_sum += value_update
         self.parent.backpropagate(winner)
+
+
+def count_nodes(node: 'Node'):
+    if len(node.children) == 0:
+        return 1
+    return 1 + sum(map(count_nodes, node.children))
+
+
+def count_leaves(node: 'Node'):
+    if len(node.children) == 0:
+        return 1
+    return sum(map(count_leaves, node.children))
 
 
 def simulate(game: Game):
@@ -150,62 +176,81 @@ class MCTS(Agent):
     player=1
     '''
 
-    def __init__(self, memory=None):
-        # memory (if given) is stored as a pickle file and initiated here 
+    def __init__(self, memory_path=None, update_memory=False):
+        # memory (if given) is stored as a pickle file and initiated here
         logger.info("MCTS agent initialized")
         super().__init__()
-        #self.root = root
-        #self.current_node = self.root
+        # self.root = root
+        # self.current_node = self.root
         '''
         memory: represents the node itself, but also contains their children with their values at the same time
         '''
-        if memory is not None:
-            logger.info("load memory")
-            self.memory = memory
-        else:
-            self.memory = None
-        '''
-        st_memory: only remembers the calculation of the path you're currently playing on
-        '''
-        #self.st_memory = None
+        logger.info("load memory")
+        self.memory_path = memory_path
+
+        self.update_memory = update_memory
+
+        self.memory = Node()
+        if memory_path is not None:
+            if os.path.exists(memory_path):
+                self.load_memory()
+
+    def find_node_by_game(self, game: Game):
+        """
+        Find the node in the memory tree corresponding to the given game.
+
+        Args:
+            game (Game): The game instance for which to find the corresponding node.
+
+        Returns:
+            Node or None: The node in the memory tree that corresponds to the given game.
+            Returns None if the node is not found.
+        """
+        node = self.memory
+
+        for move in game.complete_history:
+            found_child = None
+            for child in node.children:
+                if child.game.last_move == move:
+                    found_child = child
+                    break
+
+            if found_child is not None:
+                node = found_child
+            else:
+                # Handle the case where a child node with a matching last move is not found
+                # Create a new node only if the move is not found
+                new_child = Node(game=game, parent=node)
+                node.children.append(new_child)
+                node = new_child
+
+        return node
 
     # TODO: set "C" to 0 before choosing best_child / actual move (done) | check if better way to do that later
     # TODO: set timer (max. 5 sec / move, etc.)
+
     def play(
-            self, 
-            game: Game, 
-            num_iterations=100, 
-            max_time=None, 
+            self,
+            game: Game,
+            num_iterations=100,
+            max_time=None,
             disable_progress_bar=True,
-            root = None, # just for training
-            ) -> tuple:
-        
+            update_memory=False,
+    ) -> tuple:
+
         logger.info("Start play")
         start_time = time()
 
-        root = Node(game)
+        self.update_memory = update_memory
 
-        # checking if a memory is available
-        if self.memory is not None:
-            logger.debug("have memory")
-            if self.memory.game == game:
-                logger.debug("memory root is game")
-                # if so, than start first move from board/game state of memory
-                root = self.memory
-            else:
-                logger.debug("memory root is parent of game")
-                # if no memory available, 
-                for child in self.memory.children:
-                    if game == child.game:
-                        logger.debug("child found")
-                        root = child
-                        break
-                    
+        # find the current game state in memory
+        root = self.find_node_by_game(game)
         current_node = root
-        logger.debug(f"current_node: \n{current_node}" )
+        logger.debug(f"current_node: \n{current_node}")
+
         for _ in tqdm(range(num_iterations), disable=disable_progress_bar):
             if current_node.game.done:
-                current_node = root
+                current_node = root  # TODO: do we need that line?
                 continue
             if not current_node.is_fully_expanded:
                 new_child = current_node.expand()
@@ -213,24 +258,52 @@ class MCTS(Agent):
                 new_child.backpropagate(value_update)
                 current_node = root
 
-            best_child = current_node.select_child()
-            assert best_child is not None
-            current_node = best_child
+            current_node = current_node.select_child()
 
             if max_time and time() - start_time > max_time:
                 break
-        
 
+        # select the best child with a c value of 0
         old_C = parameters['C']
         parameters['C'] = 0
         best_child = root.select_child()
         next_move = best_child.game.last_move
         parameters['C'] = old_C
 
-        self.memory = best_child
-        return next_move
-    
+        # if save_memory:
+        #     self.memory = best_child
+        #     self.save_memory()  # Save memory after each play
 
+        return next_move
+
+    def save_memory(self):
+        """
+        Save the current state of the MCTS tree to a pickle file.
+
+        Args:
+            filename (str): The filename to save the memory to.
+        """
+        logger.info(f"save memory to {self.memory_path}")
+        if self.memory is not None:
+            with open(self.memory_path, 'wb') as file:
+                pickle.dump(self.memory, file)
+                logger.info(f"Memory saved to {self.memory_path}")
+        else:
+            logger.info("No memory to save.")
+
+    def load_memory(self):
+        """
+        Load the MCTS tree state from a pickle file.
+
+        Args:
+            filename (str): The filename to load the memory from.
+        """
+        if os.path.exists(self.memory_path):
+            with open(self.memory_path, 'rb') as file:
+                self.memory = pickle.load(file)
+                logger.info(f"Memory loaded from {self.memory_path}")
+        else:
+            logger.info(f"No memory file found at {self.memory_path}.")
 
     def train(self, num_iterations, max_time):
         game = Game()
@@ -242,12 +315,15 @@ class MCTS(Agent):
                               disable_progress_bar=False,
                               root=root)
         logger.info(f"next move: {next_move}")
+
+        # Save the memory at the end of the game
         with open(f"data/mcts_ltmm.pkl", 'wb') as file:
             pickle.dump(root, file=file)
-        
 
-
-
-
-
-    
+    def __del__(self):
+        logger.info("save memory")
+        if self.update_memory:
+            if self.memory_path is not None:
+                self.save_memory()
+            else:
+                logger.warn("no memory path to store the memory!!!")
