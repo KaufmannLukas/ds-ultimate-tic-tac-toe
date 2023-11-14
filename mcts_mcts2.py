@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     logger.info("load mcts memory 02")
     with open("data/mcts_ltmm_02.pkl", 'rb') as file:
-        memory = pickle.load(file)
+        memory_path = pickle.load(file)
 
     num_of_games = 100
     mcts_no_mem = MCTS()
