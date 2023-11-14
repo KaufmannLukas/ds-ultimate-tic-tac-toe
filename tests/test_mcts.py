@@ -164,13 +164,21 @@ class TestMCTS(unittest.TestCase):
 
         child = Node(parent=root)
         child.backpropagate(None)
-        self.assertEqual(child.value_sum, 0)
+        self.assertEqual(child.value_sum, 0.5)
         self.assertEqual(child.visit_count, 1)
 
         child.backpropagate(child.parent.game.current_player.color)
-        self.assertEqual(child.value_sum, 1)
+        self.assertEqual(child.value_sum, 1.5)
         self.assertEqual(child.visit_count, 2)
 
+
+    def test_count_nodes(self):
+        pass
+
+    def test_count_leaves(self):
+        pass
+
+    
 
 if __name__ == '__main__':
     unittest.main()
