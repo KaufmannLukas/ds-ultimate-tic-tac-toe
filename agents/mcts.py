@@ -50,6 +50,7 @@ class Node:
         self.parent = parent
         self.is_fully_expanded = False
 
+    # TODO: not used yet, delete later maybe?
     def __hash__(self) -> int:
         return hash(self.game)
 
@@ -148,6 +149,12 @@ def count_leaves(node: 'Node'):
         return 1
     return sum(map(count_leaves, node.children))
 
+def deepest_path(): # counts number of moves of deepest path
+    pass
+
+def winner_distribution(): # value sum / visit count from root node
+    pass
+
 
 def simulate(game: Game):
     '''
@@ -202,8 +209,8 @@ class MCTS(Agent):
             game (Game): The game instance for which to find the corresponding node.
 
         Returns:
-            Node or None: The node in the memory tree that corresponds to the given game.
-            Returns None if the node is not found.
+            Node: The node in the memory tree that corresponds to the given game.
+            Returns and creates new_child if the node is not found.
         """
         node = self.memory
 
@@ -218,7 +225,6 @@ class MCTS(Agent):
             if found_child is not None:
                 node = found_child
             else:
-                # Handle the case where a child node with a matching last move is not found
                 # Create a new node only if the move is not found
                 new_child = Node(game=game, parent=node)
                 node.children.append(new_child)
@@ -273,27 +279,28 @@ class MCTS(Agent):
 
         return next_move
 
-    def save_memory(self):
+    def save_memory(self, memory_path=None):
         """
         Save the current state of the MCTS tree to a pickle file.
 
         Args:
-            filename (str): The filename to save the memory to.
+            path (str): location to save the memory to.
         """
         logger.info(f"save memory to {self.memory_path}")
-        if self.memory is not None:
-            with open(self.memory_path, 'wb') as file:
-                pickle.dump(self.memory, file)
-                logger.info(f"Memory saved to {self.memory_path}")
+        if memory_path is not None:
+            path = memory_path
         else:
-            logger.info("No memory to save.")
+            path = self.memory_path
+        if self.memory is not None:
+            with open(path, 'wb') as file:
+                pickle.dump(self.memory, file)
+                logger.info(f"Memory saved to {path}")
+        else:
+            logger.warn("No memory to save.")
 
     def load_memory(self):
         """
         Load the MCTS tree state from a pickle file.
-
-        Args:
-            filename (str): The filename to load the memory from.
         """
         if os.path.exists(self.memory_path):
             with open(self.memory_path, 'rb') as file:
@@ -315,6 +322,7 @@ class MCTS(Agent):
 
         self.save_memory()
 
+    # TODO: figure this out, since update_memory method is defined here.
     # def __del__(self):
     #     logger.info("save memory")
     #     if self.update_memory:
