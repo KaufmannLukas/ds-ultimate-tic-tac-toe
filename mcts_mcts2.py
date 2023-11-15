@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
         winner_dataframe = pd.DataFrame(
             winner_table, columns=["game_nr", "num_iter", "mcts_color", "winner"])
-        winner_dataframe.to_csv(f"data/mcts_no_mem_vs_mcts_agent_02_1_{num_iterations}.csv")
+        winner_dataframe.to_csv(f"data/mcts_no_mem_vs_mcts_agent_02_4_{num_iterations}.csv")
         winner_table = []
 
     mcts_agent_02.save_memory()
@@ -86,5 +86,6 @@ if __name__ == "__main__":
     - memory initation: 10_000_000 iterations from the beginning
     - 100 games against MCTS_no_memory (15.11.23 - 10:00)
     - 100 games against MCTS_no_memory (15.11.23 - 11:00)
+    - 100 games against MCTS_no_memory (15.11.23 - 12:30)
     ...
     '''
