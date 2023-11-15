@@ -35,18 +35,18 @@ if __name__ == "__main__":
     ]
 
     logger.info("load mcts memory 02")
-    with open("data/mcts_ltmm_02.pkl", 'rb') as file:
-        memory_path = pickle.load(file)
+    # with open("data/mcts_ltmm_02.pkl", 'rb') as file:
+    #     memory_path = pickle.load(file)
 
     num_of_games = 100
     mcts_no_mem = MCTS()
 
     winner_table = []
+    mcts_agent_02 = MCTS(memory_path="data/mcts_ltmm_02.pkl", update_memory=True)
 
     for num_iterations in num_iterations_list:
         print(f"num_iterations: {num_iterations}")
         for i in tqdm(range(num_of_games)):
-            mcts_agent_02 = MCTS(memory_path="data/mcts_ltmm_02.pkl", update_memory=True)
 
             logger.info("Start new Game")
             game = Game()
@@ -69,10 +69,22 @@ if __name__ == "__main__":
             else:
                 winner_table.append(
                     [i, num_iterations, game.black.color, game.winner])
+        
 
         winner_dataframe = pd.DataFrame(
             winner_table, columns=["game_nr", "num_iter", "mcts_color", "winner"])
         winner_dataframe.to_csv(f"data/mcts_no_mem_vs_mcts_agent_02_1_{num_iterations}.csv")
         winner_table = []
 
-        logger.info("mcts main stopped")
+    mcts_agent_02.save_memory()
+
+    logger.info("mcts main stopped")
+
+
+    '''
+    training documentation for updatable memory:
+    - memory initation: 10_000_000 iterations from the beginning
+    - 100 games against MCTS_no_memory (15.11.23 - 10:00)
+    - 100 games against MCTS_no_memory (15.11.23 - 11:00)
+    ...
+    '''
