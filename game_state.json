@@ -1,0 +1,25 @@
+{
+    "game_0": { # next game(s) to play next
+        "won_by": "white",
+        "fields": {
+                
+            "field_0": {
+                # visual
+                "white": true, FALSE
+                "black": false, TRUE
+                "last_move": true, (last TRUE/FALSE)
+                "blocked": true,
+                # action
+                "valid_move": false, NONE
+                # maybe only highlight game not fields
+                "field_0": {
+                    # visual
+                    "white": true,
+                    "black": false,
+                    "last_move": true,
+                    # action
+                    "valid_move": false
+
+        }
+    }
+}

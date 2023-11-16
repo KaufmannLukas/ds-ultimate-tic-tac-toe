@@ -18,3 +18,4 @@ dependencies:
   - gymnasium
   - tqdm
   - nodejs
+  - flask
