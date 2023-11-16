@@ -1,3 +1,5 @@
+# TODO: comment all functions
+
 """
     The file contains the PPO class to train with.
     NOTE: All "ALG STEP"s are following the numbers from the original PPO pseudocode.
@@ -13,7 +15,7 @@ import torch.nn as nn
 from torch.distributions import MultivariateNormal
 from torch.optim import Adam
 
-from network import FeedForwardNN
+from agents.network import FeedForwardNN
 
 
 class PPO:
@@ -34,7 +36,7 @@ class PPO:
                 None
         """
         assert(type(env.observation_space) == gym.spaces.box.Box)
-        assert(type(env.action_space) == gym.spaces.box.Box)
+        assert(type(env.action_space) == gym.spaces.Discrete)
         
         self._init_hyperparameters()
 
@@ -42,7 +44,7 @@ class PPO:
         # TODO: check if shape[0] makes sense for us
         self.env = env
         self.obs_dim = env.observation_space.shape[0]
-        self.act_dim = env.action_space.shape[0]
+        self.act_dim = 1 # env.action_space.shape
 
         # ALG STEP 1
         # Initialize actor and critic networks
@@ -115,7 +117,7 @@ class PPO:
 
                 # Calculate gradients and perform backward propagation for actor network
                 self.actor_optim.zero_grad()
-                actor_loss.backward()
+                actor_loss.backward() # TODO: maybe with retain_graph=True (see original repo)
                 self.actor_optim.step()
 
                 # Calculate gradients and perform backward propagation for critic network
@@ -123,7 +125,6 @@ class PPO:
                 critic_loss.backward()
                 self.critic_optim.step()
 
-    # TODO: comment all functions
 
     def rollout(self):
         # Batch data
@@ -139,22 +140,25 @@ class PPO:
         while t < self.timesteps_per_batch:
             # Rewards this episode
             ep_rews = []
-            obs = self.env.reset()
+            obs, _ = self.env.reset()
             done = False
 
             # TODO: make a while loop instead because max_timesteps_per_episode will never reached
             for ep_t in range(self.max_timesteps_per_episode):
+
+                #self.env.render()
                 # Increment timesteps ran this batch so far
                 t += 1
                 # Collect observation
                 batch_obs.append(obs)
                 action, log_prob = self.get_action(obs)
-                obs, rew, done, _, _ = self.env.step(action)
+                obs, rew, done, _, _ = self.env.step(action) # two _ variables because gym changed it in newer version
 
                 # Collect reward, action, and log prob
                 ep_rews.append(rew)
                 batch_acts.append(action)
                 batch_log_probs.append(log_prob)
+
                 if done:
                     break
 
@@ -222,7 +226,3 @@ class PPO:
 
         return V, log_probs
 
-
-env = gym.make('Pendulum-v1')
-model = PPO(env)
-model.learn(10000)

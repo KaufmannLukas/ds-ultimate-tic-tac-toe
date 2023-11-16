@@ -14,13 +14,11 @@ class FeedForwardNN(nn.Module):
         # TODO: adjust layers later (64)
         self.layer1 = nn.Linear(in_dim, 64)
         self.layer2 = nn.Linear(64, 64)
-        self.layer3 = nn.Linear(64, out_dim)
+        self.layer3 = nn.Linear(64, 1)
 
 
     def forward(self, obs):
         # Convert observation to tensor if it's a numpy array
-        print(type(obs))
-        print(obs)
         if isinstance(obs, np.ndarray):
             obs = torch.tensor(obs, dtype=torch.float)
         

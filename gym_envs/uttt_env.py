@@ -20,17 +20,17 @@ class UltimateTicTacToeEnv(gym.Env):
         self.game = Game()
 
 
-        self.reset()
         self.opponent = opponent
         self.opponent_starts = opponent_starts
     
+        self.reset()
 
     def reset(self):
         self.game = Game()
         if self.opponent is not None and self.opponent_starts:
                 opponent_move = self.opponent.play(self.game)
                 self.game.play(*opponent_move)
-        return self.game
+        return game2tensor(self.game), {}
         
 
     def step(self, action: tuple):
@@ -41,16 +41,27 @@ class UltimateTicTacToeEnv(gym.Env):
         if self.opponent is not None:
             counter_action = self.opponent.play(self.game)
             self.game.play(*counter_action)
-        new_state = self.game
+        new_state = game2tensor(self.game)
         reward = 0
         done = self.game.done
 
-        return new_state, reward, done, {}
+        return new_state, reward, done, {}, {}
 
 
     def render(self):
         print(self.game)
 
+def game2tensor(game: Game):
+
+    wb = game.white.board
+    bb = game.black.board
+    bf = game.blocked_fields
+    lm = np.zeros(shape=(9, 9), dtype=bool)
+    if game.last_move:
+        lm[*game.last_move] = True
+
+    res = np.stack([wb, bb, bf, lm])
+    return res
 
 '''
 class UltimateTicTacToeEnv(gym.Env):
