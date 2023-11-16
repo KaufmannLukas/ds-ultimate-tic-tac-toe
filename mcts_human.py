@@ -7,7 +7,6 @@ import pickle
 
 
 if __name__ == "__main__":
-    game = Game()
     #implement the next two lines for using a memory_prone agent (like mcts_agent_01)
     # with open("data/mcts_ltmm_02.pkl", mode="rb") as file:
     #     memory = pickle.load(file)
@@ -16,19 +15,25 @@ if __name__ == "__main__":
     human_agent = Human()
 
     # TODO: improve interface (print local/global wins, etc.)
-    # TODO: implement game loop (replay)
-    counter = 0
-    while not game.done:
-        print("-"*31)
-        print(game)
-        print("-"*31)
-        if counter % 2 != 0:
-            next_move = human_agent.play(game)
-        else:
-            next_move = computer_agent.play(game, num_iterations=1000)
-        print(f"last move: ({next_move[0]+1}, {next_move[1]+1})")
-        result = game.play(*next_move)
-        print(result)
-        counter += 1
+    # TODO: improve game loop (replay)
+    
+    while True:
+        counter = 0
+        game = Game()
+        while not game.done:
+            print("-"*31)
+            print(game)
+            print("-"*31)
+            if counter % 2 != 0:
+                next_move = human_agent.play(game)
+            else:
+                next_move = computer_agent.play(game, num_iterations=5000)
+            print(f"last move: ({next_move[0]+1}, {next_move[1]+1})")
+            result = game.play(*next_move)
+            print(result)
+            counter += 1
 
-    print(game)
+        print(game)
+    
+
+    
