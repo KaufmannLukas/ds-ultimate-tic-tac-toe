@@ -13,6 +13,8 @@ class UltimateTicTacToeEnv(gym.Env):
     def __init__(self, opponent: Agent = None, opponent_starts=False):
         super(UltimateTicTacToeEnv, self).__init__()
         self.action_space = spaces.Discrete(81)  # 9x9 board
+
+        # 9x9 game boards for white, black, last_move, blocked_field
         self.observation_space = spaces.Box(
             low=0, high=2, shape=(4, 9, 9), dtype=bool)
         self.game = Game()
