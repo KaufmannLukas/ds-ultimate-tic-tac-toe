@@ -360,86 +360,51 @@ class Game:
         # reorder axis
         return repr
     
-    # make_json PSEUDOCODE
-    def make_json():
-        pass
-        return  white.history, \
-                black.history, \
-                blocked_fields, \
-                win_local_game, \
-                valid_move, \
-                last_move, \
-                
-
-    
-    # make_json first draft (ChatGPT)
-    # def make_json(game):
-    #     json_data = {}
-
-    #     for player_name, player in [("white", game.white), ("black", game.black)]:
-    #         json_data[player_name] = {
-    #             "history": player.history,
-    #             "fields": {}
-    #         }
-
-    #         for game_idx in range(9):
-    #             json_data[player_name]["fields"][f"game_{game_idx}"] = {
-    #                 "won_by": "white" if player.color == "white (X)" and player.wins[game_idx] else (
-    #                     "black" if player.color == "black (O)" and player.wins[game_idx] else "None"
-    #                 ),
-    #                 "next_move": game.last_move is not None and game.last_move[0] == game_idx,
-    #                 "fields": {}
-    #             }
-
-    #             for field_idx in range(9):
-    #                 field_key = f"field_{field_idx}"
-    #                 json_data[player_name]["fields"][f"game_{game_idx}"]["fields"][field_key] = {
-    #                     "white": player.board[game_idx, field_idx] and player.color == "white (X)",
-    #                     "black": player.board[game_idx, field_idx] and player.color == "black (O)",
-    #                     "last_move": game.last_move == (game_idx, field_idx),
-    #                     "blocked_field": game.blocked_fields[game_idx, field_idx],
-    #                     "valid_move": game.check_valid_move(game_idx, field_idx)
-    #                 }
-
-    #     # Convert to JSON format
-    #     json_string = json.dumps(json_data, indent=4)
-    #     return json_string
-
-### VERSION 2:
-
 
     def make_json(self):
-        json_data = {}
+        json_data = {
+            "win_global_game": "white" if self.winner == "white" else ("black" if self.winner == "black" else "None"),
+            "black_history": [],
+            "white_history": [],
+            "combined_history": {
+                "history": [],
+                "games": {}
+            }
+        }
 
+        # Populate black and white history
         for player_name, player in [("white", self.white), ("black", self.black)]:
-            json_data[player_name] = {
-                "history": player.history,
+            json_data[player_name + "_history"] = player.history
+
+        # Combine black and white history
+        json_data["combined_history"]["history"] = json_data["white_history"] + json_data["black_history"]
+
+        for game_idx in range(9):
+            json_data["combined_history"]["games"][f"game_{game_idx}"] = {
+                "won_by": "white" if self.white.wins[game_idx] else (
+                    "black" if self.black.wins[game_idx] else "None"
+                ),
+                "next_move": game_idx == self.last_move[1] if self.last_move else False,
                 "fields": {}
             }
 
-            for game_idx in range(9):
-                json_data[player_name]["fields"][f"game_{game_idx}"] = {
-                    "won_by": "white" if player.color == "white (X)" and player.wins[game_idx] else (
-                        "black" if player.color == "black (O)" and player.wins[game_idx] else "None"
-                    ),
-                    "next_move": game_idx == self.last_move[1] if self.last_move else False,
-                    "fields": {}
+            for field_idx in range(9):
+                field_key = f"field_{field_idx}"
+                json_data["combined_history"]["games"][f"game_{game_idx}"]["fields"][field_key] = {
+                    "white": bool(self.white.board[game_idx, field_idx]),
+                    "black": bool(self.black.board[game_idx, field_idx]),
+                    "last_move": bool((game_idx, field_idx) == self.last_move) if self.last_move else False,
+                    "blocked_field": bool(self.blocked_fields[game_idx, field_idx]),
+                    "valid_move": bool(not self.blocked_fields[game_idx, field_idx])
                 }
 
-                for field_idx in range(9):
-                    field_key = f"field_{field_idx}"
-                    json_data[player_name]["fields"][f"game_{game_idx}"]["fields"][field_key] = {
-                        "white": bool(player.board[game_idx, field_idx] and player.color == "white (X)"),
-                        "black": bool(player.board[game_idx, field_idx] and player.color == "black (O)"),
-                        "last_move": bool((game_idx, field_idx) == self.last_move) if self.last_move else False,
-                        "blocked_field": bool(self.blocked_fields[game_idx, field_idx]),
-                        "valid_move": bool(not self.blocked_fields[game_idx, field_idx])
-                    }
-
         json_string = json.dumps(json_data, indent=4, default=lambda x: bool(x))
-        print(json_string)
+        # print(json_string)
         return json_string
+
 
 # Example usage
 game = Game()
-game.make_json()
+json_string = game.make_json()
+with open("json_test.json", "w") as file:
+    file.write(json_string)
