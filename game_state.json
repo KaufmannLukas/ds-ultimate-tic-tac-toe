@@ -1,35 +1,47 @@
+'''
 {
-    "game_0": { # next game(s) to play next
-        "won_by": "white/black/draw/None", # local game won or not (=done)
-        "next_move": true/false, # which local game(s) to play next
+    "game_0": { 
+        "won_by": "white/black/draw/None",  // local game won or not (=done)
+        "next_move": true/false,  // which local game(s) to play next
         "fields": {
-                
             "field_0": {
-                # visual components
-                "white": true/false, # did white play a stone here
-                "black": true/false, # did black play a stone here
-                "last_move": true/false, # was the last move played here
-                "blocked_field": true/false, # is this field blocked or not
-                # action components
-                "valid_move": true/false, # can a valid next move played here
+                // visual components
+                "white": true/false,  // did white play a stone here
+                "black": true/false,  // did black play a stone here
+                "last_move": true/false,  // was the last move played here
+                "blocked_field": true/false,  // is this field blocked or not
+                // action components
+                "valid_move": true/false  // can a valid next move played here
+            },
             "field_1": {
-                # visual components
-                "white": true/false, # did white play a stone here
-                "black": true/false, # did black play a stone here
-                "last_move": true/false, # was the last move played here
-                "blocked_field": true/false, # is this field blocked or not
-                # action components
-                "valid_move": true/false, # can a valid next move played here
+                // visual components
+                "white": true/false,  // did white play a stone here
+                "black": true/false,  // did black play a stone here
+                "last_move": true/false,  // was the last move played here
+                "blocked_field": true/false,  // is this field blocked or not
+                // action components
+                "valid_move": true/false  // can a valid next move played here
+            },
             "field_2": {
-                ...
-            "field_9": {
-                ...
-    "game_1": { # next game(s) to play next
-        "won_by": "white/black/draw/None", # local game won or not
-        "next_move": true/false, # which local game(s) to play next
-        "fields": { # 9 games with 9 fields each in total ...
-        ...
-
+                // ...
+            },
+            "field_8": {
+                // ...
+            }
         }
-    }
+    },
+    "game_1": {
+        // ...
+            },
+            "field_1": {
+                // ...
+            },
+            // ...
+            "field_8": {
+                // ...
+            }
+        }
+    },
+    // ...
 }
+'''
