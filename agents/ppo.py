@@ -14,11 +14,13 @@ import torch
 import torch.nn as nn
 from torch.distributions import MultivariateNormal
 from torch.optim import Adam
+from tqdm import tqdm
 
+from agents.agent import Agent
 from agents.network import FeedForwardNN
 
 
-class PPO:
+class PPO(Agent):
     """
         This is the PPO class we will use as our model in main.py
     """
@@ -36,7 +38,7 @@ class PPO:
                 None
         """
         assert(type(env.observation_space) == gym.spaces.box.Box)
-        assert(type(env.action_space) == gym.spaces.Discrete)
+        assert(type(env.action_space) == gym.spaces.box.Box)
         
         self._init_hyperparameters()
 
@@ -44,12 +46,12 @@ class PPO:
         # TODO: check if shape[0] makes sense for us
         self.env = env
         self.obs_dim = env.observation_space.shape[0]
-        self.act_dim = 1 # env.action_space.shape
+        self.act_dim = 81 # env.action_space.shape
 
         # ALG STEP 1
         # Initialize actor and critic networks
         self.actor = FeedForwardNN(self.obs_dim, self.act_dim)
-        self.critic = FeedForwardNN(self.obs_dim, 1)
+        self.critic = FeedForwardNN(self.obs_dim, self.act_dim)
 
         # Initialize optimizers for actor and critic
         self.actor_optim = Adam(self.actor.parameters(), lr=self.lr)
@@ -74,8 +76,18 @@ class PPO:
         self.lr = 0.005
 
     def learn(self, total_timesteps):
+        
+        pbar = tqdm(total=total_timesteps)
+
         t_so_far = 0  # Timesteps simulated so far
+
+
         while t_so_far < total_timesteps:              # ALG STEP 2
+
+            # Update the progress bar to reflect the current timestep
+            pbar.n = t_so_far
+            pbar.refresh()  # Refresh the progress bar to show the updated value
+
             # Increment t_so_far somewhere below
             # TODO: for loop makes more sense?
             # ALG STEP 3
@@ -124,6 +136,8 @@ class PPO:
                 self.critic_optim.zero_grad()
                 critic_loss.backward()
                 self.critic_optim.step()
+        
+        pbar.close()
 
 
     def rollout(self):
@@ -197,7 +211,14 @@ class PPO:
         # Query the actor network for a mean action.
         # Same thing as calling self.actor.forward(obs)
         # TODO: check later if mean makes sense in discrete, not continuous action space.
-        mean = self.actor(obs)
+
+        # Convert obs to a PyTorch tensor if it's not already one
+        if not isinstance(obs, torch.Tensor):
+            obs = torch.tensor(obs, dtype=torch.float32)
+
+        flat_obs = obs.view(-1)
+
+        mean = self.actor(flat_obs)
         # Create our Multivariate Normal Distribution
         dist = MultivariateNormal(mean, self.cov_mat)
         # Sample an action from the distribution and get its log prob
@@ -210,6 +231,7 @@ class PPO:
         # of the graph and just convert the action to numpy array.
         # log prob as tensor is fine. Our computation graph will
         # start later down the line.
+
         return action.detach().numpy(), log_prob.detach()
 
     def evaluate(self, batch_obs, batch_acts):

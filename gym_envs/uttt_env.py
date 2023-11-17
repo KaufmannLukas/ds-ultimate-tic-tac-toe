@@ -12,7 +12,8 @@ from agents.agent import Agent
 class UltimateTicTacToeEnv(gym.Env):
     def __init__(self, opponent: Agent = None, opponent_starts=False):
         super(UltimateTicTacToeEnv, self).__init__()
-        self.action_space = spaces.Discrete(81)  # 9x9 board
+        self.action_space = spaces.Box(
+            low=0, high=1, shape=(9, 9), dtype=float)  # 9x9 board
 
         # 9x9 game boards for white, black, last_move, blocked_field
         self.observation_space = spaces.Box(
@@ -37,12 +38,28 @@ class UltimateTicTacToeEnv(gym.Env):
         '''
         action: tuple like (game_idx, field_idx)
         '''
+
+        
+        reward = 0
+
+        action_list = [(i, p) for i, p in enumerate(action.tolist())]
+        action_list.sort(key=lambda x: x[1], reverse=True)
+        for action in action_list:
+            move = Game.get_index_from_vector(action[0])
+            if not self.game.check_valid_move(*move):
+                reward -= 1
+            else:
+                break
+
+
+        action = move
+
+
         self.game.play(*action)
-        if self.opponent is not None:
+        if self.opponent is not None and not self.game.done:
             counter_action = self.opponent.play(self.game)
             self.game.play(*counter_action)
         new_state = game2tensor(self.game)
-        reward = 0
         done = self.game.done
 
         return new_state, reward, done, {}, {}

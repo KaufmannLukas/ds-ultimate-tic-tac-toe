@@ -9,5 +9,9 @@ class Random(Agent):
 
     def play(self, game: Game) -> tuple:
         valid_moves = game.get_valid_moves()
-        move = sample(sorted(valid_moves), 1)[0]
+        try:
+            move = sample(sorted(valid_moves), 1)[0]
+        except ValueError:
+            print(valid_moves)
+            print(game) 
         return move

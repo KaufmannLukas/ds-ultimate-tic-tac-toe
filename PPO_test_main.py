@@ -8,11 +8,14 @@ if __name__ == "__main__":
 
     # Agent = Agent / Random ?
 
-    env = UltimateTicTacToeEnv(Agent)
+    random_opponent = Random()
+
+    env = UltimateTicTacToeEnv(opponent=random_opponent, opponent_starts=False)
 
 
     print(env.opponent)
     # Create a model for PPO.
-    model = PPO(policy_class=FeedForwardNN, env=env)
+    model = PPO(env=env)
+    # model = PPO(policy_class=FeedForwardNN, env=env)
     #model = PPO(env)
     model.learn(10000)

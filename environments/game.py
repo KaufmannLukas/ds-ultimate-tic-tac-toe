@@ -292,6 +292,15 @@ class Game:
 
         return win_local_game, win_global_game
 
+
+    def get_index_from_vector(index: int):
+        field_idx = index % 9 # -> field index
+        game_idx = index // 9
+
+        return game_idx, field_idx
+
+
+
     def _reshape_board(board):
         """
         Reshapes a 9x9 Ultimate Tic-Tac-Toe board for visual representation purposes.
