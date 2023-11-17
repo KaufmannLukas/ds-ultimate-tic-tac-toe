@@ -17,5 +17,4 @@ if __name__ == "__main__":
     # Create a model for PPO.
     model = PPO(env=env)
     # model = PPO(policy_class=FeedForwardNN, env=env)
-    #model = PPO(env)
     model.learn(10000)

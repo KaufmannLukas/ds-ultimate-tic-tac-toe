@@ -37,50 +37,53 @@ class PPO(Agent):
             Returns:
                 None
         """
-        assert(type(env.observation_space) == gym.spaces.box.Box)
-        assert(type(env.action_space) == gym.spaces.box.Box)
-        
+        assert (type(env.observation_space) == gym.spaces.box.Box)
+        assert (type(env.action_space) == gym.spaces.box.Box)
+
+        torch.autograd.set_detect_anomaly(True) # ?????!!!!!????
+
         self._init_hyperparameters()
 
         # Extract environment information
         # TODO: check if shape[0] makes sense for us
         self.env = env
-        self.obs_dim = env.observation_space.shape[0]
-        self.act_dim = 81 # env.action_space.shape
+        # self.obs_dim = env.observation_space.shape[0]
+        # For a 4x9x9 observation space, this should be 324
+        self.obs_dim = np.prod(env.observation_space.shape)
+
+        self.act_dim = 81  # env.action_space.shape
 
         # ALG STEP 1
         # Initialize actor and critic networks
+        # TODO: add policy_class (and then set as FeedForwardNN e.g.)
         self.actor = FeedForwardNN(self.obs_dim, self.act_dim)
-        self.critic = FeedForwardNN(self.obs_dim, self.act_dim)
+        self.critic = FeedForwardNN(self.obs_dim, 1)
 
+        # TODO: maybe change Adam (currently continuos?)
         # Initialize optimizers for actor and critic
         self.actor_optim = Adam(self.actor.parameters(), lr=self.lr)
         self.critic_optim = Adam(self.critic.parameters(), lr=self.lr)
 
-        # Create our variable for the matrix.
+        # Initialize the covariance matrix used to query the actor for actions
         # Note that I chose 0.5 for stdev arbitrarily.
         self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
-
-        # Create the covariance matrix
         self.cov_mat = torch.diag(self.cov_var)
 
     # TODO: adjust values later
-
     def _init_hyperparameters(self):
         # Default values for hyperparameters, will need to change later.
         self.timesteps_per_batch = 4800            # timesteps per batch
-        self.max_timesteps_per_episode = 1600      # timesteps per episode
-        self.gamma = 0.95
-        self.n_updates_per_iteration = 5
+        self.max_timesteps_per_episode = 81      # timesteps per episode
+        self.gamma = 0.95   # Discount factor to be applied when calculating Rewards-To-Go            
+        self.n_updates_per_iteration = 5 # Number of times to update actor/critic per iteration
         self.clip = 0.2  # As recommended by the paper
-        self.lr = 0.005
+        self.lr = 0.005  # Learning rate of actor optimizer
 
     def learn(self, total_timesteps):
-        
+
         pbar = tqdm(total=total_timesteps)
 
         t_so_far = 0  # Timesteps simulated so far
-
 
         while t_so_far < total_timesteps:              # ALG STEP 2
 
@@ -94,14 +97,22 @@ class PPO(Agent):
             # ollecting our batch simulations
             batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens = self.rollout()
 
+            #batch_obs = np.array(batch_obs)  # Convert to a single numpy array first
+            #batch_obs = torch.tensor(batch_obs, dtype=torch.float).view(-1, self.obs_dim)
+
+
             # Calculate how many timesteps we collected this batch
             t_so_far += np.sum(batch_lens)
 
             # Calculate V_{phi, k}
             V, _ = self.evaluate(batch_obs, batch_acts)
+
+            print("length of batch_rtgs: ", len(batch_rtgs))
+            print("length of V: ", len(V))
+
             # ALG STEP 5
             # Calculate advantage
-            A_k = batch_rtgs - V.detach()
+            A_k = batch_rtgs - V
 
             # Normalize advantages
             # TODO: check if usefull for us or not
@@ -129,16 +140,15 @@ class PPO(Agent):
 
                 # Calculate gradients and perform backward propagation for actor network
                 self.actor_optim.zero_grad()
-                actor_loss.backward() # TODO: maybe with retain_graph=True (see original repo)
+                actor_loss.backward(retain_graph=True)  # TODO: maybe with retain_graph=True (see original repo)
                 self.actor_optim.step()
 
                 # Calculate gradients and perform backward propagation for critic network
                 self.critic_optim.zero_grad()
-                critic_loss.backward()
+                critic_loss.backward(retain_graph=True)
                 self.critic_optim.step()
-        
-        pbar.close()
 
+        pbar.close()
 
     def rollout(self):
         # Batch data
@@ -160,13 +170,14 @@ class PPO(Agent):
             # TODO: make a while loop instead because max_timesteps_per_episode will never reached
             for ep_t in range(self.max_timesteps_per_episode):
 
-                #self.env.render()
+                # self.env.render()
                 # Increment timesteps ran this batch so far
                 t += 1
                 # Collect observation
                 batch_obs.append(obs)
                 action, log_prob = self.get_action(obs)
-                obs, rew, done, _, _ = self.env.step(action) # two _ variables because gym changed it in newer version
+                # two _ variables because gym changed it in newer version
+                obs, rew, done, _, _ = self.env.step(action)
 
                 # Collect reward, action, and log prob
                 ep_rews.append(rew)
@@ -181,7 +192,13 @@ class PPO(Agent):
             batch_rews.append(ep_rews)
 
         # Reshape data as tensors in the shape specified before returning
-        batch_obs = torch.tensor(batch_obs, dtype=torch.float)
+        # batch_obs = torch.tensor(batch_obs, dtype=torch.float)
+        #batch_obs = torch.tensor(
+        #    batch_obs, dtype=torch.float).view(-1, self.obs_dim)
+
+        batch_obs = np.array(batch_obs)  # Convert to a single numpy array first
+        batch_obs = torch.tensor(batch_obs, dtype=torch.float).view(-1, self.obs_dim)
+
         batch_acts = torch.tensor(batch_acts, dtype=torch.float)
         batch_log_probs = torch.tensor(batch_log_probs, dtype=torch.float)
         # ALG STEP #4
@@ -235,6 +252,7 @@ class PPO(Agent):
         return action.detach().numpy(), log_prob.detach()
 
     def evaluate(self, batch_obs, batch_acts):
+
         # Query critic network for a value V for each obs in batch_obs.
         V = self.critic(batch_obs).squeeze()
 
@@ -247,4 +265,3 @@ class PPO(Agent):
         # Return predicted values V and log probs log_probs
 
         return V, log_probs
-
