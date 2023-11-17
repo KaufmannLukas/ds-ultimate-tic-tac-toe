@@ -23,7 +23,7 @@
             <div class="sub-cell"></div>
             <div class="sub-cell"></div>
             <div class="sub-cell"></div>
-            <div class="sub-cell"></div>
+            <div class="sub-cell">⚪</div>
             <div class="sub-cell"></div>
             <div class="sub-cell"></div>
             <div class="sub-cell"></div>
@@ -33,14 +33,14 @@
             <div class="sub-cell"></div>
             <div class="sub-cell"></div>
             <div class="sub-cell"></div>
-            <div class="sub-cell"></div>
+            <div class="sub-cell">⚫</div>
             <div class="sub-cell"></div>
             <div class="sub-cell"></div>
             <div class="sub-cell"></div>
             <div class="sub-cell"></div>
             <div class="sub-cell"></div>
         </div>
-        <div class="cell" id="game_3" style="background: red;">
+        <div class="cell" id="game_3" style="background: greenyellow;">
             <!-- 9 Unter-DIVs pro Haupt-DIV -->
             <div class="sub-cell"></div>
             <div class="sub-cell"></div>
