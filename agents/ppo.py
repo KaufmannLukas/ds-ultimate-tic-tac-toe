@@ -17,7 +17,7 @@ from torch.optim import Adam
 from tqdm import tqdm
 
 from agents.agent import Agent
-from agents.network import FeedForwardNN
+from agents.network import ActorCriticNetwork
 
 
 class PPO(Agent):
@@ -56,13 +56,16 @@ class PPO(Agent):
         # ALG STEP 1
         # Initialize actor and critic networks
         # TODO: add policy_class (and then set as FeedForwardNN e.g.)
-        self.actor = FeedForwardNN(self.obs_dim, self.act_dim)
-        self.critic = FeedForwardNN(self.obs_dim, 1)
+        self.actor_critic = ActorCriticNetwork(self.obs_dim, self.act_dim)
+        # self.actor = FeedForwardNN(self.obs_dim, self.act_dim)
+        # self.critic = FeedForwardNN(self.obs_dim, 1)
 
         # TODO: maybe change Adam (currently continuos?)
         # Initialize optimizers for actor and critic
-        self.actor_optim = Adam(self.actor.parameters(), lr=self.lr)
-        self.critic_optim = Adam(self.critic.parameters(), lr=self.lr)
+
+        self.actor_critic_optim = Adam(self.actor_critic.parameters(), lr=self.lr)
+        # self.actor_optim = Adam(self.actor.parameters(), lr=self.lr)
+        #self.critic_optim = Adam(self.critic.parameters(), lr=self.lr)
 
         # Initialize the covariance matrix used to query the actor for actions
         # Note that I chose 0.5 for stdev arbitrarily.
@@ -139,14 +142,14 @@ class PPO(Agent):
                 critic_loss = nn.MSELoss()(V, batch_rtgs)
 
                 # Calculate gradients and perform backward propagation for actor network
-                self.actor_optim.zero_grad()
-                actor_loss.backward(retain_graph=True)  # TODO: maybe with retain_graph=True (see original repo)
-                self.actor_optim.step()
+                self.actor_critic_optim.zero_grad()
+                actor_loss.backward(retain_graph=False)  # TODO: maybe with retain_graph=True (see original repo)
+                self.actor_critic_optim.step()
 
                 # Calculate gradients and perform backward propagation for critic network
-                self.critic_optim.zero_grad()
-                critic_loss.backward(retain_graph=True)
-                self.critic_optim.step()
+                self.actor_critic_optim.zero_grad()
+                critic_loss.backward(retain_graph=False)
+                self.actor_critic_optim.step()
 
         pbar.close()
 
@@ -235,7 +238,8 @@ class PPO(Agent):
 
         flat_obs = obs.view(-1)
 
-        mean = self.actor(flat_obs)
+        mean, _ = self.actor_critic(flat_obs)
+        # mean = self.actor(flat_obs)
         # Create our Multivariate Normal Distribution
         dist = MultivariateNormal(mean, self.cov_mat)
         # Sample an action from the distribution and get its log prob
@@ -253,13 +257,16 @@ class PPO(Agent):
 
     def evaluate(self, batch_obs, batch_acts):
 
+        mean, V = self.actor_critic(batch_obs)
+        V = V.squeeze()
+
         # Query critic network for a value V for each obs in batch_obs.
-        V = self.critic(batch_obs).squeeze()
+        # V = self.critic(batch_obs).squeeze()
 
         # Calculate the log probabilities of batch actions using most
         # recent actor network.
         # This segment of code is similar to that in get_action()
-        mean = self.actor(batch_obs)
+        # mean = self.actor(batch_obs)
         dist = MultivariateNormal(mean, self.cov_mat)
         log_probs = dist.log_prob(batch_acts)
         # Return predicted values V and log probs log_probs

@@ -2,7 +2,8 @@ from agents.ppo import PPO
 from agents.random_agnt import  Random
 from agents.human import Agent
 from gym_envs.uttt_env import UltimateTicTacToeEnv
-from agents.network import FeedForwardNN
+# from agents.network import FeedForwardNN
+from agents.network import ActorCriticNetwork
 
 if __name__ == "__main__":
 
