@@ -14,7 +14,6 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 
-app.config.compilerOptions.isCustomElement = tag => tag.startsWith('sl-') // ShoeLace Components
 app.config.ignoredElements = [/^sl-/] // ShoeLace Components
 
 app.mount('#app')

@@ -35,7 +35,7 @@ import '@shoelace-style/shoelace/dist/components/button/button.js';
     font-size: 4em;
     text-align: center;
     margin: 0.1em;
-    color: bisque;
+    color: rgb(144, 86, 15);
     transform: rotate(-5deg);
 }
 

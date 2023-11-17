@@ -3,6 +3,11 @@
 #app {
   margin: auto;
   padding: 15px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .game_wrapper {
@@ -20,22 +25,25 @@
 
 .cell {
   display: grid;
-  grid-template-areas: 
+  grid-template-areas:
     "area area area"
     "area area area"
     "area area area";
   grid-gap: 0px;
   padding: 0px;
-  border: 0px solid black;
+  border: 2 px solid black;
   aspect-ratio: 1 / 1;
 }
 
 .sub-cell {
-  border: 1px solid grey;
+  border: 1.5px solid grey;
   width: 100px;
   height: 100px;
   background-image: url('./icons_board_wood_01.png');
-  background-size: contain; /* oder eine spezifische Größe wie 100% 100% */
-  background-repeat: no-repeat; /* oder repeat, falls gewünscht */
-  background-position: center; /* Zentriert das Bild */
+  background-size: contain;
+  /* oder eine spezifische Größe wie 100% 100% */
+  background-repeat: no-repeat;
+  /* oder repeat, falls gewünscht */
+  background-position: center;
+  /* Zentriert das Bild */
 }
