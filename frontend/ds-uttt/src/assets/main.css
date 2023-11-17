@@ -1,5 +1,9 @@
 @import './base.css';
 
+#app {
+  margin: auto;
+  padding: 15px;
+}
 
 .game_wrapper {
   text-align: center;
@@ -8,21 +12,30 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-gap: 3px;
+  grid-gap: 1px;
   padding: 0px;
-  width: 450px;
+  width: 900px;
+  height: 900px;
 }
 
 .cell {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 1px;
-  padding: 1px;
-  border: 1px solid black;
+  grid-template-areas: 
+    "area area area"
+    "area area area"
+    "area area area";
+  grid-gap: 0px;
+  padding: 0px;
+  border: 0px solid black;
+  aspect-ratio: 1 / 1;
 }
 
 .sub-cell {
   border: 1px solid grey;
-  width: 50px;
-  height: 50px;
+  width: 100px;
+  height: 100px;
+  background-image: url('./icons_board_wood_01.png');
+  background-size: contain; /* oder eine spezifische Größe wie 100% 100% */
+  background-repeat: no-repeat; /* oder repeat, falls gewünscht */
+  background-position: center; /* Zentriert das Bild */
 }
