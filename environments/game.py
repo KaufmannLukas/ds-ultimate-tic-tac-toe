@@ -373,10 +373,45 @@ class Game:
 
     
     # make_json first draft (ChatGPT)
-    def make_json(game):
+    # def make_json(game):
+    #     json_data = {}
+
+    #     for player_name, player in [("white", game.white), ("black", game.black)]:
+    #         json_data[player_name] = {
+    #             "history": player.history,
+    #             "fields": {}
+    #         }
+
+    #         for game_idx in range(9):
+    #             json_data[player_name]["fields"][f"game_{game_idx}"] = {
+    #                 "won_by": "white" if player.color == "white (X)" and player.wins[game_idx] else (
+    #                     "black" if player.color == "black (O)" and player.wins[game_idx] else "None"
+    #                 ),
+    #                 "next_move": game.last_move is not None and game.last_move[0] == game_idx,
+    #                 "fields": {}
+    #             }
+
+    #             for field_idx in range(9):
+    #                 field_key = f"field_{field_idx}"
+    #                 json_data[player_name]["fields"][f"game_{game_idx}"]["fields"][field_key] = {
+    #                     "white": player.board[game_idx, field_idx] and player.color == "white (X)",
+    #                     "black": player.board[game_idx, field_idx] and player.color == "black (O)",
+    #                     "last_move": game.last_move == (game_idx, field_idx),
+    #                     "blocked_field": game.blocked_fields[game_idx, field_idx],
+    #                     "valid_move": game.check_valid_move(game_idx, field_idx)
+    #                 }
+
+    #     # Convert to JSON format
+    #     json_string = json.dumps(json_data, indent=4)
+    #     return json_string
+
+### VERSION 2:
+
+
+    def make_json(self):
         json_data = {}
 
-        for player_name, player in [("white", game.white), ("black", game.black)]:
+        for player_name, player in [("white", self.white), ("black", self.black)]:
             json_data[player_name] = {
                 "history": player.history,
                 "fields": {}
@@ -387,21 +422,24 @@ class Game:
                     "won_by": "white" if player.color == "white (X)" and player.wins[game_idx] else (
                         "black" if player.color == "black (O)" and player.wins[game_idx] else "None"
                     ),
-                    "next_move": game.last_move is not None and game.last_move[0] == game_idx,
+                    "next_move": game_idx == self.last_move[1] if self.last_move else False,
                     "fields": {}
                 }
 
                 for field_idx in range(9):
                     field_key = f"field_{field_idx}"
                     json_data[player_name]["fields"][f"game_{game_idx}"]["fields"][field_key] = {
-                        "white": player.board[game_idx, field_idx] and player.color == "white (X)",
-                        "black": player.board[game_idx, field_idx] and player.color == "black (O)",
-                        "last_move": game.last_move == (game_idx, field_idx),
-                        "blocked_field": game.blocked_fields[game_idx, field_idx],
-                        "valid_move": game.check_valid_move(game_idx, field_idx)
+                        "white": bool(player.board[game_idx, field_idx] and player.color == "white (X)"),
+                        "black": bool(player.board[game_idx, field_idx] and player.color == "black (O)"),
+                        "last_move": bool((game_idx, field_idx) == self.last_move) if self.last_move else False,
+                        "blocked_field": bool(self.blocked_fields[game_idx, field_idx]),
+                        "valid_move": bool(not self.blocked_fields[game_idx, field_idx])
                     }
 
-        # Convert to JSON format
-        json_string = json.dumps(json_data, indent=4)
+        json_string = json.dumps(json_data, indent=4, default=lambda x: bool(x))
+        print(json_string)
         return json_string
 
+# Example usage
+game = Game()
+game.make_json()
