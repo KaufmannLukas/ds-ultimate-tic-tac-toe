@@ -1,6 +1,9 @@
 <script setup>
 import { ref } from 'vue';
 import subGame from '@/components/subGame.vue';
+import { useGameStore } from '@/stores/game';
+
+const gameStore = useGameStore();
 
 
 // options:
@@ -49,7 +52,7 @@ const gameState = ref({
     <main>
         <div class="display">Game: {{ currentGame }}, Cell: {{ currentCell }}</div>
         <div class="game_wrapper">
-            <div class="grid" id="main_game">
+            <div class="grid" id="main_game" v-if="gameStore.currentGameId != null">
                 <subGame v-for="_, index in 9" :game_id="index" :key="index" :passHover="subHover"
                     :gameState="gameState['game' + (index + 1)]" />
             </div>

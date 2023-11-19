@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from agents.mcts import MCTS
 import threading
 import time
@@ -14,6 +15,8 @@ computer_agent_model = {}
 print(os.getcwd())
 
 app = Flask(__name__)
+
+cors = CORS(app, resources={r"*": {"origins": "*"}})
 
 @app.route("/")
 def hello_world():

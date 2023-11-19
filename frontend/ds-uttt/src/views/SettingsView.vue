@@ -1,14 +1,23 @@
 <template>
     <h1>Settings</h1>
     <p>Hier kommen die Game Einstellungen hin </p>
-    <sl-button class="fancy">Start Game</sl-button>
+    <sl-button class="fancy" @click="startGame()">Start Game</sl-button>
 </template>
 
 
 <script setup>
 import '@shoelace-style/shoelace/dist/components/button/button.js'
-import { RouterLink, RouterView } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useGameStore } from '@/stores/game';
 
+const gameStore = useGameStore();
+
+function startGame() {
+    console.log('start game');
+    gameStore.newGame();
+    const router = useRouter();
+    router.push({ name: 'GameView' });
+}
 
 </script>
 

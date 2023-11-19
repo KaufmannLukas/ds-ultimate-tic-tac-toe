@@ -1,4 +1,5 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
+import axios from 'axios';
 
 const defaultState = () => ({
     "games": {
@@ -628,14 +629,43 @@ const defaultState = () => ({
 
 
 export const useGameStore = defineStore('gameStore', {
-  state: () => ({
-    ...defaultState(),
-  }),
-  actions: { },
-  getters: {
-  },
+    state: () => ({
+        gameState: {},
+        baseURL: 'http://127.0.0.1:5000',
+        currentGameId: null,
+        playerColor: 'white (X)',
+    }),
+    actions: {
+        async newGame() {
+            const response = await axios.get(`${this.baseURL}/new_game`);
+            this.currentGameId = response.data.game_id;
+            this.gameState = response.data.game_state;
+        },
+        async updateGameState() {
+
+            let response;
+            do {
+                await new Promise(r => setTimeout(r, 1000));
+                response = await axios.get(`${this.baseURL}/get_game_state?id=${this.currentGameId}`);
+                this.gameState = response.data.game_state;
+            } while (response && response.data.agent_is_busy === true);
+        },
+        async makeMove(gameIndex, fieldIndex) {
+            const data = {
+                game_id: this.currentGameId,
+                game_idx: gameIndex,
+                field_idx: fieldIndex,
+                };
+            
+            const response = await axios.post(`${this.baseURL}/play`, data);
+            this.gameState = response.data.game_state;
+            this.updateGameState();
+        }
+    },
+    getters: {
+    },
 });
 
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useGameStore, import.meta.hot))
+    import.meta.hot.accept(acceptHMRUpdate(useGameStore, import.meta.hot))
 }

@@ -1,19 +1,19 @@
 <template>
-    <div class="cell" :id="game_id" :class="{'highlight-game': currentGame?.next_move, 
-        'won_by_black': currentGame?.won_by == 'black', 
-        'won_by_white': currentGame?.won_by == 'white',
-        'won_by_draw': currentGame?.won_by == 'draw'
+    <div class="cell" :id="game_id" :class="{'highlight-game': gameStore.gameState.games['game_' + (props.game_id)]?.next_move, 
+        'won_by_black': gameStore.gameState.games['game_' + (props.game_id)]?.won_by == 'black', 
+        'won_by_white': gameStore.gameState.games['game_' + (props.game_id)]?.won_by == 'white',
+        'won_by_draw': gameStore.gameState.games['game_' + (props.game_id)]?.won_by == 'draw'
         }">
         <!-- 9 Unter-DIVs pro Haupt-DIV -->
         <div class="sub-cell" 
         v-for="cell in cells" 
         :key="cell.id" 
         @mouseover="passHover(props.game_id, cell.id)"
-        @click="() => currentGame?.fields['field_' + cell.id].validMove ? console.log('valid move') : console.log('invalid move')"
-        :class="{'highlight-last-move': currentGame?.fields['field_' + cell.id].last_move}"
+        @click="() => gameStore.gameState.games['game_' + (props.game_id)]?.fields['field_' + cell.id].valid_move ? makeMove(cell.id) : console.log('invalid move')"
+        :class="{'highlight-last-move': gameStore.gameState.games['game_' + (props.game_id)]?.fields['field_' + cell.id].last_move}"
         >
-            <img v-if="currentGame?.fields['field_' + cell.id].black" src="@/assets/icon_black_stone.png" alt="black stone" />
-            <img v-if="currentGame?.fields['field_' + cell.id].white" src="@/assets/icon_white_stone.png" alt="white stone" />
+            <img v-if="gameStore.gameState.games['game_' + (props.game_id)]?.fields['field_' + cell.id].black" src="@/assets/icon_black_stone.png" alt="black stone" />
+            <img v-if="gameStore.gameState.games['game_' + (props.game_id)]?.fields['field_' + cell.id].white" src="@/assets/icon_white_stone.png" alt="white stone" />
         </div>
     </div>
 </template>
@@ -21,6 +21,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useGameStore } from '@/stores/game';
+import { storeToRefs } from 'pinia';
 
 const props = defineProps({
     game_id: {
@@ -45,13 +46,15 @@ const cells = ref([
     {id: 8}]);
 
 const gameStore = useGameStore();
-const currentGame = ref(null);
 
 onMounted(() =>{
-    currentGame.value = gameStore.games['game_' + (props.game_id)];
-    console.log(currentGame.value);
+
 });
 
+function makeMove(cell_id) {
+    console.log('make move');
+    gameStore.makeMove(props.game_id, cell_id);
+}
     
 function getStone(type) {
     if (type == 'black') {
