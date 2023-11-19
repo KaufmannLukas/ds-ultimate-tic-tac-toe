@@ -1,10 +1,15 @@
 from flask import Flask, jsonify, request
+from agents.mcts import MCTS
+import threading
+import time
 import os
 
 
-from .environments.game import Game
+from environments.game import Game
 games = {}
 game_counter = 0
+computer_agent_state = {}
+computer_agent_model = {}
 
 print(os.getcwd())
 
@@ -18,21 +23,71 @@ def hello_world():
 def new_game():
     global game_counter
     global games
+    global computer_agent_state
+    global computer_agent_model
     game_id = game_counter
-    games[game_id] = Game()
+    game = Game()
+    games[game_id] = game
+    computer_agent_state[game_id] = 0
+    computer_agent_model[game_id] = MCTS()
     game_counter += 1
-    return jsonify(game_id), 200
+    
+    return jsonify({"game_state": game.make_json(), "game_id": game_id}), 200
 
 
 @app.route("/get_game_state", methods=['GET'])
 def get_game_state():
     global games
+    global computer_agent_state
     id = request.args.get('id')
     game = games[int(id)]
-    return jsonify(game.blocked_fields.tolist())
+    if computer_agent_state[int(id)] == 1:
+        return jsonify({"game_state": game.make_json(), "agent_is_busy": True}), 200
+    else:
+        return jsonify({"game_state": game.make_json(), "agent_is_busy": False}), 200
 
-@app.route("/play")
+@app.route("/play", methods=['POST'])
 def play_game():
-    games[game_counter] = Game()
-    game_counter += 1
-    return 
+    # get game id from request body
+    global games
+
+    data = request.get_json()  # Parse JSON data
+    game_id = int(data['game_id'])
+    move_game_idx = int(data['game_idx'])
+    move_field_idx = int(data['field_idx'])
+    move = (move_game_idx, move_field_idx)
+
+    current_game = games[game_id]
+    current_game.play(*move)
+
+    x = threading.Thread(target=move_agent_T, kwargs={'game_id': game_id})
+    x.start()
+
+    response = {
+        "game_id": game_id,
+        "game_state": current_game.make_json()
+    }
+
+    return response, 200
+
+@app.route("/get_agent_state", methods=['GET'])
+def get_agent_state():
+    global computer_agent_state
+    id = request.args.get('id')
+    return jsonify({"agent_is_busy": bool(computer_agent_state[int(id)])}), 200
+
+def move_agent_T(game_id):
+    global games
+    global computer_agent_state
+    global computer_agent_model
+    game = games[game_id]
+    computer_agent = computer_agent_model[game_id]
+    computer_agent_state[game_id] = 1
+    next_move = computer_agent.play(game, num_iterations=1000)
+    print(next_move)
+    game.play(*next_move)
+    computer_agent_state[game_id] = 0
+    return True
+
+
+# TO RUN: "flask --debug --app main_flask run"

@@ -28,14 +28,9 @@ const gameState = ref({
     game9: {}
 })
 
-
 </script>
-ss
+
 <style>
-
-
-
-
 .game_wrapper {
     display: flex;
     justify-content: center;
@@ -55,11 +50,8 @@ ss
         <div class="display">Game: {{ currentGame }}, Cell: {{ currentCell }}</div>
         <div class="game_wrapper">
             <div class="grid" id="main_game">
-                <subGame v-for="_, index in 9" 
-                :game_id="index" 
-                :key="index" 
-                :passHover="subHover"
-                :gameState="gameState['game' + (index + 1)]" />
+                <subGame v-for="_, index in 9" :game_id="index" :key="index" :passHover="subHover"
+                    :gameState="gameState['game' + (index + 1)]" />
             </div>
         </div>
     </main>

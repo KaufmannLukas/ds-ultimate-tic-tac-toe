@@ -401,6 +401,7 @@ class Game:
 
     def make_json(self):
         json_data = {
+                "current_player": self.current_player.color,
                 "games": {}
             }
 
@@ -409,7 +410,7 @@ class Game:
                 "won_by": "white" if self.white.wins[game_idx] else (
                     "black" if self.black.wins[game_idx] else "None" # TODO: add draw
                 ),
-                "next_move": game_idx == self.last_move[1] if self.last_move else False,
+                "next_move": game_idx in {move[0] for move in self.get_valid_moves()},
                 "fields": {}
             }
 
@@ -423,12 +424,13 @@ class Game:
                     "valid_move": bool(not self.blocked_fields[game_idx, field_idx])
                 }
 
-        json_string = json.dumps(json_data, indent=4, default=lambda x: bool(x))
+        #json_string = json.dumps(json_data, indent=4, default=lambda x: bool(x))
         # print(json_string)
-        return json_string
+        #return json_string
+        return json_data
 
 # Example usage
-game = Game()
-json_string = game.make_json()
-with open("json_test.json", "w") as file:
-    file.write(json_string)
+# game = Game()
+# json_string = game.make_json()
+# with open("json_test.json", "w") as file:
+#     file.write(json_string)

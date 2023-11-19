@@ -1,8 +1,9 @@
 {
+    "current_player": "white (X)",
     "games": {
         "game_0": {
             "won_by": "None",
-            "next_move": false,
+            "next_move": true,
             "fields": {
                 "field_0": {
                     "white": false,
@@ -71,7 +72,7 @@
         },
         "game_1": {
             "won_by": "None",
-            "next_move": false,
+            "next_move": true,
             "fields": {
                 "field_0": {
                     "white": false,
@@ -140,7 +141,7 @@
         },
         "game_2": {
             "won_by": "None",
-            "next_move": false,
+            "next_move": true,
             "fields": {
                 "field_0": {
                     "white": false,
@@ -209,7 +210,7 @@
         },
         "game_3": {
             "won_by": "None",
-            "next_move": false,
+            "next_move": true,
             "fields": {
                 "field_0": {
                     "white": false,
@@ -278,7 +279,7 @@
         },
         "game_4": {
             "won_by": "None",
-            "next_move": false,
+            "next_move": true,
             "fields": {
                 "field_0": {
                     "white": false,
@@ -347,7 +348,7 @@
         },
         "game_5": {
             "won_by": "None",
-            "next_move": false,
+            "next_move": true,
             "fields": {
                 "field_0": {
                     "white": false,
@@ -416,7 +417,7 @@
         },
         "game_6": {
             "won_by": "None",
-            "next_move": false,
+            "next_move": true,
             "fields": {
                 "field_0": {
                     "white": false,
@@ -485,7 +486,7 @@
         },
         "game_7": {
             "won_by": "None",
-            "next_move": false,
+            "next_move": true,
             "fields": {
                 "field_0": {
                     "white": false,
@@ -554,7 +555,7 @@
         },
         "game_8": {
             "won_by": "None",
-            "next_move": false,
+            "next_move": true,
             "fields": {
                 "field_0": {
                     "white": false,
