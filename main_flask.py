@@ -93,4 +93,7 @@ def move_agent_T(game_id):
     return True
 
 
-# TO RUN: "flask --debug --app main_flask run"
+# TO RUN GAME:
+# 1. "flask --debug --app main_flask run"
+# 2. new terminal: go to /frontend/ds-uttt
+# 3. "npm run dev"
