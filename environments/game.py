@@ -401,6 +401,9 @@ class Game:
 
     def make_json(self):
         json_data = {
+                "global_win": "white" if self.winner == self.white.color else (
+                    "black" if self.winner == self.black.color else "None"
+                ),
                 "current_player": self.current_player.color,
                 "games": {}
             }
