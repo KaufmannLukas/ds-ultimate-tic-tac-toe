@@ -1,26 +1,25 @@
 <template>
-    <h1>Settings</h1>
-    <p>Hier kommen die Game Einstellungen hin </p>
-    <sl-button class="fancy" @click="startGame()">Start Game</sl-button>
+  <h1>Settings</h1>
+  <p>Hier kommen die Game Einstellungen hin</p>
+  <sl-button class="fancy" @click="startGame">
+      {{ gameStore.currentGameId ? 'Reset & Start new game' : 'Start new game' }}
+  </sl-button>
 </template>
 
-
 <script setup>
-import '@shoelace-style/shoelace/dist/components/button/button.js'
-import { useRouter } from 'vue-router'
+import '@shoelace-style/shoelace/dist/components/button/button.js';
+import { useRouter } from 'vue-router';
 import { useGameStore } from '@/stores/game';
 
+const router = useRouter(); // Initialize useRouter here
 const gameStore = useGameStore();
 
 function startGame() {
-    console.log('start game');
-    gameStore.newGame();
-    const router = useRouter();
-    router.push({ name: 'GameView' });
+  console.log('start game');
+  gameStore.newGame();
+  router.push({ name: 'Game' }); // Use router directly
 }
-
 </script>
-
 <style>
 sl-button.fancy::part(base) {
     /* Set design tokens for height and border width */
