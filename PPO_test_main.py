@@ -58,4 +58,4 @@ def play_ppo():
 
 
 if __name__ == "__main__":
-    train_ppo(1_000_000)
+    train_ppo(10_000_000)
