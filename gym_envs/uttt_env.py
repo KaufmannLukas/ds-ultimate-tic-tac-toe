@@ -88,7 +88,7 @@ def game2tensor(game: Game):
     if game.last_move:
         lm[*game.last_move] = True
 
-    res = np.stack([wb, bb, bf, lm])
+    res = np.stack([bf, wb, bb, lm])
     return res.flatten()
 
 '''

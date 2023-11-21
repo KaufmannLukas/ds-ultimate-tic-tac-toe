@@ -15,9 +15,9 @@ class FeedForwardNN_Actor(nn.Module):
         #out_dim = 81  # 9 * 9
 
         # TODO: adjust layers later (64)
-        self.layer1 = nn.Linear(in_dim, 64)
-        self.layer2 = nn.Linear(64, 64)
-        self.layer3 = nn.Linear(64, out_dim)
+        self.layer1 = nn.Linear(in_dim, 128)
+        self.layer2 = nn.Linear(128, 128)
+        self.layer3 = nn.Linear(128, out_dim)
 
 
     def forward(self, obs):
@@ -43,10 +43,10 @@ class FeedForwardNN_Critic(nn.Module):
         #in_dim = 324  # 4 * 9 * 9
         #out_dim = 81  # 9 * 9
 
-        # TODO: adjust layers later (64)
-        self.layer1 = nn.Linear(in_dim, 64)
-        self.layer2 = nn.Linear(64, 64)
-        self.layer3 = nn.Linear(64, out_dim)
+        # TODO: adjust layers later (128)
+        self.layer1 = nn.Linear(in_dim, 128)
+        self.layer2 = nn.Linear(128, 128)
+        self.layer3 = nn.Linear(128, out_dim)
 
 
     def forward(self, obs):

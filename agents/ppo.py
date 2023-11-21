@@ -219,18 +219,23 @@ class PPO(Agent):
         batch_rtgs = torch.tensor(batch_rtgs, dtype=torch.float)
         return batch_rtgs
 
-    def get_action(self, obs):
+    def get_action(self, obs, mode="learn"):
         # Query the actor network for a mean action.
         # Same thing as calling self.actor.forward(obs)
         # TODO: check later if mean makes sense in discrete, not continuous action space.
 
         # Convert obs to a PyTorch tensor if it's not already one
         if not isinstance(obs, torch.Tensor):
-            obs = torch.tensor(obs, dtype=torch.float32)
+            obs = torch.tensor(obs, dtype=torch.float)
 
         flat_obs = obs.view(-1)
 
         probs = self.actor(flat_obs)
+
+
+        blocked_fields = obs[0:81]
+        probs[blocked_fields == 1] = 0
+
         # Create our Multivariate Normal Distribution
         #dist = MultivariateNormal(mean, self.cov_mat)
         m = Categorical(probs)
@@ -271,10 +276,13 @@ class PPO(Agent):
 
     def play(self, game):
         obs = game2tensor(game)
-        action, log_prob = self.get_action(obs)
+        action, _ = self.get_action(obs, mode="play")
 
+    
         game_idx = action // 9
         field_idx = action % 9
+
+        move = (game_idx, field_idx)
 
         return (game_idx, field_idx)
 

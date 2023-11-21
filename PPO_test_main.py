@@ -21,7 +21,7 @@ if __name__ == "__main__":
     model = PPO(env=env)
     # model = PPO(policy_class=FeedForwardNN, env=env)
     #model = PPO(env)
-    model.learn(20000)
+    model.learn(1000)
 
     game = Game()
     #implement the next two lines for using a memory_prone agent (like mcts_agent_01)
