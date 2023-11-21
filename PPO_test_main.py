@@ -7,7 +7,7 @@ from agents.human import Human
 
 #from agents.network import FeedForwardNN
 
-if __name__ == "__main__":
+def train_ppo(total_timesteps):
 
     # Agent = Agent / Random ?
 
@@ -15,14 +15,21 @@ if __name__ == "__main__":
 
     env = UltimateTicTacToeEnv(opponent=random_opponent, opponent_starts=False)
 
-
     print(env.opponent)
     # Create a model for PPO.
     model = PPO(env=env)
     # model = PPO(policy_class=FeedForwardNN, env=env)
     #model = PPO(env)
-    model.learn(1000)
+    model.learn(total_timesteps=total_timesteps)
 
+    model.save("./data/ppo", f"ppo_v1_{total_timesteps}")
+
+
+
+
+def play_ppo():
+    model = PPO(env=env)
+    model.load("./data/ppo")
     game = Game()
     #implement the next two lines for using a memory_prone agent (like mcts_agent_01)
     # with open("data/mcts_ltmm_02.pkl", mode="rb") as file:
@@ -49,3 +56,6 @@ if __name__ == "__main__":
 
     print(game)
 
+
+if __name__ == "__main__":
+    train_ppo(1_000_000)

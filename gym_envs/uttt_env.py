@@ -42,17 +42,6 @@ class UltimateTicTacToeEnv(gym.Env):
         
         reward = 0
 
-        # action_list = [(i, p) for i, p in enumerate(action.tolist())]
-        # action_list.sort(key=lambda x: x[1], reverse=True)
-        # for action in action_list:
-        #     move = Game.get_index_from_vector(action[0])
-        #     if not self.game.check_valid_move(*move):
-        #         reward -= 1
-        #     else:
-        #         break
-
-
-        #action = move
 
         game_idx = action // 9
         field_idx = action % 9
@@ -60,7 +49,7 @@ class UltimateTicTacToeEnv(gym.Env):
         move = (game_idx, field_idx)
 
         if self.game.check_valid_move(*move):
-            self.game.play(*move)
+            local_win, global_win = self.game.play(*move)
 
             if self.opponent is not None and not self.game.done:
                 counter_action = self.opponent.play(self.game)
@@ -68,10 +57,11 @@ class UltimateTicTacToeEnv(gym.Env):
         else:
             reward -= 1
 
-
-
         new_state = game2tensor(self.game)
         done = self.game.done
+
+
+        reward = int(local_win) * 1 + int(global_win) * 10
 
         return new_state, reward, done, {}, {}
 

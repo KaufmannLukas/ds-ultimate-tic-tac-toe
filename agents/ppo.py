@@ -287,3 +287,14 @@ class PPO(Agent):
         return (game_idx, field_idx)
 
 
+    def save(self, path, name):
+        torch.save(self.actor.state_dict(), path+"/"+name+"_actor.pth")
+        torch.save(self.critic.state_dict(), path+"/"+name+"_critic.pth")
+        
+    def load(self, path, name):
+        self.actor.load_state_dict(torch.load(path + "/" + name + "_actor.pth"))
+        self.critic.load_state_dict(torch.load(path + "/" + name + "_critic.pth"))
+
+
+
+
