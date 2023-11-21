@@ -22,7 +22,7 @@ def train_ppo(total_timesteps):
     #model = PPO(env)
     model.learn(total_timesteps=total_timesteps)
 
-    model.save("./data/ppo", f"ppo_v1_{total_timesteps}")
+    model.save("./data/ppo", f"ppo_v2_{total_timesteps}")
 
 
 
@@ -58,4 +58,4 @@ def play_ppo():
 
 
 if __name__ == "__main__":
-    train_ppo(10_000_000)
+    train_ppo(1_000_000)

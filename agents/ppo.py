@@ -232,15 +232,25 @@ class PPO(Agent):
 
         probs = self.actor(flat_obs)
 
+        if mode == "play":
+            print("probs before masking: ")
+            print(probs)
 
         blocked_fields = obs[0:81]
         probs[blocked_fields == 1] = 0
+        # probs[blocked_fields == 1] = torch.finfo(torch.float64).eps
+
+        if mode == "play":
+            print("probs after masking: ")
+            print(probs)
 
         # Create our Multivariate Normal Distribution
         #dist = MultivariateNormal(mean, self.cov_mat)
         m = Categorical(probs)
         # Sample an action from the distribution and get its log prob
         action = m.sample() # asuming this sample is NOT random ???
+
+        # print("action: ", action)
 
         # next_state, reward = env.step(action)
         # loss = -m.log_prob(action) * reward

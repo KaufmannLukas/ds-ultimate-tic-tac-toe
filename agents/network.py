@@ -17,7 +17,10 @@ class FeedForwardNN_Actor(nn.Module):
         # TODO: adjust layers later (64)
         self.layer1 = nn.Linear(in_dim, 128)
         self.layer2 = nn.Linear(128, 128)
-        self.layer3 = nn.Linear(128, out_dim)
+        self.layer3 = nn.Linear(128, 128)
+        self.layer4 = nn.Linear(128, 128)
+        self.layer5 = nn.Linear(128, 128)
+        self.layer6 = nn.Linear(128, out_dim)
 
 
     def forward(self, obs):
@@ -28,7 +31,10 @@ class FeedForwardNN_Actor(nn.Module):
         # TODO: maybe change activation function for improvement?
         activation1 = F.relu(self.layer1(obs))
         activation2 = F.relu(self.layer2(activation1))
-        output = F.softmax(self.layer3(activation2), dim=-1)
+        activation3 = F.relu(self.layer3(activation2))
+        activation4 = F.relu(self.layer4(activation3))
+        activation5 = F.relu(self.layer5(activation4))
+        output = F.softmax(self.layer6(activation5), dim=-1)
         return output
 
 
@@ -46,7 +52,10 @@ class FeedForwardNN_Critic(nn.Module):
         # TODO: adjust layers later (128)
         self.layer1 = nn.Linear(in_dim, 128)
         self.layer2 = nn.Linear(128, 128)
-        self.layer3 = nn.Linear(128, out_dim)
+        self.layer3 = nn.Linear(128, 128)
+        self.layer4 = nn.Linear(128, 128)
+        self.layer5 = nn.Linear(128, 128)
+        self.layer6 = nn.Linear(128, out_dim)
 
 
     def forward(self, obs):
@@ -58,8 +67,17 @@ class FeedForwardNN_Critic(nn.Module):
 
         
         # TODO: maybe change activation function for improvement?
+
         activation1 = F.relu(self.layer1(obs))
         activation2 = F.relu(self.layer2(activation1))
-        #output = nn.Identity(self.layer3(activation2))
-        output = self.layer3(activation2)
+        activation3 = F.relu(self.layer3(activation2))
+        activation4 = F.relu(self.layer4(activation3))
+        activation5 = F.relu(self.layer5(activation4))
+        output = self.layer6(activation5)
+
+        # activation1 = F.relu(self.layer1(obs))
+        # activation2 = F.relu(self.layer2(activation1))
+        # #output = nn.Identity(self.layer3(activation2))
+        # output = self.layer3(activation2)
         return output
+    

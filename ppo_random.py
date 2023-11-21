@@ -28,7 +28,7 @@ if __name__ == "__main__":
     random_agent = Random()
     env = UltimateTicTacToeEnv(random_agent)
     ppo_agent = PPO(env)
-    ppo_agent.load("./data/ppo", "ppo_v1_1000000")
+    ppo_agent.load("./data/ppo", "ppo_v2_1000000")
 
     winner_table = []
 
@@ -42,10 +42,12 @@ if __name__ == "__main__":
 
         # check which player's turn it is
         while not game.done:
+            print(game)
             if (counter+i) % 2 == 0:
                 next_move = ppo_agent.play(game)
             else:
                 next_move = random_agent.play(game)
+            print(next_move)
             game.play(*next_move)
             counter += 1
 
@@ -63,7 +65,7 @@ if __name__ == "__main__":
     winner_dataframe = pd.DataFrame(
         winner_table, columns=["game_nr", "ppo_color", "winner"])
 
-    winner_dataframe.to_csv(f"data/random_vs_ppo_v1_1000000.csv")
+    winner_dataframe.to_csv(f"data/random_vs_ppo_v2_1000000.csv")
     winner_table = []
 
 

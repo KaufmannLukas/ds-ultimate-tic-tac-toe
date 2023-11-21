@@ -49,19 +49,20 @@ class UltimateTicTacToeEnv(gym.Env):
         move = (game_idx, field_idx)
 
         if self.game.check_valid_move(*move):
+            reward += 0.01
             local_win, global_win = self.game.play(*move)
+            reward = reward + int(local_win) * 0.1 + int(global_win) * 3
 
             if self.opponent is not None and not self.game.done:
                 counter_action = self.opponent.play(self.game)
                 self.game.play(*counter_action)
         else:
-            reward -= 1
+            reward -= 0.01
 
         new_state = game2tensor(self.game)
         done = self.game.done
 
 
-        reward = int(local_win) * 1 + int(global_win) * 10
 
         return new_state, reward, done, {}, {}
 
