@@ -12,12 +12,12 @@ import gymnasium as gym
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.distributions import MultivariateNormal
+from torch.distributions import MultivariateNormal, Categorical
 from torch.optim import Adam
 from tqdm import tqdm
 
 from agents.agent import Agent
-from agents.network import FeedForwardNN
+from agents.network import FeedForwardNN_Actor, FeedForwardNN_Critic
 
 
 class PPO(Agent):
@@ -45,13 +45,14 @@ class PPO(Agent):
         # Extract environment information
         # TODO: check if shape[0] makes sense for us
         self.env = env
-        self.obs_dim = env.observation_space.shape[0]
+        # For a 4x9x9 observation space, this should be 324
+        self.obs_dim = np.prod(env.observation_space.shape)
         self.act_dim = 81 # env.action_space.shape
 
         # ALG STEP 1
         # Initialize actor and critic networks
-        self.actor = FeedForwardNN(self.obs_dim, self.act_dim)
-        self.critic = FeedForwardNN(self.obs_dim, self.act_dim)
+        self.actor = FeedForwardNN_Actor(self.obs_dim, self.act_dim)
+        self.critic = FeedForwardNN_Critic(self.obs_dim, 1)
 
         # Initialize optimizers for actor and critic
         self.actor_optim = Adam(self.actor.parameters(), lr=self.lr)
@@ -180,9 +181,20 @@ class PPO(Agent):
             batch_lens.append(ep_t + 1)  # plus 1 because timestep starts at 0
             batch_rews.append(ep_rews)
 
+        batch_obs = torch.tensor(np.array(batch_obs), dtype=torch.float)
+        if len(batch_acts) > 0:
+            batch_acts = torch.tensor(np.array(batch_acts), dtype=torch.float)
+        else:
+            # Handle the case where batch_acts is empty or not properly formatted
+            raise ValueError("batch_acts is empty or not in the correct format")
+
+        if not isinstance(batch_acts, torch.Tensor):
+            batch_acts = torch.tensor(batch_acts, dtype=torch.float)
+        else:
+            batch_acts = batch_acts.clone().detach()
         # Reshape data as tensors in the shape specified before returning
-        batch_obs = torch.tensor(batch_obs, dtype=torch.float)
-        batch_acts = torch.tensor(batch_acts, dtype=torch.float)
+        #batch_obs = torch.tensor(batch_obs, dtype=torch.float)
+        #batch_acts = torch.tensor(batch_acts, dtype=torch.float)
         batch_log_probs = torch.tensor(batch_log_probs, dtype=torch.float)
         # ALG STEP #4
         batch_rtgs = self.compute_rtgs(batch_rews)
@@ -218,12 +230,19 @@ class PPO(Agent):
 
         flat_obs = obs.view(-1)
 
-        mean = self.actor(flat_obs)
+        probs = self.actor(flat_obs)
         # Create our Multivariate Normal Distribution
-        dist = MultivariateNormal(mean, self.cov_mat)
+        #dist = MultivariateNormal(mean, self.cov_mat)
+        m = Categorical(probs)
         # Sample an action from the distribution and get its log prob
-        action = dist.sample()
-        log_prob = dist.log_prob(action)
+        action = m.sample() # asuming this sample is NOT random ???
+
+        # next_state, reward = env.step(action)
+        # loss = -m.log_prob(action) * reward
+        # loss.backward()
+
+
+        log_prob = m.log_prob(action)
 
         # Return the sampled action and the log prob of that action
         # Note that I'm calling detach() since the action and log_prob
@@ -242,7 +261,8 @@ class PPO(Agent):
         # recent actor network.
         # This segment of code is similar to that in get_action()
         mean = self.actor(batch_obs)
-        dist = MultivariateNormal(mean, self.cov_mat)
+        #dist = MultivariateNormal(mean, self.cov_mat)
+        dist = Categorical(mean)
         log_probs = dist.log_prob(batch_acts)
         # Return predicted values V and log probs log_probs
 
