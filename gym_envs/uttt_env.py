@@ -89,7 +89,7 @@ def game2tensor(game: Game):
         lm[*game.last_move] = True
 
     res = np.stack([wb, bb, bf, lm])
-    return res
+    return res.flatten()
 
 '''
 class UltimateTicTacToeEnv(gym.Env):

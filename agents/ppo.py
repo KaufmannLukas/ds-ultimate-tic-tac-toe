@@ -18,7 +18,7 @@ from tqdm import tqdm
 
 from agents.agent import Agent
 from agents.network import FeedForwardNN_Actor, FeedForwardNN_Critic
-
+from gym_envs.uttt_env import game2tensor
 
 class PPO(Agent):
     """
@@ -267,4 +267,15 @@ class PPO(Agent):
         # Return predicted values V and log probs log_probs
 
         return V, log_probs
+
+
+    def play(self, game):
+        obs = game2tensor(game)
+        action, log_prob = self.get_action(obs)
+
+        game_idx = action // 9
+        field_idx = action % 9
+
+        return (game_idx, field_idx)
+
 
