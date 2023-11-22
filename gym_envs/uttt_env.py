@@ -37,7 +37,7 @@ class UltimateTicTacToeEnv(gym.Env):
     def reset(self):
         self.full_reward_history.append(self.single_reward_history)
         self.single_reward_history = []
-        logger.info("reset env")
+        #logger.info("reset env")
         self.game = Game()
         if self.opponent is not None and self.opponent_starts:
                 opponent_move = self.opponent.play(self.game)
@@ -91,7 +91,7 @@ class UltimateTicTacToeEnv(gym.Env):
         new_state = game2tensor(self.game)
         done = self.game.done
 
-        self.single_reward_history.append(reward)
+        #self.single_reward_history.append(reward)
 
         return new_state, reward, done, {}, {}
 

@@ -28,7 +28,7 @@ if __name__ == "__main__":
     random_agent = Random()
     env = UltimateTicTacToeEnv(random_agent)
     ppo_agent = PPO(env)
-    ppo_agent.load("./data/ppo", "ppo_v3")
+    ppo_agent.load("./data/ppo", "ppo_v3_100000_fin")
 
     winner_table = []
 
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     winner_dataframe = pd.DataFrame(
         winner_table, columns=["game_nr", "ppo_color", "winner"])
 
-    winner_dataframe.to_csv(f"data/random_vs_ppo_v3_10000000.csv")
+    winner_dataframe.to_csv(f"data/random_vs_ppo_v3_100000_fin.csv")
     winner_table = []
 
 

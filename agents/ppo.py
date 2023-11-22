@@ -98,7 +98,7 @@ class PPO(Agent):
         self.n_updates_per_iteration = 10      # Number of times to update actor/critic per iteration
         self.clip = 0.2                        # As recommended by the paper
         self.lr = 0.0005                        # Learning rate of actor optimizer
-        self.save_freq = 100                   # How often we save in number of iterations 
+        self.save_freq = 500                  # How often we save in number of iterations 
 
     def learn(self, total_timesteps):
 
