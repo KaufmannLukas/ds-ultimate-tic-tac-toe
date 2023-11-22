@@ -1,4 +1,5 @@
 from random import choice
+import logging
 from anyio import open_process
 import gymnasium as gym
 import numpy as np
@@ -9,8 +10,12 @@ from environments.game import Game
 from agents.agent import Agent
 
 
+logger = logging.getLogger(__name__)
+
+
 class UltimateTicTacToeEnv(gym.Env):
     def __init__(self, opponent: Agent = None, opponent_starts=False):
+        logger.info("init env")
         super(UltimateTicTacToeEnv, self).__init__()
         self.action_space = spaces.Box(
             low=0, high=1, shape=(9, 9), dtype=float)  # 9x9 board
@@ -20,6 +25,9 @@ class UltimateTicTacToeEnv(gym.Env):
             low=0, high=2, shape=(4, 9, 9), dtype=bool)
         self.game = Game()
 
+        self.full_reward_history = []
+        self.single_reward_history = []
+
 
         self.opponent = opponent
         self.opponent_starts = opponent_starts
@@ -27,6 +35,9 @@ class UltimateTicTacToeEnv(gym.Env):
         self.reset()
 
     def reset(self):
+        self.full_reward_history.append(self.single_reward_history)
+        self.single_reward_history = []
+        logger.info("reset env")
         self.game = Game()
         if self.opponent is not None and self.opponent_starts:
                 opponent_move = self.opponent.play(self.game)
@@ -38,10 +49,23 @@ class UltimateTicTacToeEnv(gym.Env):
         '''
         action: tuple like (game_idx, field_idx)
         '''
+        
+        '''
+        Reward factors:
+        '''
+        global_win_factor = 50
+        global_draw_factor = 10
+
+        local_win_factor = 5
+        local_draw_factor = 2
+
+        legal_move_factor = 1
+        illegal_move_factor = -1
+
 
         
         reward = 0
-
+        global_draw, local_draws = self.game.check_draw()
 
         game_idx = action // 9
         field_idx = action % 9
@@ -49,20 +73,25 @@ class UltimateTicTacToeEnv(gym.Env):
         move = (game_idx, field_idx)
 
         if self.game.check_valid_move(*move):
-            reward += 0.01
+            reward += 1 * legal_move_factor
             local_win, global_win = self.game.play(*move)
-            reward = reward + int(local_win) * 0.1 + int(global_win) * 3
+            reward += int(local_win) * local_win_factor + int(global_win) * global_win_factor
 
             if self.opponent is not None and not self.game.done:
                 counter_action = self.opponent.play(self.game)
                 self.game.play(*counter_action)
         else:
-            reward -= 0.01
+            reward += 1 * illegal_move_factor
+            self.game = Game()
+
+        new_global_draw, new_local_draws = self.game.check_draw()
+        reward += int(new_global_draw) * global_draw_factor
+        reward += int(any(new_local_draws ^ local_draws)) * local_draw_factor
 
         new_state = game2tensor(self.game)
         done = self.game.done
 
-
+        self.single_reward_history.append(reward)
 
         return new_state, reward, done, {}, {}
 

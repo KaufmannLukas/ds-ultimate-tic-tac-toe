@@ -93,6 +93,7 @@ class Game:
         self.winner = None
         self.done = False
         self.last_move = None
+        self.global_draw = False
 
     # TODO: maybe implement immutable game-states later
     def __key(self):
@@ -150,6 +151,7 @@ class Game:
         finished_games = (self.white.wins | self.black.wins)[
             :, np.newaxis] * np.ones((9, 9), dtype=bool)
         blocked_fields = blocked_fields | finished_games
+    
 
         # if a whole game is blocked, return the rest of the games as free
         if all(blocked_fields[self.last_move[1]]):
@@ -288,6 +290,8 @@ class Game:
 
         # check for a draw
         if np.all(self.blocked_fields):
+            if not win_global_game:
+                self.global_draw = True
             self.done = True
 
         return win_local_game, win_global_game
@@ -298,6 +302,19 @@ class Game:
         game_idx = index // 9
 
         return game_idx, field_idx
+    
+
+    def check_draw(self):
+        global_draw = self.global_draw
+
+        local_wins = self.white.wins | self.black.wins
+        played_fields = self.white.board | self.black.board
+        full_games = played_fields.sum(axis=1) == 9
+
+        local_draws = (full_games ^ local_wins) > 0
+
+        return global_draw, local_draws
+        
 
 
 

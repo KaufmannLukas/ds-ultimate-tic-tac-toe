@@ -7,6 +7,7 @@
 """
 
 import time
+import logging
 
 import gymnasium as gym
 import numpy as np
@@ -20,12 +21,16 @@ from agents.agent import Agent
 from agents.network import FeedForwardNN_Actor, FeedForwardNN_Critic
 from gym_envs.uttt_env import game2tensor
 
+logger = logging.getLogger(__name__)
+
+
+
 class PPO(Agent):
     """
         This is the PPO class we will use as our model in main.py
     """
 
-    def __init__(self, env, **hyperparameters):
+    def __init__(self, env, name=None, path=None, **hyperparameters):
         """
             Initializes the PPO model, including hyperparameters.
 
@@ -37,10 +42,28 @@ class PPO(Agent):
             Returns:
                 None
         """
+
+        logger.info("Init PPO agent...")
+
         assert(type(env.observation_space) == gym.spaces.box.Box)
         assert(type(env.action_space) == gym.spaces.box.Box)
         
         self._init_hyperparameters()
+        self.name = name
+        self.path = path
+
+
+        # This logger will help us with printing out summaries of each iteration
+        self.logger_dict = {
+            'delta_t': time.time_ns(),
+            't_so_far': 0,          # timesteps so far
+            'i_so_far': 0,          # iterations so far
+            'batch_lens': [],       # episodic lengths in batch
+            'batch_rews': [],       # episodic returns in batch
+            'actor_losses': [],     # losses of actor network in current iteration
+        }
+
+        self.reward_history = []
 
         # Extract environment information
         # TODO: check if shape[0] makes sense for us
@@ -69,18 +92,22 @@ class PPO(Agent):
 
     def _init_hyperparameters(self):
         # Default values for hyperparameters, will need to change later.
-        self.timesteps_per_batch = 4800            # timesteps per batch
-        self.max_timesteps_per_episode = 1600      # timesteps per episode
-        self.gamma = 0.95
-        self.n_updates_per_iteration = 5
-        self.clip = 0.2  # As recommended by the paper
-        self.lr = 0.005
+        self.timesteps_per_batch = 5000        # timesteps per batch
+        self.max_timesteps_per_episode = 1000  # timesteps per episode
+        self.gamma = 0.95                      # Discount factor to be applied when calculating Rewards-To-Go
+        self.n_updates_per_iteration = 10      # Number of times to update actor/critic per iteration
+        self.clip = 0.2                        # As recommended by the paper
+        self.lr = 0.0005                        # Learning rate of actor optimizer
+        self.save_freq = 100                   # How often we save in number of iterations 
 
     def learn(self, total_timesteps):
+
+        logger.info(f"start learn with {total_timesteps} total timesteps...")
         
         pbar = tqdm(total=total_timesteps)
 
         t_so_far = 0  # Timesteps simulated so far
+        i_so_far = 0 # Iterations ran so far
 
 
         while t_so_far < total_timesteps:              # ALG STEP 2
@@ -95,9 +122,19 @@ class PPO(Agent):
             # ollecting our batch simulations
             batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens = self.rollout()
 
+            
+
             # Calculate how many timesteps we collected this batch
             t_so_far += np.sum(batch_lens)
 
+            # Increment the number of iterations
+            i_so_far += 1
+
+            # Logging timesteps so far and iterations so far
+            self.logger_dict['t_so_far'] = t_so_far
+            self.logger_dict['i_so_far'] = i_so_far
+
+            
             # Calculate V_{phi, k}
             V, _ = self.evaluate(batch_obs, batch_acts)
             # ALG STEP 5
@@ -130,13 +167,28 @@ class PPO(Agent):
 
                 # Calculate gradients and perform backward propagation for actor network
                 self.actor_optim.zero_grad()
-                actor_loss.backward() # TODO: maybe with retain_graph=True (see original repo)
+                actor_loss.backward(retain_graph=True) # TODO: maybe with retain_graph=True (see original repo)
                 self.actor_optim.step()
 
                 # Calculate gradients and perform backward propagation for critic network
                 self.critic_optim.zero_grad()
                 critic_loss.backward()
                 self.critic_optim.step()
+
+                # Log actor loss
+                self.logger_dict['actor_losses'].append(actor_loss.detach())
+
+            if i_so_far % self.save_freq == 0:
+                
+                torch.save(self.actor.state_dict(), self.path+"/"+self.name+"_actor.pth")
+                torch.save(self.critic.state_dict(), self.path+"/"+self.name+"_critic.pth")
+                logger.info("saved files")
+                print("model saved")
+
+        # Print a summary of our training so far
+        self._log_summary()
+
+        # Save our model if it's time
         
         pbar.close()
 
@@ -149,6 +201,10 @@ class PPO(Agent):
         batch_rews = []            # batch rewards
         batch_rtgs = []            # batch rewards-to-go
         batch_lens = []            # episodic lengths in batch
+
+        # Episodic data. Keeps track of rewards per episode, will get cleared
+		# upon each new episode
+        ep_rews = []   
 
         # Number of timesteps run so far this batch
         t = 0
@@ -198,6 +254,11 @@ class PPO(Agent):
         batch_log_probs = torch.tensor(batch_log_probs, dtype=torch.float)
         # ALG STEP #4
         batch_rtgs = self.compute_rtgs(batch_rews)
+
+        # Log the episodic returns and episodic lengths in this batch.
+        self.logger_dict['batch_rews'] = batch_rews
+        self.logger_dict['batch_lens'] = batch_lens
+
         # Return the batch data
         return batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens
 
@@ -232,16 +293,22 @@ class PPO(Agent):
 
         probs = self.actor(flat_obs)
 
-        if mode == "play":
-            print("probs before masking: ")
-            print(probs)
+        # if mode == "play":
+        #     print("probs before masking: ")
+        #     print(probs)
 
-        blocked_fields = obs[0:81]
-        probs[blocked_fields == 1] = 0
+        '''putting probs for invalid moves to X manually'''
+        #blocked_fields = obs[0:81]
         # probs[blocked_fields == 1] = torch.finfo(torch.float64).eps
 
+        '''Normalisation of the probs'''
+        #print("Probs before normalization:", probs)
+        #probs[blocked_fields == 1] = 0
+        #probs /= (probs.sum() + 1e-8)  # Adding a small epsilon to avoid division by zero
+        #print("Probs after normalization:", probs)
+
         if mode == "play":
-            print("probs after masking: ")
+            print("probs: ")
             print(probs)
 
         # Create our Multivariate Normal Distribution
@@ -305,6 +372,63 @@ class PPO(Agent):
         self.actor.load_state_dict(torch.load(path + "/" + name + "_actor.pth"))
         self.critic.load_state_dict(torch.load(path + "/" + name + "_critic.pth"))
 
+
+    def _log_summary(self):
+            """
+                Print to stdout what we've logged so far in the most recent batch.
+
+                Parameters:
+                    None
+
+                Return:
+                    None
+            """
+            # Calculate logging values. I use a few python shortcuts to calculate each value
+            # without explaining since it's not too important to PPO; feel free to look it over,
+            # and if you have any questions you can email me (look at bottom of README)
+            delta_t = self.logger_dict['delta_t']
+            self.logger_dict['delta_t'] = time.time_ns()
+            delta_t = (self.logger_dict['delta_t'] - delta_t) / 1e9
+            delta_t = str(round(delta_t, 2))
+
+            t_so_far = self.logger_dict['t_so_far']
+            i_so_far = self.logger_dict['i_so_far']
+            avg_ep_lens = np.mean(self.logger_dict['batch_lens'])
+            avg_ep_rews = np.mean([np.sum(ep_rews) for ep_rews in self.logger_dict['batch_rews']])
+            avg_actor_loss = np.mean([losses.float().mean() for losses in self.logger_dict['actor_losses']])
+            # game_counter = 0
+            # avg_game_rews = if game.done -> game_counter += 1 -> 
+
+            # Round decimal places for more aesthetic logging messages
+            avg_ep_lens = str(round(avg_ep_lens, 2))
+            avg_ep_rews = str(round(avg_ep_rews, 2))
+            avg_actor_loss = str(round(avg_actor_loss, 5))
+
+            # Print logging statements
+            print(flush=True)
+            print(f"-------------------- Iteration #{i_so_far} --------------------", flush=True)
+            print(f"Average Episodic Length: {avg_ep_lens}", flush=True)
+            print(f"Average Episodic Return: {avg_ep_rews}", flush=True)
+            # print(f"Average Return per Game: {avg_game_rews}", flush=True)
+            print(f"Average Loss: {avg_actor_loss}", flush=True)
+            print(f"Timesteps So Far: {t_so_far}", flush=True)
+            print(f"Iteration took: {delta_t} secs", flush=True)
+            print(f"------------------------------------------------------", flush=True)
+            print(flush=True)
+
+            logger.info(f"-------------------- Iteration #{i_so_far} --------------------")
+            logger.info(f"Average Episodic Length: {avg_ep_lens}")
+            logger.info(f"Average Episodic Return: {avg_ep_rews}")
+            # logger.info(f"Average Return per Game: {avg_game_rews}")
+            logger.info(f"Average Loss: {avg_actor_loss}")
+            logger.info(f"Timesteps So Far: {t_so_far}")
+            logger.info(f"Iteration took: {delta_t} secs")
+            logger.info(f"------------------------------------------------------" )
+
+            # Reset batch-specific logging data
+            self.logger_dict['batch_lens'] = []
+            self.logger_dict['batch_rews'] = []
+            self.logger_dict['actor_losses'] = []
 
 
 
