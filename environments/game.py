@@ -466,7 +466,7 @@ class Game:
 # with open("json_test.json", "w") as file:
 #     file.write(json_string)
 
-game = Game()
-json_test = game.make_json()
-json_print = json.dumps(json_test, indent=4, default=lambda x: bool(x))
-print(json_print)
+# game = Game()
+# json_test = game.make_json()
+# json_print = json.dumps(json_test, indent=4, default=lambda x: bool(x))
+# print(json_print)
