@@ -4,7 +4,6 @@ import numpy as np
 
 import json
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -95,6 +94,7 @@ class Game:
         self.winner = None
         self.done = False
         self.last_move = None
+        self.global_draw = False
 
     # TODO: maybe implement immutable game-states later
     def __key(self):
@@ -152,6 +152,7 @@ class Game:
         finished_games = (self.white.wins | self.black.wins)[
             :, np.newaxis] * np.ones((9, 9), dtype=bool)
         blocked_fields = blocked_fields | finished_games
+    
 
         # if a whole game is blocked, return the rest of the games as free
         if all(blocked_fields[self.last_move[1]]):
@@ -290,9 +291,33 @@ class Game:
 
         # check for a draw
         if np.all(self.blocked_fields):
+            if not win_global_game:
+                self.global_draw = True
             self.done = True
 
         return win_local_game, win_global_game
+
+
+    def get_index_from_vector(index: int):
+        field_idx = index % 9 # -> field index
+        game_idx = index // 9
+
+        return game_idx, field_idx
+    
+
+    def check_draw(self):
+        global_draw = self.global_draw
+
+        local_wins = self.white.wins | self.black.wins
+        played_fields = self.white.board | self.black.board
+        full_games = played_fields.sum(axis=1) == 9
+
+        local_draws = (full_games ^ local_wins) > 0
+
+        return global_draw, local_draws
+        
+
+
 
     def _reshape_board(board):
         """
@@ -400,19 +425,22 @@ class Game:
 
 
     def make_json(self):
+        global_draw, local_draws = self.check_draw()
         json_data = {
-                "global_win": "white" if self.winner == self.white.color else (
+            "global_win": "draw" if self.global_draw else (
+                "white" if self.winner == self.white.color else (
                     "black" if self.winner == self.black.color else "None"
-                ),
-                "current_player": self.current_player.color,
-                "games": {}
-            }
+                )),
+            "current_player": self.current_player.color,
+            "games": {}
+        }
 
         for game_idx in range(9):
             json_data["games"][f"game_{game_idx}"] = {
-                "won_by": "white" if self.white.wins[game_idx] else (
-                    "black" if self.black.wins[game_idx] else "None" # TODO: add draw
-                ),
+                "won_by": "draw" if local_draws[game_idx] else (
+                    "white" if self.white.wins[game_idx] else (
+                        "black" if self.black.wins[game_idx] else "None"
+                    )),
                 "next_move": game_idx in {move[0] for move in self.get_valid_moves()},
                 "fields": {}
             }
@@ -437,3 +465,8 @@ class Game:
 # json_string = game.make_json()
 # with open("json_test.json", "w") as file:
 #     file.write(json_string)
+
+game = Game()
+json_test = game.make_json()
+json_print = json.dumps(json_test, indent=4, default=lambda x: bool(x))
+print(json_print)
