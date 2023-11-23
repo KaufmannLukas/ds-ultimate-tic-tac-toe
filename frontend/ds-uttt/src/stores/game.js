@@ -48,7 +48,7 @@ export const useGameStore = defineStore('gameStore', {
                     await new Promise(r => setTimeout(r, 1000));
                     response = await apiService.getGameState(this.currentGameId);
                     this.gameState = response.data.game_state;
-                } while (response && response.data.agent_is_busy === true);
+                } while (response && response.data.agent_is_busy === true && response.data.global_win === "None");
                 overlay.hide();
             } catch (error) {
                 console.error('Error updating game state:', error);

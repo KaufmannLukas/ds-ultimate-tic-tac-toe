@@ -56,8 +56,12 @@ const gameInfo = computed(() => {
 
 
 const gameClasses = computed(() => {
+        // get all games from gameStore.gamesState.games that have next_move == true and won_by == 'none'
+        const games_valid = Object.values(gameStore.gameState.games).filter(game => game.next_move && game.won_by === 'None');
+    // check if games_valid is greater than 1
+    const isAllValid = games_valid.length > 1;
     return {
-        'highlight-whole-game': gameStore.gameState.games.game_0.next_move && gameStore.gameState.games.game_1.next_move && gameStore.gameState.games.game_2.next_move && gameStore.gameState.games.game_3.next_move && gameStore.gameState.games.game_4.next_move && gameStore.gameState.games.game_5.next_move && gameStore.gameState.games.game_6.next_move && gameStore.gameState.games.game_7.next_move && gameStore.gameState.games.game_8.next_move,
+        'highlight-whole-game': gameStore.gameState.games.game_0.next_move && isAllValid,
     }
 });
 

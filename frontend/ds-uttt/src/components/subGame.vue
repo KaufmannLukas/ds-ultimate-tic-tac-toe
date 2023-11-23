@@ -34,7 +34,13 @@ const gameStore = useGameStore();
 
 const gameClasses = computed(() => {
     const game = gameStore.gameState.games[`game_${props.game_id}`];
-    const isAllValid = gameStore.gameState.games.game_0.next_move && gameStore.gameState.games.game_1.next_move && gameStore.gameState.games.game_2.next_move && gameStore.gameState.games.game_3.next_move && gameStore.gameState.games.game_4.next_move && gameStore.gameState.games.game_5.next_move && gameStore.gameState.games.game_6.next_move && gameStore.gameState.games.game_7.next_move && gameStore.gameState.games.game_8.next_move;
+
+    // get all games from gameStore.gamesState.games that have next_move == true and won_by == 'none'
+    const games_valid = Object.values(gameStore.gameState.games).filter(game => game.next_move && game.won_by === 'None');
+    // check if games_valid is greater than 1
+    const isAllValid = games_valid.length > 1;
+    console.log('games_valid', games_valid);
+
     console.log('isAllValid', isAllValid);
     return {
         'highlight-game': game?.next_move && settings.value.show_valid_areas && !isAllValid,
@@ -50,7 +56,7 @@ const settings = computed(() => {
 
 function handleCellClick(cell_id) {
     const game = gameStore.gameState.games[`game_${props.game_id}`];
-    if (game?.fields[`field_${cell_id}`]?.valid_move) {
+    if (game?.fields[`field_${cell_id}`]?.valid_move && gameStore.gameState.global_win == 'None') {
         makeMove(cell_id);
     } else {
         showToast(`Illegal move! You cannot make a move in game ${props.game_id + 1}, cell ${cell_id + 1} now!`, 'info')
@@ -114,10 +120,7 @@ function showToast(msg, type="info") {
     display: block;
 }
 
-.sub-cell:hover {
-    /* make it a little transparent */
-    opacity: 0.5;
-}
+
 
 .game-highlight {
     border: 2px solid rgb(11, 231, 11);
