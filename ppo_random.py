@@ -28,6 +28,7 @@ if __name__ == "__main__":
     random_agent = Random()
     env = UltimateTicTacToeEnv(random_agent)
     ppo_agent = PPO(env)
+    # Load model values saved so far 
     ppo_agent.load("./data/ppo", "ppo_v3_100000_fin")
 
     winner_table = []
@@ -48,6 +49,10 @@ if __name__ == "__main__":
             else:
                 next_move = random_agent.play(game)
             print(next_move)
+            if not game.check_valid_move(*next_move):
+                print("Invalid Move, restart the Game...")
+                game = Game()
+                break
             game.play(*next_move)
             counter += 1
 
@@ -65,7 +70,8 @@ if __name__ == "__main__":
     winner_dataframe = pd.DataFrame(
         winner_table, columns=["game_nr", "ppo_color", "winner"])
 
-    winner_dataframe.to_csv(f"data/random_vs_ppo_v3_100000_fin.csv")
+    # Create CSV file with winning distribution
+    winner_dataframe.to_csv(f"data/random_vs_ppo_v3_75_000_000_fin.csv")
     winner_table = []
 
 

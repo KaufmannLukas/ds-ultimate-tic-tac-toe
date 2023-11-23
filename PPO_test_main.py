@@ -43,7 +43,9 @@ def train_ppo(total_timesteps, model_path=None, model_name=None):
     model.learn(total_timesteps=total_timesteps)
     model.save(model_path, model_name)
 
-    #pd.DataFrame(env.full_reward_history).to_csv("./full_reward_history.csv")
+    # Saving the reward history
+    # Comment this out if you're training with large numbers!
+    pd.DataFrame(env.full_reward_history).to_csv("./full_reward_history.csv")
     
     logger.info("End training...")
 
@@ -88,6 +90,6 @@ def play_ppo():
 
 
 if __name__ == "__main__":
-    total_timesteps = 75_000_000
+    total_timesteps = 100_000
     train_ppo(total_timesteps, "./data/ppo", f"ppo_v3_100000_fin")
     #play_ppo()

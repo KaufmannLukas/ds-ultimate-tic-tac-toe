@@ -91,7 +91,8 @@ class UltimateTicTacToeEnv(gym.Env):
         new_state = game2tensor(self.game)
         done = self.game.done
 
-        #self.single_reward_history.append(reward)
+        # Append reward history => needed to implement numbers into csv file in 
+        self.single_reward_history.append(reward)
 
         return new_state, reward, done, {}, {}
 
