@@ -5,7 +5,7 @@
             @mouseleave="setHovered(cell.id, false)" :class="getCellClass(cell.id)">
             <img v-if="isStonePresent(cell.id, 'black')" src="@/assets/icon_black_stone.png" alt="black stone" />
             <img v-if="isStonePresent(cell.id, 'white')" src="@/assets/icon_white_stone.png" alt="white stone" />
-            <img v-if="isHovered[cell.id] && isLegalMove(cell.id)" src="@/assets/icon_white_stone.png"
+            <img v-if="isHovered[cell.id] && isLegalMove(cell.id) && settings.show_valid_moves" src="@/assets/icon_white_stone.png"
                 alt="white stone half opacity" style="opacity: 0.5;" />
         </div>
     </div>
@@ -35,11 +35,15 @@ const gameStore = useGameStore();
 const gameClasses = computed(() => {
     const game = gameStore.gameState.games[`game_${props.game_id}`];
     return {
-        'highlight-game': game?.next_move,
-        'won_by_black': game?.won_by === 'black',
-        'won_by_white': game?.won_by === 'white',
-        'won_by_draw': game?.won_by === 'draw'
+        'highlight-game': game?.next_move && settings.value.show_valid_areas,
+        'won_by_black': game?.won_by === 'black' && settings.value.show_local_wins,
+        'won_by_white': game?.won_by === 'white' && settings.value.show_local_wins,
+        'won_by_draw': game?.won_by === 'draw' && settings.value.show_local_wins
     };
+});
+
+const settings = computed(() => {
+    return gameStore.settings;
 });
 
 function handleCellClick(cell_id) {
@@ -63,7 +67,7 @@ function makeMove(cell_id) {
 function getCellClass(cell_id) {
     const game = gameStore.gameState.games[`game_${props.game_id}`];
     return {
-        'highlight-last-move': game?.fields[`field_${cell_id}`]?.last_move
+        'highlight-last-move': game?.fields[`field_${cell_id}`]?.last_move && settings.value.show_last_move,
     };
 }
 

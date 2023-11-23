@@ -20,6 +20,12 @@ export const useGameStore = defineStore('gameStore', {
         currentGameId: null,
         playerColor: 'white (X)',
         isLoading: false,
+        settings: { 
+            show_valid_moves: true,
+            show_local_wins: true,
+            show_last_move: true,
+            show_valid_areas: true,
+        },
     }),
     actions: {
         async newGame() {

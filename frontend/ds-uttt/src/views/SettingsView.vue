@@ -1,6 +1,32 @@
 <template>
   <h1>Settings</h1>
-  <p>Hier kommen die Game Einstellungen hin</p>
+  
+  <div class="settings">
+  <sl-checkbox 
+  :checked="gameStore.settings.show_valid_moves" 
+    @click="gameStore.settings.show_valid_moves = $event.target.checked">
+    Show valid moves
+  </sl-checkbox>
+
+  <sl-checkbox 
+  :checked="gameStore.settings.show_local_wins" 
+    @click="gameStore.settings.show_local_wins = $event.target.checked">
+    Show local wins
+  </sl-checkbox>
+
+  <sl-checkbox 
+  :checked="gameStore.settings.show_last_move" 
+    @click="gameStore.settings.show_last_move = $event.target.checked">
+    Show last move
+  </sl-checkbox>
+
+  <sl-checkbox 
+  :checked="gameStore.settings.show_valid_areas" 
+    @click="gameStore.settings.show_valid_areas = $event.target.checked">
+    Show valid move area
+  </sl-checkbox>
+</div>
+
   <sl-button class="fancy" @click="startGame">
       {{ gameStore.currentGameId ? 'Reset & Start new game' : 'Start new game' }}
   </sl-button>
@@ -8,6 +34,7 @@
 
 <script setup>
 import '@shoelace-style/shoelace/dist/components/button/button.js';
+import '@shoelace-style/shoelace/dist/components/checkbox/checkbox.js';
 import { useRouter } from 'vue-router';
 import { useGameStore } from '@/stores/game';
 
@@ -44,6 +71,13 @@ sl-button.fancy::part(base) {
   sl-button.fancy::part(base):focus-visible {
     outline: dashed 2px deeppink;
     outline-offset: 4px;
+  }
+
+  .settings {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
   }
 
 </style>
