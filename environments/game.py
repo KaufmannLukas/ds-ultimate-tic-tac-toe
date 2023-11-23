@@ -426,8 +426,8 @@ class Game:
 
     def make_json(self):
         global_draw, local_draws = self.check_draw()
-        local_wins_white = sum(self.white.wins)
-        local_wins_black = sum(self.black.wins)
+        local_wins_white = int(sum(self.white.wins))
+        local_wins_black = int(sum(self.black.wins))
 
         json_data = {
             "global_win": "draw" if self.global_draw else (
@@ -435,17 +435,16 @@ class Game:
                     "black" if self.winner == self.black.color else "None"
                 )),
             "current_player": self.current_player.color,
-            "local_wins_white": local_wins_white if local_wins_white > 0 else 0,
-            "local_wins_black": local_wins_black if local_wins_black > 0 else 0,
+            "local_wins_white": local_wins_white, #if local_wins_white > 0 else 0,
+            "local_wins_black": local_wins_black, #if local_wins_black > 0 else 0,
             "games": {}
         }
 
         for game_idx in range(9):
             json_data["games"][f"game_{game_idx}"] = {
-                "won_by": "draw" if local_draws[game_idx] else (
-                    "white" if self.white.wins[game_idx] else (
+                "won_by": "white" if self.white.wins[game_idx] else (
                         "black" if self.black.wins[game_idx] else "None"
-                    )),
+                    ),
                 "next_move": game_idx in {move[0] for move in self.get_valid_moves()},
                 "fields": {}
             }

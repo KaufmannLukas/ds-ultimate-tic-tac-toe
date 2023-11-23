@@ -3,7 +3,6 @@
 #app {
   margin: auto;
   padding: 15px;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -41,14 +40,45 @@
     "area area area";
   grid-gap: 0px;
   padding: 0px;
-  border: 2px solid rgba(0, 0, 0);
+  border: 2.5px solid rgba(0, 0, 0);
   aspect-ratio: 1 / 1;
 }
 
 /* fields  */
 .sub-cell {
-  border: 1.5px solid grey;
+  border: 2px solid grey;
   width: 100px;
   height: 100px;
   
+}
+
+
+.highlight-game {
+  /* glow and flash effect */
+  border: 2.5px solid rgb(129, 192, 255);
+  /* animation: glow 1s ease-in-out infinite alternate; */
+  box-shadow: inset 0 0 0 4px rgb(129, 192, 255); /* Weißer innerer Rahmen */
+}
+
+.highlight-whole-game {
+  /* glow and flash effect */
+  border: 2.5px solid rgb(129, 192, 255);
+  /* animation: glow 1s ease-in-out infinite alternate; */
+  box-shadow: inset 0 0 0 8px rgb(129, 192, 255); /* Weißer innerer Rahmen */
+}
+
+
+button {
+  margin: 0.5em;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  border: 0.1em solid black;
+  background-color: white;
+  font-size: 1.5em;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #e6e6e6;
 }

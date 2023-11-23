@@ -1,40 +1,50 @@
 <template>
-  <h1>Settings</h1>
-  
-  <div class="settings">
-  <sl-checkbox 
-  :checked="gameStore.settings.show_valid_moves" 
-    @click="gameStore.settings.show_valid_moves = $event.target.checked">
-    Show valid moves
-  </sl-checkbox>
+  <div class="settings-view">
+    <h1>Settings</h1>
 
-  <sl-checkbox 
-  :checked="gameStore.settings.show_local_wins" 
-    @click="gameStore.settings.show_local_wins = $event.target.checked">
-    Show local wins
-  </sl-checkbox>
+    <div class="settings">
+      <p>choose player</p>
+      <sl-select>
+        <sl-option selected value="white"><img style="vertical-align: bottom;" src="@/assets/icon_white_stone.png"
+            width="20"> white</sl-option>
+        <sl-option value="black"><img style="vertical-align: bottom;" src="@/assets/icon_black_stone.png" width="20">
+          black</sl-option>
+      </sl-select>
+      <div class="switch-container">
+        <sl-switch :checked="gameStore.settings.show_valid_moves"
+        @click="gameStore.settings.show_valid_moves = $event.target.checked">
+        show valid moves
+      </sl-switch>
 
-  <sl-checkbox 
-  :checked="gameStore.settings.show_last_move" 
-    @click="gameStore.settings.show_last_move = $event.target.checked">
-    Show last move
-  </sl-checkbox>
+      <sl-switch :checked="gameStore.settings.show_local_wins"
+        @click="gameStore.settings.show_local_wins = $event.target.checked">
+        show local wins
+      </sl-switch>
 
-  <sl-checkbox 
-  :checked="gameStore.settings.show_valid_areas" 
-    @click="gameStore.settings.show_valid_areas = $event.target.checked">
-    Show valid move area
-  </sl-checkbox>
-</div>
+      <sl-switch :checked="gameStore.settings.show_last_move"
+        @click="gameStore.settings.show_last_move = $event.target.checked">
+        show last move
+      </sl-switch>
 
-  <sl-button class="fancy" @click="startGame">
-      {{ gameStore.currentGameId ? 'Reset & Start new game' : 'Start new game' }}
-  </sl-button>
+      <sl-switch :checked="gameStore.settings.show_valid_areas"
+        @click="gameStore.settings.show_valid_areas = $event.target.checked">
+        show valid move area
+      </sl-switch>
+      </div>
+      
+    </div>
+
+    <button @click="startGame">
+      {{ gameStore.currentGameId != null ? 'Reset game' : 'Start new game' }}
+    </button>
+  </div>
 </template>
 
 <script setup>
 import '@shoelace-style/shoelace/dist/components/button/button.js';
-import '@shoelace-style/shoelace/dist/components/checkbox/checkbox.js';
+import '@shoelace-style/shoelace/dist/components/switch/switch.js';
+import '@shoelace-style/shoelace/dist/components/select/select.js';
+import '@shoelace-style/shoelace/dist/components/option/option.js';
 import { useRouter } from 'vue-router';
 import { useGameStore } from '@/stores/game';
 
@@ -42,42 +52,44 @@ const router = useRouter(); // Initialize useRouter here
 const gameStore = useGameStore();
 
 function startGame() {
-  console.log('start game');
   gameStore.newGame();
   router.push({ name: 'Game' }); // Use router directly
 }
 </script>
 <style>
-sl-button.fancy::part(base) {
-    /* Set design tokens for height and border width */
-    --sl-input-height-medium: 48px;
-    --sl-input-border-width: 4px;
-    margin: 5px;
-    border-radius: 0;
-    font-size: 1.125rem;
-    box-shadow: 0 2px 10px #0002;
-    transition: var(--sl-transition-medium) transform ease, var(--sl-transition-medium) border ease;
+.settings {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  font-size: 1.5em;
+
+}
+
+sl-switch {
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+  --width: 40px; --height: 20px; --thumb-size: 18px;
+}
+
+sl-switch > div {
+  font-size: 2em;
+}
+
+.settings-view {
+  
+  width: 70%;
+  margin-bottom: 5em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
   }
 
-  sl-button.fancy::part(base):hover {
-    transform: scale(1.05) rotate(-1deg);
-  }
-
-  sl-button.fancy::part(base):active {
-    color: black;
-    transform: scale(1.05) rotate(-1deg) translateY(2px);
-  }
-
-  sl-button.fancy::part(base):focus-visible {
-    outline: dashed 2px deeppink;
-    outline-offset: 4px;
-  }
-
-  .settings {
-    display: flex;
-    flex-direction: column;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-  }
-
+.switch-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 32px;
+}
 </style>

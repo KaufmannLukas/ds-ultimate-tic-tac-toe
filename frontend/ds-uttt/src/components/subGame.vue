@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, getCurrentInstance  } from 'vue';
+import { ref, computed, reactive  } from 'vue';
 import { useGameStore } from '@/stores/game';
 import { useToast } from "vue-toastification";
 const toast = useToast();
@@ -34,8 +34,10 @@ const gameStore = useGameStore();
 
 const gameClasses = computed(() => {
     const game = gameStore.gameState.games[`game_${props.game_id}`];
+    const isAllValid = gameStore.gameState.games.game_0.next_move && gameStore.gameState.games.game_1.next_move && gameStore.gameState.games.game_2.next_move && gameStore.gameState.games.game_3.next_move && gameStore.gameState.games.game_4.next_move && gameStore.gameState.games.game_5.next_move && gameStore.gameState.games.game_6.next_move && gameStore.gameState.games.game_7.next_move && gameStore.gameState.games.game_8.next_move;
+    console.log('isAllValid', isAllValid);
     return {
-        'highlight-game': game?.next_move && settings.value.show_valid_areas,
+        'highlight-game': game?.next_move && settings.value.show_valid_areas && !isAllValid,
         'won_by_black': game?.won_by === 'black' && settings.value.show_local_wins,
         'won_by_white': game?.won_by === 'white' && settings.value.show_local_wins,
         'won_by_draw': game?.won_by === 'draw' && settings.value.show_local_wins
@@ -121,11 +123,6 @@ function showToast(msg, type="info") {
     border: 2px solid rgb(11, 231, 11);
 }
 
-.highlight-game {
-    /* glow and flash effect */
-    border: 4px solid rgb(129, 192, 255);
-    /* animation: glow 1s ease-in-out infinite alternate; */
-}
 
 .highlight-last-move {
     /* glow and flash effect */

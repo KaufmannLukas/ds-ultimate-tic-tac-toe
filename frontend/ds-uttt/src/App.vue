@@ -1,60 +1,90 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
+import { computed } from 'vue';
 import '@shoelace-style/shoelace/dist/components/button-group/button-group.js';
 import '@shoelace-style/shoelace/dist/components/button/button.js';
 import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
 import '@shoelace-style/shoelace/dist/components/menu/menu.js';
 import '@shoelace-style/shoelace/dist/components/menu-item/menu-item.js';
+
+import { useRoute, useRouter } from 'vue-router';
+const router = useRouter();
+const route = useRoute();
+const isMenuRoute = computed(() => route.path === '/menu');
+
+
 </script>
 
 <template>
+  <div>
+    
+  </div>
   <header>
     <div class="navigation">
-      <sl-button-group label="navigation">
-        <router-link to="/" custom v-slot="{ navigate }">
-          <sl-button @click="navigate">Game</sl-button>
-        </router-link>
-      </sl-button-group>
-      <div class="game_name">UTTT</div>
+      <div class="game_name">U_T-T-T</div>
       <div class="dropdown-selection-alt">
-        <sl-dropdown>
-          <sl-button slot="trigger" caret>Menu</sl-button>
-          <sl-menu>
-            <router-link to="/about" custom v-slot="{ navigate }">
-              <sl-menu-item @click="navigate">About</sl-menu-item>
-            </router-link>
-            <router-link to="/rules" custom v-slot="{ navigate }">
-              <sl-menu-item @click="navigate">Rules</sl-menu-item>
-            </router-link>
-            <router-link to="/settings" custom v-slot="{ navigate }">
-              <sl-menu-item @click="navigate">Settings</sl-menu-item>
-            </router-link>
-
-          </sl-menu>
-        </sl-dropdown>
+        <div class="menu_container" @click=" router.push({ name: 'menu' })" :class="isMenuRoute ? 'change' : ''">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+          </div>
       </div>
     </div>
 
   </header>
 
   <RouterView />
+  <div class="group_name">XOXO&#178;</div>
 </template>
 
 <style>
 .navigation {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  min-width: 914px;
 }
 
 .game_name {
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  font-size: 4em;
+  display: absolute;
+  bottom: 0;
+  font-size: 3em;
   text-align: center;
   margin: 0.1em;
-  color: rgb(144, 86, 15);
-  transform: rotate(-5deg);
+  color: rgb(0, 0, 0);
+}
+
+.group_name {
+  font-size: 3em;
+  text-align: center;
+  color: rgb(0, 0, 0);
+}
+
+.menu_container {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.bar1,
+.bar2,
+.bar3 {
+  width: 35px;
+  height: 5px;
+  background-color: #333;
+  margin: 6px 0;
+  transition: 0.4s;
+}
+
+.change .bar1 {
+  transform: translate(0, 11px) rotate(-45deg);
+}
+
+.change .bar2 {
+  opacity: 0;
+}
+
+.change .bar3 {
+  transform: translate(0, -11px) rotate(45deg);
 }
 </style>
 
