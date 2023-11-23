@@ -18,6 +18,7 @@ from torch.optim import Adam
 from tqdm import tqdm
 
 from agents.agent import Agent
+# from agents.network_v2 import FeedForwardNN_Actor, FeedForwardNN_Critic
 from agents.network import FeedForwardNN_Actor, FeedForwardNN_Critic
 from gym_envs.uttt_env import game2tensor
 
@@ -30,7 +31,7 @@ class PPO(Agent):
         This is the PPO class we will use as our model in main.py
     """
 
-    def __init__(self, env, name=None, path=None, **hyperparameters):
+    def __init__(self, env, name=None, path=None, show_probs=False, **hyperparameters):
         """
             Initializes the PPO model, including hyperparameters.
 
@@ -51,6 +52,8 @@ class PPO(Agent):
         self._init_hyperparameters()
         self.name = name
         self.path = path
+
+        self.show_probs = show_probs
 
 
         # This logger will help us with printing out summaries of each iteration
@@ -202,6 +205,7 @@ class PPO(Agent):
         batch_rews = []            # batch rewards
         batch_rtgs = []            # batch rewards-to-go
         batch_lens = []            # episodic lengths in batch
+        batch_rew_count_dicts = [] # list of dictionaries for collected rewards 
 
         # Episodic data. Keeps track of rewards per episode, will get cleared
 		# upon each new episode
@@ -212,6 +216,8 @@ class PPO(Agent):
         while t < self.timesteps_per_batch:
             # Rewards this episode
             ep_rews = []
+            # count of rewards dic => in order to track invalid moves
+            rew_count_dict = {}
             obs, _ = self.env.reset()
             done = False
 
@@ -226,6 +232,10 @@ class PPO(Agent):
                 action, log_prob = self.get_action(obs)
                 obs, rew, done, _, _ = self.env.step(action) # two _ variables because gym changed it in newer version
 
+                rew_count_dict[rew] = rew_count_dict.get(rew, 0) + 1
+
+
+
                 # Collect reward, action, and log prob
                 ep_rews.append(rew)
                 batch_acts.append(action)
@@ -237,6 +247,7 @@ class PPO(Agent):
             # Collect episodic length and rewards
             batch_lens.append(ep_t + 1)  # plus 1 because timestep starts at 0
             batch_rews.append(ep_rews)
+            batch_rew_count_dicts.append(rew_count_dict)
 
         batch_obs = torch.tensor(np.array(batch_obs), dtype=torch.float)
         if len(batch_acts) > 0:
@@ -256,9 +267,11 @@ class PPO(Agent):
         # ALG STEP #4
         batch_rtgs = self.compute_rtgs(batch_rews)
 
-        # Log the episodic returns and episodic lengths in this batch.
+        # Log the episodic returns and episodic lengths and reward count (for invalid_move count) in this batch.
         self.logger_dict['batch_rews'] = batch_rews
         self.logger_dict['batch_lens'] = batch_lens
+        self.logger_dict['batch_rew_count_dicts'] = batch_rew_count_dicts
+
 
         # Return the batch data
         return batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens
@@ -294,9 +307,11 @@ class PPO(Agent):
 
         probs = self.actor(flat_obs)
 
-        # if mode == "play":
-        #     print("probs before masking: ")
-        #     print(probs)
+
+        # If you wanna print the probabilities, yes, if not, comment out
+        if mode == "play":
+            print("probs before masking: ")
+            print(probs)
 
         '''putting probs for invalid moves to X manually'''
         #blocked_fields = obs[0:81]
@@ -308,7 +323,7 @@ class PPO(Agent):
         #probs /= (probs.sum() + 1e-8)  # Adding a small epsilon to avoid division by zero
         #print("Probs after normalization:", probs)
 
-        if mode == "play":
+        if mode == "play" and self.show_probs:
             print("probs: ")
             print(probs)
 
@@ -343,7 +358,7 @@ class PPO(Agent):
         # Calculate the log probabilities of batch actions using most
         # recent actor network.
         # This segment of code is similar to that in get_action()
-        mean = self.actor(batch_obs)
+        mean = self.actor.forward(batch_obs)
         #dist = MultivariateNormal(mean, self.cov_mat)
         dist = Categorical(mean)
         log_probs = dist.log_prob(batch_acts)
@@ -397,39 +412,47 @@ class PPO(Agent):
             avg_ep_lens = np.mean(self.logger_dict['batch_lens'])
             avg_ep_rews = np.mean([np.sum(ep_rews) for ep_rews in self.logger_dict['batch_rews']])
             avg_actor_loss = np.mean([losses.float().mean() for losses in self.logger_dict['actor_losses']])
-            # game_counter = 0
-            # avg_game_rews = if game.done -> game_counter += 1 -> 
 
+            rew_dict_list = self.logger_dict["batch_rew_count_dicts"]
+
+            invalid_move_count = sum(rew_dict[-2] for rew_dict in rew_dict_list if -2 in rew_dict.keys())
+            invalid_move_ratio = invalid_move_count / self.timesteps_per_batch
+            
             # Round decimal places for more aesthetic logging messages
             avg_ep_lens = str(round(avg_ep_lens, 2))
             avg_ep_rews = str(round(avg_ep_rews, 2))
             avg_actor_loss = str(round(avg_actor_loss, 5))
+            invalid_move_ratio = str(round(invalid_move_ratio, 5))
+
 
             # Print logging statements
             print(flush=True)
             print(f"-------------------- Iteration #{i_so_far} --------------------", flush=True)
             print(f"Average Episodic Length: {avg_ep_lens}", flush=True)
             print(f"Average Episodic Return: {avg_ep_rews}", flush=True)
-            # print(f"Average Return per Game: {avg_game_rews}", flush=True)
             print(f"Average Loss: {avg_actor_loss}", flush=True)
             print(f"Timesteps So Far: {t_so_far}", flush=True)
             print(f"Iteration took: {delta_t} secs", flush=True)
+            print(f"invalid move count: {invalid_move_count}", flush=True)
+            print(f"invalid move ratio: {invalid_move_ratio}", flush=True)
             print(f"------------------------------------------------------", flush=True)
             print(flush=True)
 
             logger.info(f"-------------------- Iteration #{i_so_far} --------------------")
             logger.info(f"Average Episodic Length: {avg_ep_lens}")
             logger.info(f"Average Episodic Return: {avg_ep_rews}")
-            # logger.info(f"Average Return per Game: {avg_game_rews}")
             logger.info(f"Average Loss: {avg_actor_loss}")
             logger.info(f"Timesteps So Far: {t_so_far}")
             logger.info(f"Iteration took: {delta_t} secs")
+            logger.info(f"invalid move count: {invalid_move_count}")
+            logger.info(f"invalid move ratio: {invalid_move_ratio}")
             logger.info(f"------------------------------------------------------" )
 
             # Reset batch-specific logging data
             self.logger_dict['batch_lens'] = []
             self.logger_dict['batch_rews'] = []
             self.logger_dict['actor_losses'] = []
+            self.logger_dict['batch_rew_count_dicts']
 
 
 

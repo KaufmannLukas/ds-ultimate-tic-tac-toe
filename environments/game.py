@@ -154,7 +154,7 @@ class Game:
     
 
         # if a whole game is blocked, return the rest of the games as free
-        if all(blocked_fields[self.last_move[1]]):
+        if np.all(blocked_fields[self.last_move[1]]):
             return blocked_fields
 
         blocked_games = np.ones((9, 9), dtype=bool)

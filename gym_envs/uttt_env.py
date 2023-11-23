@@ -54,13 +54,15 @@ class UltimateTicTacToeEnv(gym.Env):
         Reward factors:
         '''
         global_win_factor = 100
-        global_draw_factor = 10
+        global_draw_factor = 0
+        global_loose_factor = -100
 
         local_win_factor = 5
-        local_draw_factor = 2
+        local_draw_factor = 0
+        local_loose_factor = -5
 
         legal_move_factor = 1
-        illegal_move_factor = -2
+        illegal_move_factor = -200
 
 
         
@@ -77,9 +79,15 @@ class UltimateTicTacToeEnv(gym.Env):
             local_win, global_win = self.game.play(*move)
             reward += int(local_win) * local_win_factor + int(global_win) * global_win_factor
 
-            if self.opponent is not None and not self.game.done:
+            while self.opponent is not None and not self.game.done:
                 counter_action = self.opponent.play(self.game)
-                self.game.play(*counter_action)
+                if not self.game.check_valid_move(*counter_action):
+                    self.game = Game()
+                    continue
+                opp_local_win, opp_global_win = self.game.play(*counter_action)
+                reward += int(opp_local_win) * local_loose_factor
+                reward += int(opp_global_win) * global_loose_factor
+                break
         else:
             reward += 1 * illegal_move_factor
             self.game = Game()

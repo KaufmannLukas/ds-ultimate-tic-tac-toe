@@ -24,12 +24,12 @@ if __name__ == "__main__":
 
     logger.info("Main started...")
 
-    num_of_games = 100
+    num_of_games = 1000
     random_agent = Random()
     env = UltimateTicTacToeEnv(random_agent)
-    ppo_agent = PPO(env)
+    ppo_agent = PPO(env, show_probs=True)
     # Load model values saved so far 
-    ppo_agent.load("./data/ppo", "ppo_v4_2")
+    ppo_agent.load("./data/ppo", "ppo_v5_1")
 
     winner_table = []
 
@@ -71,8 +71,17 @@ if __name__ == "__main__":
         winner_table, columns=["game_nr", "ppo_color", "winner"])
 
     # Create CSV file with winning distribution
-    winner_dataframe.to_csv(f"data/random_vs_ppo_v4_2.csv")
-    winner_table = []
+    winner_dataframe.to_csv(f"data/random_vs_ppo_v5_1.csv")
+
+    wins = winner_dataframe[winner_dataframe["winner"] == winner_dataframe["ppo_color"]].value_counts()
+    draws = winner_dataframe["winner"].isna().sum()
+    losses = winner_dataframe[winner_dataframe["winner"] != winner_dataframe["ppo_color"]].value_counts()
+
+    print(f"The ppo_v4_ppo has won {wins.shape[0]} out of {num_of_games} games against Baseline Model.")
+    print(f"The ppo_v4_ppo has tied {draws} out of {num_of_games} games against Baseline Model.")
+    print(f"The ppo_v4_ppo has lost {losses.shape[0]} out of {num_of_games} games against Baseline Model.")
+
+    #winner_table = []
 
 
     logger.info("ppo vs. random main stopped")
