@@ -34,7 +34,7 @@ def train_ppo(total_timesteps):
     print(env.opponent)
     # Create a model for PPO.
     # Saving during the learning process freq times
-    model = PPO(env=env, name="ppo_v5_1", path="./data/ppo")
+    model = PPO(env=env, name="ppo_v5_2", path="./data/ppo")
     #if model_path and model_name:
     # load existing model
     #model.load(name="ppo_v4_2", path="./data/ppo")
@@ -44,7 +44,7 @@ def train_ppo(total_timesteps):
     #for i in range(1):
     model.learn(total_timesteps=total_timesteps)
     # saving at the end of the run
-    model.save(name="ppo_v5_1", path="./data/ppo")
+    model.save(name="ppo_v5_2", path="./data/ppo")
 
     # Saving the reward history
     # Comment this out if you're training with large numbers!
@@ -56,7 +56,7 @@ def train_ppo(total_timesteps):
 def play_ppo():
     env = UltimateTicTacToeEnv(opponent=None, opponent_starts=False)
     model = PPO(env=env)
-    model.load("./data/ppo", "ppo_v3_100000")
+    model.load("./data/ppo", "ppo_v4_3")
     game = Game()
     #implement the next two lines for using a memory_prone agent (like mcts_agent_01)
     # with open("data/mcts_ltmm_02.pkl", mode="rb") as file:
@@ -93,6 +93,6 @@ def play_ppo():
 
 
 if __name__ == "__main__":
-    total_timesteps = 20_000_000
+    total_timesteps = 10_000_000
     train_ppo(total_timesteps)
     #play_ppo()

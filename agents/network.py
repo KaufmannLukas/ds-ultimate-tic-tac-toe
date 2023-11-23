@@ -17,10 +17,13 @@ class FeedForwardNN_Actor(nn.Module):
         # TODO: adjust layers later (64)
         self.layer1 = nn.Linear(in_dim, 324)
         self.bn1 = nn.BatchNorm1d(324)
+        self.do1 = nn.Dropout()
         self.layer2 = nn.Linear(324, 324)
         self.bn2 = nn.BatchNorm1d(324)
+        self.do2 = nn.Dropout()
         self.layer3 = nn.Linear(324, 324)
         self.bn3 = nn.BatchNorm1d(324)
+        self.do3 = nn.Dropout()
         # self.layer4 = nn.Linear(324, 324)
         # self.layer5 = nn.Linear(324, 324)
         self.layer6 = nn.Linear(324, out_dim)
@@ -32,6 +35,7 @@ class FeedForwardNN_Actor(nn.Module):
         # self.bn2 = nn.BatchNorm1d(128)  # Batch normalization layer
         # self.layer3 = nn.Linear(128, out_dim)
 
+
         # Consider adding batch normalization layers, especially if you are deepening your network.
         # Batch normalization can improve the stability and speed of training.
 
@@ -40,11 +44,23 @@ class FeedForwardNN_Actor(nn.Module):
         # Convert observation to tensor if it's a numpy array
         if isinstance(obs, np.ndarray):
             obs = torch.tensor(obs, dtype=torch.float)
+        if obs.dim() == 1:
+            batch = False
+        else:
+            batch = True
+
         
         # TODO: maybe change activation function for improvement?
-        activation1 = F.relu(self.layer1(obs))
-        activation2 = F.relu(self.layer2(activation1))
-        activation3 = F.relu(self.layer3(activation2))
+        if batch:
+            activation1 = F.relu(self.bn1(self.layer1(obs)))
+            activation2 = F.relu(self.bn2(self.layer2(activation1)))
+            activation3 = F.relu(self.bn3(self.layer3(activation2)))
+        else:
+            activation1 = F.relu(self.layer1(obs))
+            activation2 = F.relu(self.layer2(activation1))
+            activation3 = F.relu(self.layer3(activation2))
+
+        
         # activation4 = F.relu(self.layer4(activation3))
         # activation5 = F.relu(self.layer5(activation4))
         output = F.softmax(self.layer6(activation3), dim=-1)

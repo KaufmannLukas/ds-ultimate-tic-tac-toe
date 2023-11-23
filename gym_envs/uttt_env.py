@@ -53,16 +53,16 @@ class UltimateTicTacToeEnv(gym.Env):
         '''
         Reward factors:
         '''
-        global_win_factor = 100
-        global_draw_factor = 0
-        global_loose_factor = -100
+        global_win_factor = 50
+        global_draw_factor = 10
+        global_loose_factor = 0
 
-        local_win_factor = 5
-        local_draw_factor = 0
-        local_loose_factor = -5
+        local_win_factor = 3
+        local_draw_factor = 1
+        local_loose_factor = 0
 
-        legal_move_factor = 1
-        illegal_move_factor = -200
+        legal_move_factor = 0.3
+        illegal_move_factor = -15       # !!! If you change this number, change it in the counter for invalid moves in ppo.py
 
 
         

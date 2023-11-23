@@ -27,8 +27,8 @@ def train_ppo(total_timesteps):
     # Agent = Agent / Random ?
     # TODO: load a model first 
 
-    random_opponent = Random()
-    opponent_env = UltimateTicTacToeEnv(opponent=random_opponent, opponent_starts=False)
+    #random_opponent = Random()
+    opponent_env = UltimateTicTacToeEnv(opponent=None, opponent_starts=False)
     
     opponent = PPO(env=opponent_env)
     opponent.load(name="ppo_v4_3", path="./data/ppo")
@@ -38,7 +38,7 @@ def train_ppo(total_timesteps):
     print(env.opponent)
     # Create a model for PPO.
     # Saving during the learning process freq times
-    model = PPO(env=env, name="ppo_v4_ppo", path="./data/ppo")
+    model = PPO(env=env, name="ppo_v4_ppo_2", path="./data/ppo")
     #if model_path and model_name:
     # load existing model
     model.load(name="ppo_v4_3", path="./data/ppo")
@@ -48,7 +48,7 @@ def train_ppo(total_timesteps):
     #for i in range(1):
     model.learn(total_timesteps=total_timesteps)
     # saving at the end of the run
-    model.save(name="ppo_v4_ppo", path="./data/ppo")
+    model.save(name="ppo_v4_ppo_2", path="./data/ppo")
 
     # Saving the reward history
     # Comment this out if you're training with large numbers!

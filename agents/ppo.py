@@ -100,7 +100,7 @@ class PPO(Agent):
         self.gamma = 0.95                      # Discount factor to be applied when calculating Rewards-To-Go
         self.n_updates_per_iteration = 10      # Number of times to update actor/critic per iteration
         self.clip = 0.2                        # As recommended by the paper
-        self.lr = 0.0005                        # Learning rate of actor optimizer
+        self.lr = 0.005                        # Learning rate of actor optimizer
         self.save_freq = 10                  # How often we save in number of iterations 
 
     def learn(self, total_timesteps):
@@ -309,9 +309,9 @@ class PPO(Agent):
 
 
         # If you wanna print the probabilities, yes, if not, comment out
-        if mode == "play":
-            print("probs before masking: ")
-            print(probs)
+        # if mode == "play":
+        #     print("probs before masking: ")
+        #     print(probs)
 
         '''putting probs for invalid moves to X manually'''
         #blocked_fields = obs[0:81]
@@ -381,10 +381,12 @@ class PPO(Agent):
 
 
     def save(self, path, name):
+        print(f"Save {name} to {path}")
         torch.save(self.actor.state_dict(), path+"/"+name+"_actor.pth")
         torch.save(self.critic.state_dict(), path+"/"+name+"_critic.pth")
         
     def load(self, path, name):
+        print(f"Load {name} from {path}")
         self.actor.load_state_dict(torch.load(path + "/" + name + "_actor.pth"))
         self.critic.load_state_dict(torch.load(path + "/" + name + "_critic.pth"))
 
@@ -415,7 +417,7 @@ class PPO(Agent):
 
             rew_dict_list = self.logger_dict["batch_rew_count_dicts"]
 
-            invalid_move_count = sum(rew_dict[-2] for rew_dict in rew_dict_list if -2 in rew_dict.keys())
+            invalid_move_count = sum(rew_dict[-15] for rew_dict in rew_dict_list if -15 in rew_dict.keys())
             invalid_move_ratio = invalid_move_count / self.timesteps_per_batch
             
             # Round decimal places for more aesthetic logging messages
