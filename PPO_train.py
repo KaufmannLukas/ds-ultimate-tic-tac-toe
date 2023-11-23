@@ -33,7 +33,7 @@ def train_ppo(total_timesteps):
 
     print(env.opponent)
     # Create a model for PPO.
-    model = PPO(env=env, name="ppo_v4_2", path="./data/ppo")
+    model = PPO(env=env, name="ppo_v4_5_test", path="./data/ppo")
     #if model_path and model_name:
     # model.load(model_path, model_name)
     # model = PPO(policy_class=FeedForwardNN, env=env)
@@ -41,11 +41,11 @@ def train_ppo(total_timesteps):
 
     #for i in range(1):
     model.learn(total_timesteps=total_timesteps)
-    model.save(name="ppo_v4_2", path="./data/ppo")
+    model.save(name="ppo_v4_5_test", path="./data/ppo")
 
     # Saving the reward history
     # Comment this out if you're training with large numbers!
-    pd.DataFrame(env.full_reward_history).to_csv("./full_reward_history.csv")
+   #pd.DataFrame(env.full_reward_history).to_csv("./full_reward_history.csv")
 
     logger.info("End training...")
 
