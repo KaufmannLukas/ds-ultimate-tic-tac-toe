@@ -98,7 +98,7 @@ class PPO(Agent):
         self.n_updates_per_iteration = 10      # Number of times to update actor/critic per iteration
         self.clip = 0.2                        # As recommended by the paper
         self.lr = 0.0005                        # Learning rate of actor optimizer
-        self.save_freq = 500                  # How often we save in number of iterations 
+        self.save_freq = 10                  # How often we save in number of iterations 
 
     def learn(self, total_timesteps):
 
@@ -183,6 +183,7 @@ class PPO(Agent):
                 torch.save(self.actor.state_dict(), self.path+"/"+self.name+"_actor.pth")
                 torch.save(self.critic.state_dict(), self.path+"/"+self.name+"_critic.pth")
                 logger.info("saved files")
+                self._log_summary()
                 print("model saved")
 
         # Print a summary of our training so far

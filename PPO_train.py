@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 #from agents.network import FeedForwardNN
 
-def train_ppo(total_timesteps, model_path=None, model_name=None):
+def train_ppo(total_timesteps):
 
     logger.info("Start training...")
 
@@ -33,20 +33,20 @@ def train_ppo(total_timesteps, model_path=None, model_name=None):
 
     print(env.opponent)
     # Create a model for PPO.
-    model = PPO(env=env, name="ppo_v3", path="./data/ppo")
-    if model_path and model_name:
-        model.load(model_path, model_name)
+    model = PPO(env=env, name="ppo_v4_2", path="./data/ppo")
+    #if model_path and model_name:
+    # model.load(model_path, model_name)
     # model = PPO(policy_class=FeedForwardNN, env=env)
     #model = PPO(env)
 
     #for i in range(1):
     model.learn(total_timesteps=total_timesteps)
-    model.save(model_path, model_name)
+    model.save(name="ppo_v4_2", path="./data/ppo")
 
     # Saving the reward history
     # Comment this out if you're training with large numbers!
     pd.DataFrame(env.full_reward_history).to_csv("./full_reward_history.csv")
-    
+
     logger.info("End training...")
 
 
@@ -90,6 +90,6 @@ def play_ppo():
 
 
 if __name__ == "__main__":
-    total_timesteps = 100_000
-    train_ppo(total_timesteps, "./data/ppo", f"ppo_v3_100000_fin")
+    total_timesteps = 1_000_000
+    train_ppo(total_timesteps)
     #play_ppo()

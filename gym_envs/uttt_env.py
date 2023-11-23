@@ -53,14 +53,14 @@ class UltimateTicTacToeEnv(gym.Env):
         '''
         Reward factors:
         '''
-        global_win_factor = 50
+        global_win_factor = 100
         global_draw_factor = 10
 
         local_win_factor = 5
         local_draw_factor = 2
 
         legal_move_factor = 1
-        illegal_move_factor = -1
+        illegal_move_factor = -2
 
 
         
@@ -105,11 +105,16 @@ def game2tensor(game: Game):
     wb = game.white.board
     bb = game.black.board
     bf = game.blocked_fields
+    vm = ~game.blocked_fields
     lm = np.zeros(shape=(9, 9), dtype=bool)
     if game.last_move:
         lm[*game.last_move] = True
 
-    res = np.stack([bf, wb, bb, lm])
+    if game.current_player.color == "white (X)":
+        res = np.stack([wb, bb, vm, lm])
+    else:
+        res = np.stack([bb, wb, vm, lm])
+
     return res.flatten()
 
 '''

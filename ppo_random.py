@@ -29,7 +29,7 @@ if __name__ == "__main__":
     env = UltimateTicTacToeEnv(random_agent)
     ppo_agent = PPO(env)
     # Load model values saved so far 
-    ppo_agent.load("./data/ppo", "ppo_v3_100000_fin")
+    ppo_agent.load("./data/ppo", "ppo_v4_2")
 
     winner_table = []
 
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         winner_table, columns=["game_nr", "ppo_color", "winner"])
 
     # Create CSV file with winning distribution
-    winner_dataframe.to_csv(f"data/random_vs_ppo_v3_75_000_000_fin.csv")
+    winner_dataframe.to_csv(f"data/random_vs_ppo_v4_2.csv")
     winner_table = []
 
 
