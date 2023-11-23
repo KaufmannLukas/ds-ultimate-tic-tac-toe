@@ -426,12 +426,17 @@ class Game:
 
     def make_json(self):
         global_draw, local_draws = self.check_draw()
+        local_wins_white = sum(self.white.wins)
+        local_wins_black = sum(self.black.wins)
+
         json_data = {
             "global_win": "draw" if self.global_draw else (
                 "white" if self.winner == self.white.color else (
                     "black" if self.winner == self.black.color else "None"
                 )),
             "current_player": self.current_player.color,
+            "local_wins_white": local_wins_white if local_wins_white > 0 else 0,
+            "local_wins_black": local_wins_black if local_wins_black > 0 else 0,
             "games": {}
         }
 
@@ -466,7 +471,7 @@ class Game:
 # with open("json_test.json", "w") as file:
 #     file.write(json_string)
 
-game = Game()
-json_test = game.make_json()
-json_print = json.dumps(json_test, indent=4, default=lambda x: bool(x))
-print(json_print)
+# game = Game()
+# json_test = game.make_json()
+# json_print = json.dumps(json_test, indent=4, default=lambda x: bool(x))
+# print(json_print)
