@@ -79,16 +79,18 @@ class PPO(Agent):
 
         # Create our variable for the matrix.
         # Note that I chose 0.5 for stdev arbitrarily.
-        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
+        # self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
 
-        # Create the covariance matrix
-        self.cov_mat = torch.diag(self.cov_var)
+        # # Create the covariance matrix
+        # self.cov_mat = torch.diag(self.cov_var)
 
         # Load if file exist
         # save new if not
         logger.info(f"try to load model {self.name} from {self.path}")
         try:
             self.load(self.path, self.name)
+
+            logger.info(f"succesfully loaded {self.name} from {self.path}")
         except:
             logger.info(f"unable to load, create new files")
             self.save(self.path, self.name)
@@ -97,31 +99,34 @@ class PPO(Agent):
 
     def _init_hyperparameters(self, hyperparameters):
         # Default values for hyperparameters, will need to change later.
-        hp = hyperparameters
+        if hyperparameters:
+            logger.info("setup hyperparameters as given")
+            hp = hyperparameters
 
-        # timesteps per batch
-        self.timesteps_per_batch = hp["timesteps_per_batch"]        
-        # timesteps per episode
-        self.max_timesteps_per_episode = hp["max_timesteps_per_episode"]   
-        # Discount factor to be applied when calculating Rewards-To-Go
-        self.gamma = hp["gamma"]                       
-        # Number of times to update actor/critic per iteration
-        self.n_updates_per_iteration = hp["n_updates_per_iteration"]       
-        # As recommended by the paper
-        self.clip = hp["clip"]                         
-        # Learning rate of actor optimizer
-        self.lr = hp["lr"]                         
-        # How often we save in number of iterations 
-        self.save_freq = hp["save_freq"]                   
+            # timesteps per batch
+            self.timesteps_per_batch = hp["timesteps_per_batch"]        
+            # timesteps per episode
+            self.max_timesteps_per_episode = hp["max_timesteps_per_episode"]   
+            # Discount factor to be applied when calculating Rewards-To-Go
+            self.gamma = hp["gamma"]                       
+            # Number of times to update actor/critic per iteration
+            self.n_updates_per_iteration = hp["n_updates_per_iteration"]       
+            # As recommended by the paper
+            self.clip = hp["clip"]                         
+            # Learning rate of actor optimizer
+            self.lr = hp["lr"]                         
+            # How often we save in number of iterations 
+            self.save_freq = hp["save_freq"]                   
 
-
-        # self.timesteps_per_batch = 5000        # timesteps per batch
-        # self.max_timesteps_per_episode = 1000  # timesteps per episode
-        # self.gamma = 0.95                      # Discount factor to be applied when calculating Rewards-To-Go
-        # self.n_updates_per_iteration = 10      # Number of times to update actor/critic per iteration
-        # self.clip = 0.2                        # As recommended by the paper
-        # self.lr = 0.0005                        # Learning rate of actor optimizer
-        # self.save_freq = 10                  # How often we save in number of iterations 
+        else:
+            logger.info("setup hyperparameters by dafault")
+            self.timesteps_per_batch = 5000        # timesteps per batch
+            self.max_timesteps_per_episode = 1000  # timesteps per episode
+            self.gamma = 0.95                      # Discount factor to be applied when calculating Rewards-To-Go
+            self.n_updates_per_iteration = 10      # Number of times to update actor/critic per iteration
+            self.clip = 0.2                        # As recommended by the paper
+            self.lr = 0.0005                        # Learning rate of actor optimizer
+            self.save_freq = 10                  # How often we save in number of iterations 
 
     def learn(self, total_timesteps, env):
 
@@ -227,6 +232,7 @@ class PPO(Agent):
         batch_rews = []            # batch rewards
         batch_rtgs = []            # batch rewards-to-go
         batch_lens = []            # episodic lengths in batch
+        batch_rew_count_dicts = [] # list of dictionaries for collected rewards 
 
         # Episodic data. Keeps track of rewards per episode, will get cleared
 		# upon each new episode
@@ -237,8 +243,11 @@ class PPO(Agent):
         while t < self.timesteps_per_batch:
             # Rewards this episode
             ep_rews = []
+            # count of rewards dic => in order to track invalid moves
+            rew_count_dict = {}
             obs, _ = env.reset()
             done = False
+
 
             # TODO: make a while loop instead because max_timesteps_per_episode will never reached
             ep_t = 0
@@ -252,6 +261,8 @@ class PPO(Agent):
                 action, log_prob = self.get_action(obs)
                 obs, rew, done, _, _ = env.step(action) # two _ variables because gym changed it in newer version
 
+                rew_count_dict[rew] = rew_count_dict.get(rew, 0) + 1
+
                 # Collect reward, action, and log prob
                 ep_rews.append(rew)
                 batch_acts.append(action)
@@ -263,6 +274,7 @@ class PPO(Agent):
             # Collect episodic length and rewards
             batch_lens.append(ep_t + 1)  # plus 1 because timestep starts at 0
             batch_rews.append(ep_rews)
+            batch_rew_count_dicts.append(rew_count_dict)
 
         batch_obs = torch.tensor(np.array(batch_obs), dtype=torch.float)
         if len(batch_acts) > 0:
@@ -280,16 +292,19 @@ class PPO(Agent):
         #batch_acts = torch.tensor(batch_acts, dtype=torch.float)
         batch_log_probs = torch.tensor(batch_log_probs, dtype=torch.float)
         # ALG STEP #4
-        batch_rtgs = self.compute_rtgs(batch_rews)
+        against_itself = True if env.opponent is not None else False
+        batch_rtgs = self.compute_rtgs(batch_rews, against_itself=against_itself)
 
         # Log the episodic returns and episodic lengths in this batch.
         self.logger_dict['batch_rews'] = batch_rews
         self.logger_dict['batch_lens'] = batch_lens
+        self.logger_dict['batch_rew_count_dicts'] = batch_rew_count_dicts
+
 
         # Return the batch data
         return batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens
 
-    def compute_rtgs(self, batch_rews):
+    def compute_rtgs(self, batch_rews, against_itself=False):
         # The rewards-to-go (rtg) per episode per batch to return.
         # The shape will be (num timesteps per episode)
         batch_rtgs = []
@@ -298,7 +313,7 @@ class PPO(Agent):
         for ep_rews in reversed(batch_rews):
 
             discounted_reward = 0  # The discounted reward so far
-
+            
             for rew in reversed(ep_rews):
                 discounted_reward = rew + discounted_reward * self.gamma
                 batch_rtgs.insert(0, discounted_reward)
@@ -334,9 +349,9 @@ class PPO(Agent):
         #probs /= (probs.sum() + 1e-8)  # Adding a small epsilon to avoid division by zero
         #print("Probs after normalization:", probs)
 
-        if mode == "play":
-            print("probs: ")
-            print(probs)
+        # if mode == "play":
+        #     print("probs: ")
+        #     print(probs)
 
         # Create our Multivariate Normal Distribution
         #dist = MultivariateNormal(mean, self.cov_mat)
@@ -423,39 +438,46 @@ class PPO(Agent):
             avg_ep_lens = np.mean(self.logger_dict['batch_lens'])
             avg_ep_rews = np.mean([np.sum(ep_rews) for ep_rews in self.logger_dict['batch_rews']])
             avg_actor_loss = np.mean([losses.float().mean() for losses in self.logger_dict['actor_losses']])
-            # game_counter = 0
-            # avg_game_rews = if game.done -> game_counter += 1 -> 
+           
+            rew_dict_list = self.logger_dict["batch_rew_count_dicts"]
+
+            invalid_move_count = sum(rew_dict[-2] for rew_dict in rew_dict_list if -2 in rew_dict.keys())
+            invalid_move_ratio = invalid_move_count / self.timesteps_per_batch
 
             # Round decimal places for more aesthetic logging messages
             avg_ep_lens = str(round(avg_ep_lens, 2))
             avg_ep_rews = str(round(avg_ep_rews, 2))
             avg_actor_loss = str(round(avg_actor_loss, 5))
+            invalid_move_ratio = str(round(invalid_move_ratio, 5))
 
             # Print logging statements
             print(flush=True)
             print(f"-------------------- Iteration #{i_so_far} --------------------", flush=True)
             print(f"Average Episodic Length: {avg_ep_lens}", flush=True)
             print(f"Average Episodic Return: {avg_ep_rews}", flush=True)
-            # print(f"Average Return per Game: {avg_game_rews}", flush=True)
             print(f"Average Loss: {avg_actor_loss}", flush=True)
             print(f"Timesteps So Far: {t_so_far}", flush=True)
             print(f"Iteration took: {delta_t} secs", flush=True)
+            print(f"invalid move count: {invalid_move_count}", flush=True)
+            print(f"invalid move ratio: {invalid_move_ratio}", flush=True)
             print(f"------------------------------------------------------", flush=True)
             print(flush=True)
 
             logger.info(f"-------------------- Iteration #{i_so_far} --------------------")
             logger.info(f"Average Episodic Length: {avg_ep_lens}")
             logger.info(f"Average Episodic Return: {avg_ep_rews}")
-            # logger.info(f"Average Return per Game: {avg_game_rews}")
             logger.info(f"Average Loss: {avg_actor_loss}")
             logger.info(f"Timesteps So Far: {t_so_far}")
             logger.info(f"Iteration took: {delta_t} secs")
+            logger.info(f"invalid move count: {invalid_move_count}")
+            logger.info(f"invalid move ratio: {invalid_move_ratio}")
             logger.info(f"------------------------------------------------------" )
 
             # Reset batch-specific logging data
             self.logger_dict['batch_lens'] = []
             self.logger_dict['batch_rews'] = []
             self.logger_dict['actor_losses'] = []
+            self.logger_dict['batch_rew_count_dicts'] = []
 
 
 

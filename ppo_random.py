@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 
-def test_ppo(ppo_agent: Agent, num_of_games=100):
+def test_ppo(ppo_agent: Agent, num_of_games=100, print_stuff=False):
 
     logger.info("Main started...")
 
@@ -35,53 +35,49 @@ def test_ppo(ppo_agent: Agent, num_of_games=100):
 
     for i in tqdm(range(num_of_games)):
         
-        logger.info("Start new Game")
+        #logger.info("Start new Game")
         game = Game()
         counter = 0
 
         # check which player's turn it is
         while not game.done:
-            print(game)
+            if print_stuff:
+                print(game)
             if (counter+i) % 2 == 0:
                 next_move = ppo_agent.play(game)
             else:
                 next_move = random_agent.play(game)
-            print(next_move)
+            if print_stuff:
+                print(next_move)
             if not game.check_valid_move(*next_move):
-                print("Invalid Move, restart the Game...")
+                if print_stuff:
+                    print("Invalid Move, restart the Game...")
                 game = Game()
-                break
+                continue
             game.play(*next_move)
             counter += 1
 
-        logger.info("Game done")
+        #logger.info("Game done")
 
         if i % 2 == 0:
-            # player_x = mcts_agent
+            # player_x = ppo_agent
             # player_o = random_agent
-
             ppo_color = game.white.color
-            winner = game.winner
-            ppo_wins = int(ppo_color == winner)
-            ppo_loose = int(ppo_wins == 0 and winner is not None)
-            draw = int(winner is None)
-
-            winner_table.append(
-                [i, 
-                 ppo_color, 
-                 winner, 
-                 ppo_wins,
-                 ppo_loose,
-                 draw])
         else:
-            winner_table.append(
-                [i, game.black.color, game.winner])
+            ppo_color = game.black.color
 
-    
+        winner = game.winner
+        ppo_wins = int(ppo_color == winner)
+        ppo_loose = int(ppo_wins == 0 and winner is not None)
+        draw = int(winner is None)
 
-    # Create CSV file with winning distribution
-    
-    #winner_table = []
+        winner_table.append(
+            [i, 
+                ppo_color, 
+                winner, 
+                ppo_wins,
+                ppo_loose,
+                draw])
 
 
     logger.info("ppo vs. random main stopped")
@@ -95,13 +91,25 @@ def winner_table_to_dataframe(winner_table):
 
 
 if __name__ == "__main__":
-    ppo_agent = PPO()
     # Load model values saved so far 
-    ppo_agent.load("./data/ppo", "ppo_v4_2")
 
-    winner_table = test_ppo(num_of_games=100,
-         ppo_agent=ppo_agent)
+    model = "ppo_v_ppo_v1_0"
+    path = "./data/ppo/ppo_vs_ppo"
+    ppo_agent = PPO(name=model, path=path)
+    #ppo_agent.load(path, model)
+
+    num_of_games = 1
+
+    winner_table = test_ppo(num_of_games=num_of_games,
+         ppo_agent=ppo_agent, print_stuff=False)
     
     winner_df = winner_table_to_dataframe(winner_table)
 
-    winner_df.to_csv(f"data/random_vs_ppo_v4_2.csv")
+    #winner_df.to_csv(f"data/random_vs_ppo_v4_2.csv")
+
+    win_count = winner_df["ppo_wins"].sum()
+    loose_count = winner_df["ppo_loose"].sum()
+    draw_count = winner_df["draw"].sum()
+
+    print(f"Played {num_of_games} games against Random:")
+    print(f"winns: {win_count}\t looses: {loose_count}\t draws: {draw_count}")
