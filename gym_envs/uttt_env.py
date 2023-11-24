@@ -97,7 +97,16 @@ class UltimateTicTacToeEnv(gym.Env):
 
             if self.opponent is not None and not self.game.done:
                 counter_action = self.opponent.play(self.game)
-                self.game.play(*counter_action)
+                for i in range(100):
+                    if self.game.check_valid_move(*counter_action):
+                        self.game.play(*counter_action)
+                        break
+                    else:
+                        counter_action = self.opponent.play(self.game)
+                else:
+                    self.game = Game()
+                    logger.warn("opponent is not making valid moves. Restart the Game!!!")
+
         else:
             reward += 1 * illegal_move_factor
             self.game = Game()

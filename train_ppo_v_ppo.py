@@ -4,6 +4,7 @@ from agents.human import Agent
 from gym_envs.uttt_env import UltimateTicTacToeEnv
 from environments.game import Game
 from agents.human import Human
+from agents.mcts import MCTS
 from ppo_random import test_ppo, winner_table_to_dataframe
 
 import pandas as pd
@@ -28,7 +29,7 @@ def train(model_name, model_path,
           save_generations=False,
           test_generations=True,
           num_of_test_games = 1000,
-          opponent = None
+          opponent = None,
           ):
 
     logger.info("Start training...")
@@ -43,12 +44,6 @@ def train(model_name, model_path,
 
     logger.info("Start training ...")
     for i in range(num_generations):
-        if opponent is None:
-            if i == 0:
-                # TODO: only valid for first round
-                opponent = Random()
-            else:
-                opponent = PPO(name=model_name + f"_g{i-1}",path=model_path, hyperparameters=ppo_hyperparameters)
         env = UltimateTicTacToeEnv(opponent=opponent, opponent_starts=bool(i%2 == 0))
         logger.info(f"Start generation {i} ...")
         print(f"Start generation {i} ...")
@@ -77,7 +72,7 @@ def train(model_name, model_path,
 
 if __name__ == "__main__":
     total_timesteps = 500_000
-    num_generations = 5
+    num_generations = 2
     model = "ppo_v_ppo_v1_1"
     path = "./data/ppo/ppo_vs_ppo"
 
@@ -99,12 +94,15 @@ if __name__ == "__main__":
         "local_win_factor": 5,
         "local_draw_factor": 0,
 
-        "legal_move_factor": 0.1,
-        "illegal_move_factor": -0.2,
+        "legal_move_factor": 1,
+        "illegal_move_factor": -5,
     }
 
-    #opponent = Random()
-    opponent = None
+    # SET STARTING OPPONENT HERE
+    op_model = "ppo_v_ppo_v1_1_g4"
+    op_path = "./data/ppo/ppo_vs_ppo"
+    #opponent = PPO(name=op_model, path=op_path, hyperparameters=ppo_hyperparameters)
+    opponent = Random()
 
     train(total_timesteps=total_timesteps,
           ppo_hyperparameters=ppo_hyperparameters,
@@ -113,6 +111,6 @@ if __name__ == "__main__":
           num_generations=num_generations,
           save_generations=True,
           num_of_test_games = 100,
-          opponent = opponent
+          opponent = opponent,
           )
-    #play_ppo()
+    
