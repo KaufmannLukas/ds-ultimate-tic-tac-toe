@@ -45,6 +45,7 @@ def train(model_name, model_path,
     for i in range(num_generations):
         if opponent is None:
             if i == 0:
+                # TODO: only valid for first round
                 opponent = Random()
             else:
                 opponent = PPO(name=model_name + f"_g{i-1}",path=model_path, hyperparameters=ppo_hyperparameters)
