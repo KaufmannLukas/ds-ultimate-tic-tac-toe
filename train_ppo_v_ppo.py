@@ -82,10 +82,12 @@ if __name__ == "__main__":
     total_timesteps = 500_000
     num_generations = 5
 
-    model_name = "ppo_v_ppo_v1_7"
+    model_name = "ppo_v_ppo_v2_1_epsilon"
     model_path = "./data/ppo/ppo_vs_ppo"
 
-    load_name = "ppo_v_ppo_v1_6"
+    # load_name = None
+    # load_path = None
+    load_name = "ppo_v_ppo_v1_7"
     load_path = "./data/ppo/ppo_vs_ppo"
 
 
@@ -95,16 +97,16 @@ if __name__ == "__main__":
         "gamma": 0.95,                      # Discount factor to be applied when calculating Rewards-To-Go
         "n_updates_per_iteration": 10,      # Number of times to update actor/critic per iteration
         "clip": 0.2,                        # As recommended by the paper
-        "lr": 0.0025,                       # Learning rate of actor optimizer
+        "lr": 0.05,                       # Learning rate of actor optimizer
         "save_freq": 10,                    # How often we save in number of iterations 
     }
 
     reward_config = {
-        "global_win_factor": 50,
-        "global_draw_factor": 20,
+        "global_win_factor": 100,
+        "global_draw_factor": 0,
 
         "local_win_factor": 5,
-        "local_draw_factor": 2,
+        "local_draw_factor": 0,
 
         "legal_move_factor": 0.1,
         # WAIT!!!!! READ BELOW
@@ -113,7 +115,7 @@ if __name__ == "__main__":
     }
 
     # SET STARTING OPPONENT HERE
-    op_model = "ppo_v_ppo_v1_1_g4"
+    op_model = "ppo_v_ppo_v1_7"
     op_path = "./data/ppo/ppo_vs_ppo"
     #opponent = PPO(name=op_model, path=op_path, hyperparameters=ppo_hyperparameters)
     opponent = Random()

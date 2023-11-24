@@ -9,6 +9,7 @@
 import time
 import logging
 import traceback
+import random
 
 import gymnasium as gym
 import numpy as np
@@ -335,7 +336,7 @@ class PPO(Agent):
         batch_rtgs = torch.tensor(batch_rtgs, dtype=torch.float)
         return batch_rtgs
 
-    def get_action(self, obs, mode="learn"):
+    def get_action(self, obs, mode="learn", epsilon=0.1):
         # Query the actor network for a mean action.
         # Same thing as calling self.actor.forward(obs)
         # TODO: check later if mean makes sense in discrete, not continuous action space.
@@ -347,6 +348,23 @@ class PPO(Agent):
         flat_obs = obs.view(-1)
 
         probs = self.actor(flat_obs)
+
+        ### CHAT GPT START
+
+        # Epsilon-greedy exploration
+        if random.random() < epsilon and mode == "learn":
+            # Explore: choose a random action
+            action = torch.tensor(random.randint(0, self.act_dim - 1))
+            log_prob = torch.tensor(0.0)  # Placeholder value for exploration
+        else:
+            # Exploit: choose action based on the policy
+            m = Categorical(probs)
+            action = m.sample()
+            log_prob = m.log_prob(action)
+
+        ### CHAT GPT END
+
+        #probs = self.actor(flat_obs)
 
         # if mode == "play":
         #     print("probs before masking: ")
@@ -368,9 +386,13 @@ class PPO(Agent):
 
         # Create our Multivariate Normal Distribution
         #dist = MultivariateNormal(mean, self.cov_mat)
-        m = Categorical(probs)
+
+
+        #m = Categorical(probs)
         # Sample an action from the distribution and get its log prob
-        action = m.sample() # asuming this sample is NOT random ???
+
+        
+        #action = m.sample() # assuming this sample is NOT random ???
 
         # print("action: ", action)
 
@@ -378,8 +400,8 @@ class PPO(Agent):
         # loss = -m.log_prob(action) * reward
         # loss.backward()
 
-
-        log_prob = m.log_prob(action)
+        # Log probability calculation
+        # log_prob = m.log_prob(action) if m is not None else None
 
         # Return the sampled action and the log prob of that action
         # Note that I'm calling detach() since the action and log_prob
@@ -463,7 +485,7 @@ class PPO(Agent):
             avg_ep_lens = str(round(avg_ep_lens, 2))
             avg_ep_rews = str(round(avg_ep_rews, 2))
             avg_actor_loss = str(round(avg_actor_loss, 5))
-            invalid_move_ratio = str(round(invalid_move_ratio, 5))
+            invalid_move_ratio = str(round(invalid_move_ratio, 6))
 
             # Print logging statements
             print(flush=True)
