@@ -9,20 +9,23 @@ from matplotlib.pylab import get_state
 from environments.game import Game
 from agents.agent import Agent
 
+from typing import Optional
+
 
 logger = logging.getLogger(__name__)
 
 
 class UltimateTicTacToeEnv(gym.Env):
-    def __init__(self, opponent: Agent = None, opponent_starts=False):
+    def __init__(self, opponent: Optional[Agent] = None, opponent_starts=False):
         logger.info("init env")
         super(UltimateTicTacToeEnv, self).__init__()
         self.action_space = spaces.Box(
-            low=0, high=1, shape=(9, 9), dtype=float)  # 9x9 board
+            low=0, high=1, shape=(9, 9), dtype=np.float64)  # 9x9 board
 
         # 9x9 game boards for white, black, last_move, blocked_field
         self.observation_space = spaces.Box(
             low=0, high=2, shape=(4, 9, 9), dtype=bool)
+        
         self.game = Game()
 
         self.full_reward_history = []

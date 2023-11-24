@@ -30,7 +30,7 @@ class PPO(Agent):
         This is the PPO class we will use as our model in main.py
     """
 
-    def __init__(self, env, name=None, path=None, **hyperparameters):
+    def __init__(self, name=None, path=None, hyperparameters=None):
         """
             Initializes the PPO model, including hyperparameters.
 
@@ -44,11 +44,8 @@ class PPO(Agent):
         """
 
         logger.info("Init PPO agent...")
-
-        assert(type(env.observation_space) == gym.spaces.box.Box)
-        assert(type(env.action_space) == gym.spaces.box.Box)
         
-        self._init_hyperparameters()
+        self._init_hyperparameters(hyperparameters)
         self.name = name
         self.path = path
 
@@ -66,16 +63,15 @@ class PPO(Agent):
         self.reward_history = []
 
         # Extract environment information
-        # TODO: check if shape[0] makes sense for us
-        self.env = env
         # For a 4x9x9 observation space, this should be 324
-        self.obs_dim = np.prod(env.observation_space.shape)
+        self.obs_dim = 324
         self.act_dim = 81 # env.action_space.shape
+        self.critic_dim = 1
 
         # ALG STEP 1
         # Initialize actor and critic networks
         self.actor = FeedForwardNN_Actor(self.obs_dim, self.act_dim)
-        self.critic = FeedForwardNN_Critic(self.obs_dim, 1)
+        self.critic = FeedForwardNN_Critic(self.obs_dim, self.critic_dim)
 
         # Initialize optimizers for actor and critic
         self.actor_optim = Adam(self.actor.parameters(), lr=self.lr)
@@ -88,19 +84,46 @@ class PPO(Agent):
         # Create the covariance matrix
         self.cov_mat = torch.diag(self.cov_var)
 
+        # Load if file exist
+        # save new if not
+        logger.info(f"try to load model {self.name} from {self.path}")
+        try:
+            self.load(self.path, self.name)
+        except:
+            logger.info(f"unable to load, create new files")
+            self.save(self.path, self.name)
+
     # TODO: adjust values later
 
-    def _init_hyperparameters(self):
+    def _init_hyperparameters(self, hyperparameters):
         # Default values for hyperparameters, will need to change later.
-        self.timesteps_per_batch = 5000        # timesteps per batch
-        self.max_timesteps_per_episode = 1000  # timesteps per episode
-        self.gamma = 0.95                      # Discount factor to be applied when calculating Rewards-To-Go
-        self.n_updates_per_iteration = 10      # Number of times to update actor/critic per iteration
-        self.clip = 0.2                        # As recommended by the paper
-        self.lr = 0.0005                        # Learning rate of actor optimizer
-        self.save_freq = 10                  # How often we save in number of iterations 
+        hp = hyperparameters
 
-    def learn(self, total_timesteps):
+        # timesteps per batch
+        self.timesteps_per_batch = hp["timesteps_per_batch"]        
+        # timesteps per episode
+        self.max_timesteps_per_episode = hp["max_timesteps_per_episode"]   
+        # Discount factor to be applied when calculating Rewards-To-Go
+        self.gamma = hp["gamma"]                       
+        # Number of times to update actor/critic per iteration
+        self.n_updates_per_iteration = hp["n_updates_per_iteration"]       
+        # As recommended by the paper
+        self.clip = hp["clip"]                         
+        # Learning rate of actor optimizer
+        self.lr = hp["lr"]                         
+        # How often we save in number of iterations 
+        self.save_freq = hp["save_freq"]                   
+
+
+        # self.timesteps_per_batch = 5000        # timesteps per batch
+        # self.max_timesteps_per_episode = 1000  # timesteps per episode
+        # self.gamma = 0.95                      # Discount factor to be applied when calculating Rewards-To-Go
+        # self.n_updates_per_iteration = 10      # Number of times to update actor/critic per iteration
+        # self.clip = 0.2                        # As recommended by the paper
+        # self.lr = 0.0005                        # Learning rate of actor optimizer
+        # self.save_freq = 10                  # How often we save in number of iterations 
+
+    def learn(self, total_timesteps, env):
 
         logger.info(f"start learn with {total_timesteps} total timesteps...")
         
@@ -120,7 +143,7 @@ class PPO(Agent):
             # TODO: for loop makes more sense?
             # ALG STEP 3
             # ollecting our batch simulations
-            batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens = self.rollout()
+            batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens = self.rollout(env=env)
 
             
 
@@ -179,10 +202,12 @@ class PPO(Agent):
                 self.logger_dict['actor_losses'].append(actor_loss.detach())
 
             if i_so_far % self.save_freq == 0:
+
+                if self.name and self.path:
                 
-                torch.save(self.actor.state_dict(), self.path+"/"+self.name+"_actor.pth")
-                torch.save(self.critic.state_dict(), self.path+"/"+self.name+"_critic.pth")
-                logger.info("saved files")
+                    torch.save(self.actor.state_dict(), self.path + "/" + self.name + "_actor.pth")
+                    torch.save(self.critic.state_dict(), self.path + "/" + self.name +"_critic.pth")
+                    logger.info("saved files")
                 self._log_summary()
                 print("model saved")
 
@@ -194,7 +219,7 @@ class PPO(Agent):
         pbar.close()
 
 
-    def rollout(self):
+    def rollout(self, env):
         # Batch data
         batch_obs = []             # batch observations
         batch_acts = []            # batch actions
@@ -212,10 +237,11 @@ class PPO(Agent):
         while t < self.timesteps_per_batch:
             # Rewards this episode
             ep_rews = []
-            obs, _ = self.env.reset()
+            obs, _ = env.reset()
             done = False
 
             # TODO: make a while loop instead because max_timesteps_per_episode will never reached
+            ep_t = 0
             for ep_t in range(self.max_timesteps_per_episode):
 
                 #self.env.render()
@@ -224,7 +250,7 @@ class PPO(Agent):
                 # Collect observation
                 batch_obs.append(obs)
                 action, log_prob = self.get_action(obs)
-                obs, rew, done, _, _ = self.env.step(action) # two _ variables because gym changed it in newer version
+                obs, rew, done, _, _ = env.step(action) # two _ variables because gym changed it in newer version
 
                 # Collect reward, action, and log prob
                 ep_rews.append(rew)
