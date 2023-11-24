@@ -56,6 +56,8 @@ def test_ppo(ppo_agent: Agent, num_of_games=100, print_stuff=False):
                 continue
             game.play(*next_move)
             counter += 1
+            if game.check_draw()[0]:
+                break
 
         #logger.info("Game done")
 
@@ -69,7 +71,9 @@ def test_ppo(ppo_agent: Agent, num_of_games=100, print_stuff=False):
         winner = game.winner
         ppo_wins = int(ppo_color == winner)
         ppo_loose = int(ppo_wins == 0 and winner is not None)
-        draw = int(winner is None)
+        #draw = int(winner is None)   
+        # draw = int(game.check_draw()[0] == True)
+        draw = int(game.global_draw)  
 
         winner_table.append(
             [i, 

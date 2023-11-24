@@ -24,12 +24,15 @@ logger = logging.getLogger(__name__)
 
 def train(model_name, model_path,
           ppo_hyperparameters,
+          load_name=None,
+          load_path=None,
           total_timesteps=1000,
           num_generations=1,
           save_generations=False,
           test_generations=True,
           num_of_test_games = 1000,
           opponent = None,
+          reward_config = None
           ):
 
     logger.info("Start training...")
@@ -37,14 +40,19 @@ def train(model_name, model_path,
     # Agent = Agent / Random ?
     # TODO: load a model first 
     logger.info("Init PPO ...")
-    ppo = PPO(name=model_name, path=model_path, hyperparameters=ppo_hyperparameters)
+    ppo = PPO(name=model_name,
+              path=model_path,
+              load_name=load_name,
+              load_path=load_path,
+              hyperparameters=ppo_hyperparameters,
+              )
 
     logger.info("Init env ...")
 
 
     logger.info("Start training ...")
     for i in range(num_generations):
-        env = UltimateTicTacToeEnv(opponent=opponent, opponent_starts=bool(i%2 == 0))
+        env = UltimateTicTacToeEnv(opponent=opponent, opponent_starts=bool(i%2 == 0), reward_config=reward_config)
         logger.info(f"Start generation {i} ...")
         print(f"Start generation {i} ...")
         ppo.learn(env=env, total_timesteps=total_timesteps)
@@ -73,8 +81,12 @@ def train(model_name, model_path,
 if __name__ == "__main__":
     total_timesteps = 500_000
     num_generations = 2
-    model = "ppo_v_ppo_v1_1"
-    path = "./data/ppo/ppo_vs_ppo"
+
+    model_name = "ppo_v_ppo_v1_5"
+    model_path = "./data/ppo/ppo_vs_ppo"
+
+    load_name = "ppo_v_ppo_v1_4"
+    load_path = "./data/ppo/ppo_vs_ppo"
 
 
     ppo_hyperparameters = {
@@ -89,13 +101,13 @@ if __name__ == "__main__":
 
     reward_config = {
         "global_win_factor": 50,
-        "global_draw_factor": 0,
+        "global_draw_factor": 20,
 
         "local_win_factor": 5,
-        "local_draw_factor": 0,
+        "local_draw_factor": 2,
 
-        "legal_move_factor": 1,
-        "illegal_move_factor": -5,
+        "legal_move_factor": 0.1,
+        "illegal_move_factor": -15,
     }
 
     # SET STARTING OPPONENT HERE
@@ -106,11 +118,14 @@ if __name__ == "__main__":
 
     train(total_timesteps=total_timesteps,
           ppo_hyperparameters=ppo_hyperparameters,
-          model_name=model,
-          model_path=path,
+          model_name=model_name,
+          model_path=model_path,
+          load_name=load_name,
+          load_path=load_path,
           num_generations=num_generations,
           save_generations=True,
-          num_of_test_games = 100,
+          num_of_test_games = 1000,
           opponent = opponent,
+          reward_config = reward_config,
           )
     

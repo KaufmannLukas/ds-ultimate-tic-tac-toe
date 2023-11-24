@@ -8,6 +8,7 @@
 
 import time
 import logging
+import traceback
 
 import gymnasium as gym
 import numpy as np
@@ -30,7 +31,7 @@ class PPO(Agent):
         This is the PPO class we will use as our model in main.py
     """
 
-    def __init__(self, name=None, path=None, hyperparameters=None):
+    def __init__(self, name=None, path=None, load_name=None, load_path=None, hyperparameters=None):
         """
             Initializes the PPO model, including hyperparameters.
 
@@ -48,6 +49,16 @@ class PPO(Agent):
         self._init_hyperparameters(hyperparameters)
         self.name = name
         self.path = path
+
+        if load_name is None:
+            self.load_name = name
+        else:
+            self.load_name = load_name
+        
+        if load_path is None:
+            self.load_path = path
+        else:
+            self.load_path = load_path
 
 
         # This logger will help us with printing out summaries of each iteration
@@ -88,11 +99,14 @@ class PPO(Agent):
         # save new if not
         logger.info(f"try to load model {self.name} from {self.path}")
         try:
-            self.load(self.path, self.name)
-
+            self.load(self.load_path, self.load_name)
+            print("yea load that bitch !!!")
             logger.info(f"succesfully loaded {self.name} from {self.path}")
-        except:
-            logger.info(f"unable to load, create new files")
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            print(traceback.format_exc())
+            logger.warn(f"unable to load, create new files")
+            print("oh cannot load :(")
             self.save(self.path, self.name)
 
     # TODO: adjust values later
@@ -209,15 +223,14 @@ class PPO(Agent):
             if i_so_far % self.save_freq == 0:
 
                 if self.name and self.path:
-                
-                    torch.save(self.actor.state_dict(), self.path + "/" + self.name + "_actor.pth")
-                    torch.save(self.critic.state_dict(), self.path + "/" + self.name +"_critic.pth")
+                    
+                    self.save(name=self.name, path=self.path)
                     logger.info("saved files")
-                self._log_summary()
+                self._log_summary(env=env)
                 print("model saved")
 
         # Print a summary of our training so far
-        self._log_summary()
+        self._log_summary(env=env)
 
         # Save our model if it's time
         
@@ -415,7 +428,7 @@ class PPO(Agent):
         self.critic.load_state_dict(torch.load(path + "/" + name + "_critic.pth"))
 
 
-    def _log_summary(self):
+    def _log_summary(self, env=None):
             """
                 Print to stdout what we've logged so far in the most recent batch.
 
@@ -441,7 +454,9 @@ class PPO(Agent):
            
             rew_dict_list = self.logger_dict["batch_rew_count_dicts"]
 
-            invalid_move_count = sum(rew_dict[-2] for rew_dict in rew_dict_list if -2 in rew_dict.keys())
+            # ill_move_factor = env.reward_config['illegal_move_factor']
+            # invalid_move_count = sum(rew_dict[ill_move_factor] for rew_dict in rew_dict_list if rew_dict[ill_move_factor] in rew_dict.keys())
+            invalid_move_count = sum(rew_dict[-15] for rew_dict in rew_dict_list if -15 in rew_dict.keys())
             invalid_move_ratio = invalid_move_count / self.timesteps_per_batch
 
             # Round decimal places for more aesthetic logging messages
@@ -452,6 +467,7 @@ class PPO(Agent):
 
             # Print logging statements
             print(flush=True)
+            print(f"-------------------- PPO VERSION #{self.name} --------------------", flush=True)
             print(f"-------------------- Iteration #{i_so_far} --------------------", flush=True)
             print(f"Average Episodic Length: {avg_ep_lens}", flush=True)
             print(f"Average Episodic Return: {avg_ep_rews}", flush=True)
@@ -460,9 +476,18 @@ class PPO(Agent):
             print(f"Iteration took: {delta_t} secs", flush=True)
             print(f"invalid move count: {invalid_move_count}", flush=True)
             print(f"invalid move ratio: {invalid_move_ratio}", flush=True)
+            print(f"----------------------- hyperparameters -----------------------", flush=True)
+            print(f"timesteps_per_batch: {self.timesteps_per_batch}", flush=True)
+            print(f"max_timesteps_per_episode: {self.max_timesteps_per_episode}", flush=True)
+            print(f"gamma: {self.gamma}", flush=True)
+            print(f"n_updates_per_iteration: {self.n_updates_per_iteration}", flush=True)
+            print(f"clip: {self.clip}", flush=True)
+            print(f"lr: {self.lr}", flush=True)
+            print(f"save_freq: {self.save_freq}", flush=True)
             print(f"------------------------------------------------------", flush=True)
             print(flush=True)
 
+            logger.info(f"-------------------- PPO VERSION #{self.name} --------------------")
             logger.info(f"-------------------- Iteration #{i_so_far} --------------------")
             logger.info(f"Average Episodic Length: {avg_ep_lens}")
             logger.info(f"Average Episodic Return: {avg_ep_rews}")
@@ -471,7 +496,36 @@ class PPO(Agent):
             logger.info(f"Iteration took: {delta_t} secs")
             logger.info(f"invalid move count: {invalid_move_count}")
             logger.info(f"invalid move ratio: {invalid_move_ratio}")
+            logger.info(f"----------------- hyperparameters -----------------------")
+            logger.info(f"timesteps_per_batch: {self.timesteps_per_batch}")
+            logger.info(f"max_timesteps_per_episode: {self.max_timesteps_per_episode}")
+            logger.info(f"gamma: {self.gamma}")
+            logger.info(f"n_updates_per_iteration: {self.n_updates_per_iteration}")
+            logger.info(f"clip: {self.clip}")
+            logger.info(f"lr: {self.lr}")
+            logger.info(f"save_freq: {self.save_freq}")
             logger.info(f"------------------------------------------------------" )
+
+
+            if env is not None:
+                print(f"------------------------rewards------------------------", flush=True)
+                print(f"global_win_factor: {env.reward_config['global_win_factor']}", flush=True)
+                print(f"global_draw_factor: {env.reward_config['global_draw_factor']}", flush=True)
+                print(f"local_win_factor: {env.reward_config['local_win_factor']}", flush=True)
+                print(f"local_draw_factor: {env.reward_config['local_draw_factor']}", flush=True)
+                print(f"legal_move_factor: {env.reward_config['legal_move_factor']}", flush=True)
+                print(f"illegal_move_factor: {env.reward_config['illegal_move_factor']}", flush=True)
+                print(f"------------------------------------------------------", flush=True)
+
+                logger.info(f"--------------------- rewards------------------------")
+                logger.info(f"global_win_factor: {env.reward_config['global_win_factor']}")
+                logger.info(f"global_draw_factor: {env.reward_config['global_draw_factor']}")
+                logger.info(f"local_win_factor: {env.reward_config['local_win_factor']}")
+                logger.info(f"local_draw_factor: {env.reward_config['local_draw_factor']}")
+                logger.info(f"legal_move_factor: {env.reward_config['legal_move_factor']}")
+                logger.info(f"illegal_move_factor: {env.reward_config['illegal_move_factor']}")
+                logger.info(f"------------------------------------------------------" )
+                    
 
             # Reset batch-specific logging data
             self.logger_dict['batch_lens'] = []
@@ -480,4 +534,4 @@ class PPO(Agent):
             self.logger_dict['batch_rew_count_dicts'] = []
 
 
-
+    
