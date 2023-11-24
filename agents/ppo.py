@@ -456,7 +456,7 @@ class PPO(Agent):
 
             # ill_move_factor = env.reward_config['illegal_move_factor']
             # invalid_move_count = sum(rew_dict[ill_move_factor] for rew_dict in rew_dict_list if rew_dict[ill_move_factor] in rew_dict.keys())
-            invalid_move_count = sum(rew_dict[-15] for rew_dict in rew_dict_list if -15 in rew_dict.keys())
+            invalid_move_count = sum(rew_dict[-30] for rew_dict in rew_dict_list if -30 in rew_dict.keys())
             invalid_move_ratio = invalid_move_count / self.timesteps_per_batch
 
             # Round decimal places for more aesthetic logging messages
