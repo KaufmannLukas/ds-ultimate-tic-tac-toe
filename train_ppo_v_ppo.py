@@ -5,7 +5,7 @@ from gym_envs.uttt_env import UltimateTicTacToeEnv
 from environments.game import Game
 from agents.human import Human
 from agents.mcts import MCTS
-from ppo_random import test_ppo, winner_table_to_dataframe
+from ppo_playout import test_ppo, winner_table_to_dataframe
 
 import pandas as pd
 
@@ -49,6 +49,8 @@ def train(model_name, model_path,
 
     logger.info("Init env ...")
 
+    test_opponent = Random()
+
 
     logger.info("Start training ...")
     for i in range(num_generations):
@@ -61,7 +63,7 @@ def train(model_name, model_path,
         if test_generations:
             logger.info("Start test vs random")
             print("Start test vs random")
-            winner_table = test_ppo(ppo, num_of_games=num_of_test_games)
+            winner_table = test_ppo(ppo, opponent=test_opponent, num_of_games=num_of_test_games)
             winner_df = winner_table_to_dataframe(winner_table=winner_table)
             winner_df.to_csv("winner_table_ppo_v_ppo.csv")
             win_count = winner_df["ppo_wins"].sum()
@@ -108,9 +110,9 @@ if __name__ == "__main__":
         "local_win_factor": 5,
         "local_draw_factor": 2,
 
-        "legal_move_factor": 0.1,
+        "legal_move_factor": 1,
         # WAIT!!!!! READ BELOW
-        "illegal_move_factor": -3,         # !!!!! CHANGE THE INVALID MOVE COUNT TO THE NUMBER !!!!!
+        "illegal_move_factor": -5,         # !!!!! CHANGE THE INVALID MOVE COUNT TO THE NUMBER !!!!!
         # dont forget to change the other number you IDIOTS!!!!!!
     }
 

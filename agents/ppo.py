@@ -17,9 +17,12 @@ import torch
 import torch.nn as nn
 from torch.distributions import MultivariateNormal, Categorical
 from torch.optim import Adam
+import torch.nn.functional as F
 from tqdm import tqdm
 
+
 from agents.agent import Agent
+from agents.mcts import MCTS
 from agents.network import FeedForwardNN_Actor, FeedForwardNN_Critic
 from gym_envs.uttt_env import game2tensor
 
@@ -336,7 +339,7 @@ class PPO(Agent):
         batch_rtgs = torch.tensor(batch_rtgs, dtype=torch.float)
         return batch_rtgs
 
-    def get_action(self, obs, mode="learn", epsilon=0.001):
+    def get_action(self, obs, mode="learn", epsilon=0, noise_scale=0.01):
         # Query the actor network for a mean action.
         # Same thing as calling self.actor.forward(obs)
         # TODO: check later if mean makes sense in discrete, not continuous action space.
@@ -350,6 +353,13 @@ class PPO(Agent):
         probs = self.actor(flat_obs)
 
         ### CHAT GPT START
+
+        # Add Gaussian noise and re-normalize to maintain a probability distribution
+        if mode == "learn":
+            noise = torch.randn_like(probs) * noise_scale
+            noisy_probs = probs + noise
+            probs = F.softmax(noisy_probs, dim=-1)  # Re-normalize
+
 
         # Epsilon-greedy exploration
         if random.random() < epsilon and mode == "learn":
@@ -367,8 +377,13 @@ class PPO(Agent):
         #probs = self.actor(flat_obs)
 
         # if mode == "play":
-        #     print("probs before masking: ")
-        #     print(probs)
+            # print("probs: ")
+            # print(probs)
+            # print("log_prob")
+            # print(log_prob)
+            # print("action: ")
+            # print(action)
+            # print("")
 
         '''putting probs for invalid moves to X manually'''
         #blocked_fields = obs[0:81]
@@ -428,17 +443,29 @@ class PPO(Agent):
         return V, log_probs
 
 
-    def play(self, game):
+    def play(self, game, num_of_tries = 10):
         obs = game2tensor(game)
-        action, _ = self.get_action(obs, mode="play")
 
-    
-        game_idx = action // 9
-        field_idx = action % 9
 
-        move = (game_idx, field_idx)
 
-        return (game_idx, field_idx)
+        for i in range(num_of_tries):
+            action, _ = self.get_action(obs, mode="play")
+        
+            game_idx = action // 9
+            field_idx = action % 9
+
+            move = (game_idx, field_idx)
+
+
+            if game.check_valid_move(*move):
+                break
+            else:
+                continue
+        else:
+            mcts_helper = MCTS()
+            move = mcts_helper.play(game=game, num_iterations=1000)
+
+        return move
 
 
     def save(self, path, name):
@@ -478,7 +505,7 @@ class PPO(Agent):
 
             # ill_move_factor = env.reward_config['illegal_move_factor']
             # invalid_move_count = sum(rew_dict[ill_move_factor] for rew_dict in rew_dict_list if rew_dict[ill_move_factor] in rew_dict.keys())
-            invalid_move_count = sum(rew_dict[-3] for rew_dict in rew_dict_list if -3 in rew_dict.keys())
+            invalid_move_count = sum(rew_dict[-5] for rew_dict in rew_dict_list if -5 in rew_dict.keys())
             invalid_move_ratio = invalid_move_count / self.timesteps_per_batch
 
             # Round decimal places for more aesthetic logging messages

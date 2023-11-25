@@ -22,12 +22,12 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 
-def test_ppo(ppo_agent: Agent, num_of_games=100, print_stuff=False):
+def test_ppo(ppo_agent: Agent, opponent: Agent, num_of_games=100, print_stuff=False):
 
     logger.info("Main started...")
 
-    random_agent = Random()
-    env = UltimateTicTacToeEnv(random_agent)
+    
+    env = UltimateTicTacToeEnv(opponent)
 
 
     winner_table = []
@@ -47,7 +47,7 @@ def test_ppo(ppo_agent: Agent, num_of_games=100, print_stuff=False):
             if (counter+i) % 2 == 0:
                 next_move = ppo_agent.play(game)
             else:
-                next_move = random_agent.play(game)
+                next_move = opponent.play(game)
             if print_stuff:
                 print(next_move)
             if not game.check_valid_move(*next_move):
@@ -64,7 +64,7 @@ def test_ppo(ppo_agent: Agent, num_of_games=100, print_stuff=False):
 
         if i % 2 == 0:
             # player_x = ppo_agent
-            # player_o = random_agent
+            # player_o = opponent
             ppo_color = game.white.color
         else:
             ppo_color = game.black.color
@@ -98,15 +98,21 @@ def winner_table_to_dataframe(winner_table):
 if __name__ == "__main__":
     # Load model values saved so far 
 
-    model = "ppo_v_ppo_v1_7"
+    model = "ppo_v_ppo_v1_2"
     path = "./data/ppo/ppo_vs_ppo"
     ppo_agent = PPO(name=model, path=path)
     #ppo_agent.load(path, model)
 
     num_of_games = 1
 
-    winner_table = test_ppo(num_of_games=num_of_games,
-         ppo_agent=ppo_agent, print_stuff=True)
+    random_agent = Random()
+    human_agent = Human()
+
+    winner_table = test_ppo(
+        num_of_games=num_of_games,
+         ppo_agent=ppo_agent,
+         opponent=human_agent,
+         print_stuff=True)
     
     winner_df = winner_table_to_dataframe(winner_table)
 
