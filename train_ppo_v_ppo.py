@@ -82,9 +82,9 @@ def train(model_name, model_path,
 
 if __name__ == "__main__":
     total_timesteps = 500_000
-    num_generations = 100
+    num_generations = 5
 
-    model_name = "ppo_v_ppo_v1_8_hubraum"
+    model_name = "ppo_v_ppo_v7_random"
     model_path = "./data/ppo/ppo_vs_ppo"
 
     # load_name = None
@@ -112,7 +112,7 @@ if __name__ == "__main__":
 
         "legal_move_factor": 1,
         # WAIT!!!!! READ BELOW
-        "illegal_move_factor": -5,         # !!!!! CHANGE THE INVALID MOVE COUNT TO THE NUMBER !!!!!
+        "illegal_move_factor": -0.1,         # !!!!! CHANGE THE INVALID MOVE COUNT TO THE NUMBER !!!!!
         # dont forget to change the other number you IDIOTS!!!!!!
     }
 

@@ -98,12 +98,12 @@ def winner_table_to_dataframe(winner_table):
 if __name__ == "__main__":
     # Load model values saved so far 
 
-    model = "ppo_v_ppo_v1_2"
+    model = "ppo_v_ppo_v1_7"
     path = "./data/ppo/ppo_vs_ppo"
     ppo_agent = PPO(name=model, path=path)
     #ppo_agent.load(path, model)
 
-    num_of_games = 1
+    num_of_games = 1000
 
     random_agent = Random()
     human_agent = Human()
@@ -111,12 +111,12 @@ if __name__ == "__main__":
     winner_table = test_ppo(
         num_of_games=num_of_games,
          ppo_agent=ppo_agent,
-         opponent=human_agent,
-         print_stuff=True)
+         opponent=random_agent,
+         print_stuff=False)
     
     winner_df = winner_table_to_dataframe(winner_table)
 
-    #winner_df.to_csv(f"data/random_vs_ppo_v4_2.csv")
+    winner_df.to_csv(f"data/random_vs_ppo_with_mcts_5000.csv")
 
     win_count = winner_df["ppo_wins"].sum()
     loose_count = winner_df["ppo_loose"].sum()
