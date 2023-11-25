@@ -80,9 +80,9 @@ def train(model_name, model_path,
 
 if __name__ == "__main__":
     total_timesteps = 500_000
-    num_generations = 5
+    num_generations = 100
 
-    model_name = "ppo_v_ppo_v2_1_epsilon"
+    model_name = "ppo_v_ppo_v1_8_hubraum"
     model_path = "./data/ppo/ppo_vs_ppo"
 
     # load_name = None
@@ -97,20 +97,20 @@ if __name__ == "__main__":
         "gamma": 0.95,                      # Discount factor to be applied when calculating Rewards-To-Go
         "n_updates_per_iteration": 10,      # Number of times to update actor/critic per iteration
         "clip": 0.2,                        # As recommended by the paper
-        "lr": 0.05,                       # Learning rate of actor optimizer
+        "lr": 0.005,                        # Learning rate of actor optimizer
         "save_freq": 10,                    # How often we save in number of iterations 
     }
 
     reward_config = {
         "global_win_factor": 100,
-        "global_draw_factor": 0,
+        "global_draw_factor": 20,
 
         "local_win_factor": 5,
-        "local_draw_factor": 0,
+        "local_draw_factor": 2,
 
         "legal_move_factor": 0.1,
         # WAIT!!!!! READ BELOW
-        "illegal_move_factor": -30,         # !!!!! CHANGE THE INVALID MOVE COUNT TO THE NUMBER !!!!!
+        "illegal_move_factor": -3,         # !!!!! CHANGE THE INVALID MOVE COUNT TO THE NUMBER !!!!!
         # dont forget to change the other number you IDIOTS!!!!!!
     }
 
@@ -128,7 +128,7 @@ if __name__ == "__main__":
           load_path=load_path,
           num_generations=num_generations,
           save_generations=True,
-          num_of_test_games = 1000,
+          num_of_test_games = 100,
           opponent = opponent,
           reward_config = reward_config,
           )

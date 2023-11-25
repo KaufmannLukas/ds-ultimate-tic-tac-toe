@@ -4,6 +4,7 @@ from environments.game import Game
 from agents.ppo import PPO
 from agents.random_agnt import Random
 from gym_envs.uttt_env import UltimateTicTacToeEnv
+from agents.human import Human
 
 import logging
 

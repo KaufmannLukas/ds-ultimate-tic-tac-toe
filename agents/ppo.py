@@ -336,7 +336,7 @@ class PPO(Agent):
         batch_rtgs = torch.tensor(batch_rtgs, dtype=torch.float)
         return batch_rtgs
 
-    def get_action(self, obs, mode="learn", epsilon=0.1):
+    def get_action(self, obs, mode="learn", epsilon=0.001):
         # Query the actor network for a mean action.
         # Same thing as calling self.actor.forward(obs)
         # TODO: check later if mean makes sense in discrete, not continuous action space.
@@ -478,7 +478,7 @@ class PPO(Agent):
 
             # ill_move_factor = env.reward_config['illegal_move_factor']
             # invalid_move_count = sum(rew_dict[ill_move_factor] for rew_dict in rew_dict_list if rew_dict[ill_move_factor] in rew_dict.keys())
-            invalid_move_count = sum(rew_dict[-30] for rew_dict in rew_dict_list if -30 in rew_dict.keys())
+            invalid_move_count = sum(rew_dict[-3] for rew_dict in rew_dict_list if -3 in rew_dict.keys())
             invalid_move_ratio = invalid_move_count / self.timesteps_per_batch
 
             # Round decimal places for more aesthetic logging messages

@@ -52,8 +52,8 @@ def train_ppo(total_timesteps):
 
 def play_ppo():
     env = UltimateTicTacToeEnv(opponent=None, opponent_starts=False)
-    model = PPO(env=env)
-    model.load("./data/ppo", "ppo_v3_100000")
+    model = PPO(name="ppo_v_ppo_v1_7", path="./data/ppo/ppo_vs_ppo")
+    #model.load("./data/ppo", "ppo_vs_")
     game = Game()
     #implement the next two lines for using a memory_prone agent (like mcts_agent_01)
     # with open("data/mcts_ltmm_02.pkl", mode="rb") as file:
@@ -91,5 +91,5 @@ def play_ppo():
 
 if __name__ == "__main__":
     total_timesteps = 1_000_000
-    train_ppo(total_timesteps)
-    #play_ppo()
+    #train_ppo(total_timesteps)
+    play_ppo()
