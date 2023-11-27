@@ -84,6 +84,7 @@ class PPO(Agent):
             'batch_lens': [],       # episodic lengths in batch
             'batch_rews': [],       # episodic returns in batch
             'actor_losses': [],     # losses of actor network in current iteration
+            'help_count': [0, 0],
         }
 
         self.reward_history = []
@@ -468,13 +469,19 @@ class PPO(Agent):
 
 
             if game.check_valid_move(*move) or self.helper_agent is None:
+                self.logger_dict["help_count"][0] += 1
                 break
             else:
                 continue
         else:
             if helper_parameters is None:
                 helper_parameters = {}
+            self.logger_dict["help_count"][1] += 1
             move = self.helper_agent.play(game=game, **helper_parameters)
+
+        moves_without_help, moves_with_help = self.logger_dict['help_count']
+        logger.info(f"played {moves_without_help} moves without help")
+        logger.info(f"played {moves_with_help} moves with help")
 
         return move
 
