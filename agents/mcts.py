@@ -3,6 +3,7 @@ import os
 import pickle
 from math import log, sqrt
 from random import sample
+from socket import timeout
 from time import time
 
 import numpy as np
@@ -180,14 +181,18 @@ def simulate(game: Game):
     return simulate(new_game)
 
 
+
 class MCTS(Agent):
     '''
     Agent class for Monte Carlo Tree Search.
     '''
 
-    def __init__(self, memory_path=None, update_memory=False):
+    def __init__(self, memory_path=None, update_memory=False, default_num_iterations = 1000, max_time=0):
         logger.info("MCTS agent initialized")
         super().__init__()
+
+        self.num_iterations = default_num_iterations
+        self.max_time = max_time
 
         # memory: represents the node itself, but also contains their children with their values.
         logger.info("load memory")
@@ -236,7 +241,7 @@ class MCTS(Agent):
     def play(
             self,
             game: Game,
-            num_iterations=100,
+            num_iterations=None,
             max_time=None,
             disable_progress_bar=True,
     ) -> tuple:
@@ -250,7 +255,7 @@ class MCTS(Agent):
         logger.debug(f"current_node: \n{current_node}")
 
         # play game for x number of iterations
-        for _ in tqdm(range(num_iterations), disable=disable_progress_bar):
+        for _ in tqdm(range(num_iterations or self.num_iterations), disable=disable_progress_bar):
             # restart if game is done
             if current_node.game.done:
                 current_node = root
@@ -266,7 +271,7 @@ class MCTS(Agent):
             current_node = current_node.select_child()
 
             # time limit for calculations
-            if max_time and time() - start_time > max_time:
+            if (max_time or self.max_time) and (time() - start_time) > (max_time or self.max_time):
                 break
 
         # TODO: check if better way than setting "C" to 0 before choosing best_child
