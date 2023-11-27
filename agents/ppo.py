@@ -10,6 +10,7 @@ import time
 import logging
 import traceback
 import random
+from typing import Optional
 
 import gymnasium as gym
 import numpy as np
@@ -35,7 +36,14 @@ class PPO(Agent):
         This is the PPO class we will use as our model in main.py
     """
 
-    def __init__(self, name=None, path=None, load_name=None, load_path=None, hyperparameters=None):
+    def __init__(self, 
+                 name=None, 
+                 path=None, 
+                 load_name=None, 
+                 load_path=None, 
+                 hyperparameters=None,
+                 helper: Agent = None,
+                 ):
         """
             Initializes the PPO model, including hyperparameters.
 
@@ -63,6 +71,9 @@ class PPO(Agent):
             self.load_path = path
         else:
             self.load_path = load_path
+
+
+        self.helper_agent = helper
 
 
         # This logger will help us with printing out summaries of each iteration
@@ -443,9 +454,8 @@ class PPO(Agent):
         return V, log_probs
 
 
-    def play(self, game, num_of_tries = 10):
+    def play(self, game, num_of_tries = 10, helper_parameters: dict = None):
         obs = game2tensor(game)
-
 
 
         for i in range(num_of_tries):
@@ -457,13 +467,14 @@ class PPO(Agent):
             move = (game_idx, field_idx)
 
 
-            if game.check_valid_move(*move):
+            if game.check_valid_move(*move) or self.helper_agent is None:
                 break
             else:
                 continue
         else:
-            mcts_helper = MCTS()
-            move = mcts_helper.play(game=game, num_iterations=5000)
+            if helper_parameters is None:
+                helper_parameters = {}
+            move = self.helper_agent.play(game=game, **helper_parameters)
 
         return move
 
