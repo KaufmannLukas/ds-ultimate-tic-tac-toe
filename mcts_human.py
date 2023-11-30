@@ -7,7 +7,6 @@ import pickle
 
 
 if __name__ == "__main__":
-    game = Game()
     #implement the next two lines for using a memory_prone agent (like mcts_agent_01)
     # with open("data/mcts_ltmm_02.pkl", mode="rb") as file:
     #     memory = pickle.load(file)
