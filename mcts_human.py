@@ -12,8 +12,9 @@ if __name__ == "__main__":
     #     memory = pickle.load(file)
     #change the agent to play against here:
     # computer_agent = MCTS(memory_path = "data/mcts_ltmm_02.pkl")
+    game = Game()
     computer_agent = MCTS()
-    human_agent = MCTS()
+    human_agent = Human()
 
     # TODO: improve interface (print local/global wins, etc.)
     # TODO: implement game loop (replay)
@@ -23,7 +24,7 @@ if __name__ == "__main__":
         print(game)
         print("-"*31)
         if counter % 2 != 0:
-            next_move = human_agent.play(game, num_iterations=1000)
+            next_move = human_agent.play(game)
         else:
             next_move = computer_agent.play(game, num_iterations=1000)
         print(f"last move: ({next_move[0]+1}, {next_move[1]+1})")
@@ -31,10 +32,6 @@ if __name__ == "__main__":
         print(result)
         counter += 1
 
-        
-    json_string = game.make_json()
-    with open("json_test_done_new.json", "w") as file:
-        file.write(json_string)
 
 
     print(game)
