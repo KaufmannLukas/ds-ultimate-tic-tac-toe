@@ -48,7 +48,10 @@ export const useGameStore = defineStore('gameStore', {
                     await new Promise(r => setTimeout(r, 1000));
                     response = await apiService.getGameState(this.currentGameId);
                     this.gameState = response.data.game_state;
-                } while (response && response.data.agent_is_busy === true && response.data.game_state.winner === 'None');
+                } while (response && 
+                    response.data.agent_is_busy === true && 
+                    response.data.game_state.global_win != 'white' && 
+                    response.data.game_state.global_win != 'black');
                 overlay.hide();
             } catch (error) {
                 console.error('Error updating game state:', error);

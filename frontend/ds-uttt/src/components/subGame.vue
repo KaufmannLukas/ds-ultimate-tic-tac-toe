@@ -39,7 +39,6 @@ const gameClasses = computed(() => {
     const games_valid = Object.values(gameStore.gameState.games).filter(game => game.next_move && game.won_by === 'None');
     // check if games_valid is greater than 1
     const isAllValid = games_valid.length > 1;
-    console.log('games_valid', games_valid);
 
     console.log('isAllValid', isAllValid);
     return {

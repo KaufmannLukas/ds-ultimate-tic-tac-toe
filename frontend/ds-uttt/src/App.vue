@@ -12,6 +12,14 @@ const router = useRouter();
 const route = useRoute();
 const isMenuRoute = computed(() => route.path === '/menu');
 
+function handleMenu() {
+  if (isMenuRoute.value) {
+    router.go(-1);
+  } else {
+    router.push('/menu');
+  }
+}
+
 
 </script>
 
@@ -23,7 +31,7 @@ const isMenuRoute = computed(() => route.path === '/menu');
     <div class="navigation">
       <div class="game_name">U_T-T-T</div>
       <div class="dropdown-selection-alt">
-        <div class="menu_container" @click=" router.push({ name: 'menu' })" :class="isMenuRoute ? 'change' : ''">
+        <div class="menu_container" @click="handleMenu()" :class="isMenuRoute ? 'change' : ''">
             <div class="bar1"></div>
             <div class="bar2"></div>
             <div class="bar3"></div>
