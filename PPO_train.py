@@ -1,7 +1,7 @@
 from agents.ppo import PPO
 from agents.random_agnt import  Random
 from agents.human import Agent
-from gym_envs.uttt_env import UltimateTicTacToeEnv
+from environments.uttt_env import UltimateTicTacToeEnv
 from environments.game import Game
 from agents.human import Human
 

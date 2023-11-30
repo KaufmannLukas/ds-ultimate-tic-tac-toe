@@ -25,7 +25,7 @@ from tqdm import tqdm
 from agents.agent import Agent
 from agents.mcts import MCTS
 from agents.network import FeedForwardNN_Actor, FeedForwardNN_Critic
-from gym_envs.uttt_env import game2tensor
+from environments.uttt_env import game2tensor
 
 logger = logging.getLogger(__name__)
 
