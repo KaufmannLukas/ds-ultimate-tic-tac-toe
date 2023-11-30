@@ -162,6 +162,17 @@ class TestGame(unittest.TestCase):
         game_copy.white.board[0, 0] = True
         self.assertNotEqual(self.game, game_copy)
 
+    def test_check_draw(self):
+        global_draw, local_draws = self.game.check_draw()
+        self.assertEqual(global_draw, False)
+        print(global_draw)
+        print(local_draws)
+        print(np.zeros(shape=(9,), dtype=np.bool_))
+        self.assertTrue(all(local_draws == np.zeros(shape=(9,), dtype=np.bool_)))
+
+
+        
+
 
 
 

@@ -293,6 +293,7 @@ class Game:
         if np.all(self.blocked_fields):
             if not win_global_game:
                 self.global_draw = True
+                #print("drawwwwwwwwwwwww!!!!!!!!!")
             self.done = True
 
         return win_local_game, win_global_game
