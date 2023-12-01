@@ -37,7 +37,7 @@ def new_game():
     games[game_id] = game
     computer_agent_state[game_id] = 0
     helper = MCTS(default_num_iterations=1000)
-    computer_agent_model[game_id] = PPO(name="ppo_v_ppo_v1_7", path="./data/ppo", helper=helper)
+    computer_agent_model[game_id] = PPO(name="ppo_v_ppo_v1_7", path="../data/models/ppo", helper=helper)
     game_counter += 1
     
     return jsonify({"game_state": game.make_json(), "game_id": game_id}), 200
