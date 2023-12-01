@@ -30,10 +30,10 @@ The project ... (description)
 │   │       └── ...
 │   └── ...
 ├── EDA.ipynb
+├── environment.yml
 ├── frontend/
 │   └── ds-uttt (*necessary?)/
 │       └── ...
-├── README.md
 ├── src/
 │   ├── agents/
 │   │   ├── agent.py
@@ -53,6 +53,7 @@ The project ... (description)
 │   ├── mcts_train.py
 │   ├── ppo_train.py
 │   └── main_play.py
+├── README.md
 └── docker-file (*?)
 
 ## Setup Environment
