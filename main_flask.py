@@ -1,16 +1,20 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from agents.mcts import MCTS
+from agents.ppo import PPO
 import threading
 import time
 import os
-
 
 from environments.game import Game
 games = {}
 game_counter = 0
 computer_agent_state = {}
 computer_agent_model = {}
+
+
+
+
 
 print(os.getcwd())
 
@@ -32,7 +36,8 @@ def new_game():
     game = Game()
     games[game_id] = game
     computer_agent_state[game_id] = 0
-    computer_agent_model[game_id] = MCTS()
+    helper = MCTS(default_num_iterations=1000)
+    computer_agent_model[game_id] = PPO(name="ppo_v_ppo_v1_7", path="./data/ppo", helper=helper)
     game_counter += 1
     
     return jsonify({"game_state": game.make_json(), "game_id": game_id}), 200
@@ -62,7 +67,6 @@ def play_game():
 
     current_game = games[game_id]
     current_game.play(*move)
-
     x = threading.Thread(target=move_agent_T, kwargs={'game_id': game_id})
     x.start()
 
@@ -86,7 +90,7 @@ def move_agent_T(game_id):
     game = games[game_id]
     computer_agent = computer_agent_model[game_id]
     computer_agent_state[game_id] = 1
-    next_move = computer_agent.play(game, num_iterations=1000)
+    next_move = computer_agent.play(game)
     print(next_move)
     game.play(*next_move)
     computer_agent_state[game_id] = 0
