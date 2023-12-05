@@ -344,7 +344,7 @@ class PPO(Agent):
         # Reshape data as tensors in the shape specified before returning
         
         #TODO: delete?
-        # think it's not necessary, recommendation: delete
+        # think it's not necessary, recommendation: delete it 
         #batch_obs = torch.tensor(batch_obs, dtype=torch.float)
         #batch_acts = torch.tensor(batch_acts, dtype=torch.float)
         batch_log_probs = torch.tensor(batch_log_probs, dtype=torch.float)
