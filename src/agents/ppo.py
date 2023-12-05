@@ -1,9 +1,9 @@
-# TODO: comment all functions
+
 
 """
-    The file contains the PPO class to train with.
-    NOTE: All "ALG STEP"s are following the numbers from the original PPO pseudocode.
-            It can be found here: https://spinningup.openai.com/en/latest/_images/math/e62a8971472597f4b014c2da064f636ffe365ba3.svg
+The file contains the PPO class to train with.
+NOTE: All "ALG STEP"s are following the numbers from the original PPO pseudocode. 
+It can be found here: https://spinningup.openai.com/en/latest/_images/math/e62a8971472597f4b014c2da064f636ffe365ba3.svg
 """
 
 import time
@@ -45,15 +45,18 @@ class PPO(Agent):
                  helper: Agent = None,
                  ):
         """
-            Initializes the PPO model, including hyperparameters.
+        Initializes the PPO model, including hyperparameters.
 
-            Parameters:
-                policy_class - the policy class to use for our actor/critic networks.
-                env - the environment to train on.
-                hyperparameters - all extra arguments passed into PPO that should be hyperparameters.
+        Parameters:
+            name (str): The name of the PPO instance.
+            path (str): The path to save the PPO model.
+            load_name (str): The name to use when loading the PPO model.
+            load_path (str): The path from which to load the PPO model.
+            hyperparameters (dict): Hyperparameters for PPO training.
+            helper (Agent): Helper agent for playing moves.
 
-            Returns:
-                None
+        Returns:
+            None
         """
 
         logger.info("Init PPO agent...")
@@ -95,7 +98,9 @@ class PPO(Agent):
         self.act_dim = 81 # env.action_space.shape
         self.critic_dim = 1
 
+
         # ALG STEP 1
+
         # Initialize actor and critic networks
         self.actor = FeedForwardNN_Actor(self.obs_dim, self.act_dim)
         self.critic = FeedForwardNN_Critic(self.obs_dim, self.critic_dim)
@@ -104,19 +109,11 @@ class PPO(Agent):
         self.actor_optim = Adam(self.actor.parameters(), lr=self.lr)
         self.critic_optim = Adam(self.critic.parameters(), lr=self.lr)
 
-        # Create our variable for the matrix.
-        # Note that I chose 0.5 for stdev arbitrarily.
-        # self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
-
-        # # Create the covariance matrix
-        # self.cov_mat = torch.diag(self.cov_var)
-
-        # Load if file exist
-        # save new if not
+        # Load if file exists, save a new file if not
         logger.info(f"try to load model {self.name} from {self.path}")
         try:
             self.load(self.load_path, self.load_name)
-            print("yea load that bitch !!!")
+            print("model successfully loaded")
             logger.info(f"succesfully loaded {self.name} from {self.path}")
         except Exception as e:
             logging.error(traceback.format_exc())
@@ -125,10 +122,17 @@ class PPO(Agent):
             print("oh cannot load :(")
             self.save(self.path, self.name)
 
-    # TODO: adjust values later
-
     def _init_hyperparameters(self, hyperparameters):
-        # Default values for hyperparameters, will need to change later.
+        """
+        Initialize hyperparameters for PPO.
+
+        Args:
+            hyperparameters (dict): Hyperparameters for PPO.
+
+        Returns:
+            None
+        """
+        # Default values for hyperparameters
         if hyperparameters:
             logger.info("setup hyperparameters as given")
             hp = hyperparameters
@@ -155,32 +159,44 @@ class PPO(Agent):
             self.gamma = 0.95                      # Discount factor to be applied when calculating Rewards-To-Go
             self.n_updates_per_iteration = 10      # Number of times to update actor/critic per iteration
             self.clip = 0.2                        # As recommended by the paper
-            self.lr = 0.0005                        # Learning rate of actor optimizer
-            self.save_freq = 10                  # How often we save in number of iterations 
+            self.lr = 0.0005                       # Learning rate of actor optimizer
+            self.save_freq = 10                    # How often we save in number of iterations 
 
     def learn(self, total_timesteps, env):
+        """
+        Train the PPO model.
 
+        Parameters:
+            total_timesteps (int): The total number of timesteps to train.
+            env: The environment to train on.
+
+        Returns:
+            None
+        """
         logger.info(f"start learn with {total_timesteps} total timesteps...")
         
         pbar = tqdm(total=total_timesteps)
 
         t_so_far = 0  # Timesteps simulated so far
-        i_so_far = 0 # Iterations ran so far
+        i_so_far = 0  # Iterations ran so far
 
 
-        while t_so_far < total_timesteps:              # ALG STEP 2
+        # ALG STEP 2
+
+        while t_so_far < total_timesteps:
 
             # Update the progress bar to reflect the current timestep
             pbar.n = t_so_far
             pbar.refresh()  # Refresh the progress bar to show the updated value
 
-            # Increment t_so_far somewhere below
             # TODO: for loop makes more sense?
-            # ALG STEP 3
-            # ollecting our batch simulations
-            batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens = self.rollout(env=env)
-
+            # maybe useful, recommendation: keep it
             
+
+            # ALG STEP 3
+            
+            # Collecting our batch simulations
+            batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens = self.rollout(env=env)
 
             # Calculate how many timesteps we collected this batch
             t_so_far += np.sum(batch_lens)
@@ -195,16 +211,14 @@ class PPO(Agent):
             
             # Calculate V_{phi, k}
             V, _ = self.evaluate(batch_obs, batch_acts)
+            
+            
             # ALG STEP 5
+            
             # Calculate advantage
             A_k = batch_rtgs - V.detach()
 
             # Normalize advantages
-            # TODO: check if usefull for us or not
-            '''One of the only tricks I use that isn't in the pseudocode. Normalizing advantages
-            isn't theoretically necessary, but in practice it decreases the variance of 
-            our advantages and makes convergence much more stable and faster. I added this because
-            solving some environments was too unstable without it.'''
             A_k = (A_k - A_k.mean()) / (A_k.std() + 1e-10)
 
             # This is the loop where we update our network for some n epochs
@@ -225,7 +239,7 @@ class PPO(Agent):
 
                 # Calculate gradients and perform backward propagation for actor network
                 self.actor_optim.zero_grad()
-                actor_loss.backward(retain_graph=True) # TODO: maybe with retain_graph=True (see original repo)
+                actor_loss.backward(retain_graph=True)
                 self.actor_optim.step()
 
                 # Calculate gradients and perform backward propagation for critic network
@@ -249,11 +263,19 @@ class PPO(Agent):
         self._log_summary(env=env)
 
         # Save our model if it's time
-        
         pbar.close()
 
 
     def rollout(self, env):
+        """
+        Collects batch data by running multiple episodes.
+
+        Parameters:
+            env: The environment to roll out episodes.
+
+        Returns:
+            tuple: A tuple containing batch_obs, batch_acts, batch_log_probs, batch_rtgs, and batch_lens.
+        """
         # Batch data
         batch_obs = []             # batch observations
         batch_acts = []            # batch actions
@@ -277,12 +299,15 @@ class PPO(Agent):
             obs, _ = env.reset()
             done = False
 
-
-            # TODO: make a while loop instead because max_timesteps_per_episode will never reached
+            # TODO: make a while loop instead because max_timesteps_per_episode will never be reached
+            # still necessary? recommendation: delete it
             ep_t = 0
             for ep_t in range(self.max_timesteps_per_episode):
 
+                # TODO: delete?
+                # not sure, recommendation: n/a
                 #self.env.render()
+
                 # Increment timesteps ran this batch so far
                 t += 1
                 # Collect observation
@@ -317,10 +342,16 @@ class PPO(Agent):
         else:
             batch_acts = batch_acts.clone().detach()
         # Reshape data as tensors in the shape specified before returning
+        
+        #TODO: delete?
+        # think it's not necessary, recommendation: delete it 
         #batch_obs = torch.tensor(batch_obs, dtype=torch.float)
         #batch_acts = torch.tensor(batch_acts, dtype=torch.float)
         batch_log_probs = torch.tensor(batch_log_probs, dtype=torch.float)
+        
+        
         # ALG STEP #4
+        
         against_itself = True if env.opponent is not None else False
         batch_rtgs = self.compute_rtgs(batch_rews, against_itself=against_itself)
 
@@ -329,16 +360,23 @@ class PPO(Agent):
         self.logger_dict['batch_lens'] = batch_lens
         self.logger_dict['batch_rew_count_dicts'] = batch_rew_count_dicts
 
-
-        # Return the batch data
         return batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens
 
     def compute_rtgs(self, batch_rews, against_itself=False):
+        """
+        Compute rewards-to-go for each timestep in the batch.
+
+        Parameters:
+            batch_rews (list): List of episodic rewards for each episode in the batch.
+            against_itself (bool): Indicates whether the agent is playing against itself.
+
+        Returns:
+            torch.Tensor: Rewards-to-go for each timestep in the batch.
+        """
         # The rewards-to-go (rtg) per episode per batch to return.
         # The shape will be (num timesteps per episode)
         batch_rtgs = []
-        # Iterate through each episode backwards to maintain same order
-        # in batch_rtgs
+        # Iterate through each episode backwards to maintain same order in batch_rtgs
         for ep_rews in reversed(batch_rews):
 
             discounted_reward = 0  # The discounted reward so far
@@ -352,9 +390,19 @@ class PPO(Agent):
         return batch_rtgs
 
     def get_action(self, obs, mode="learn", epsilon=0.0, noise_scale=0.0):
-        # Query the actor network for a mean action.
-        # Same thing as calling self.actor.forward(obs)
-        # TODO: check later if mean makes sense in discrete, not continuous action space.
+        """
+        Get an action from the actor network.
+        Same thing as calling self.actor.forward(obs)
+
+        Parameters:
+            obs: The observation for which to determine the action.
+            mode (str): The mode, either "learn" or "play".
+            epsilon (float): The exploration factor for epsilon-greedy exploration.
+            noise_scale (float): The scale of Gaussian noise to be added during exploration.
+
+        Returns:
+            tuple: A tuple containing the sampled action and its log probability.
+        """
 
         # Convert obs to a PyTorch tensor if it's not already one
         if not isinstance(obs, torch.Tensor):
@@ -364,14 +412,11 @@ class PPO(Agent):
 
         probs = self.actor(flat_obs)
 
-        ### CHAT GPT START
-
         # Add Gaussian noise and re-normalize to maintain a probability distribution
         if mode == "learn":
             noise = torch.randn_like(probs) * noise_scale
             noisy_probs = probs + noise
             probs = F.softmax(noisy_probs, dim=-1)  # Re-normalize
-
 
         # Epsilon-greedy exploration
         if random.random() < epsilon and mode == "learn":
@@ -384,8 +429,8 @@ class PPO(Agent):
             action = m.sample()
             log_prob = m.log_prob(action)
 
-        ### CHAT GPT END
-
+        # TODO: delete all below until <return>?
+        # not sure if we need it, recommendation n/a
         #probs = self.actor(flat_obs)
 
         # if mode == "play":
@@ -440,11 +485,20 @@ class PPO(Agent):
         return action.detach().numpy(), log_prob.detach()
 
     def evaluate(self, batch_obs, batch_acts):
+        """
+        Evaluate the actor and critic networks.
+
+        Parameters:
+            batch_obs: Batch of observations.
+            batch_acts: Batch of actions.
+
+        Returns:
+            tuple: A tuple containing the predicted values (V) and log probabilities (log_probs).
+        """
         # Query critic network for a value V for each obs in batch_obs.
         V = self.critic(batch_obs).squeeze()
 
-        # Calculate the log probabilities of batch actions using most
-        # recent actor network.
+        # Calculate the log probabilities of batch actions using most recent actor network.
         # This segment of code is similar to that in get_action()
         mean = self.actor(batch_obs)
         #dist = MultivariateNormal(mean, self.cov_mat)
@@ -456,6 +510,18 @@ class PPO(Agent):
 
 
     def play(self, game, num_of_tries = 10, helper_parameters: dict = None):
+        """
+        Play a move in the game using the PPO agent.
+
+        Parameters:
+            game: The game instance.
+            num_of_tries (int): Number of attempts to make a valid move.
+            helper_parameters (dict): Parameters for the helper agent.
+
+        Returns:
+            tuple: The chosen move (game index, field index).
+        """
+
         obs = game2tensor(game)
 
 
@@ -487,27 +553,44 @@ class PPO(Agent):
 
 
     def save(self, path, name):
+        """
+        Save the PPO model to a specified path with a given name.
+
+        Parameters:
+            path (str): The directory path for saving the model.
+            name (str): The name of the model files.
+
+        Returns:
+            None
+        """
         torch.save(self.actor.state_dict(), path+"/"+name+"_actor.pth")
         torch.save(self.critic.state_dict(), path+"/"+name+"_critic.pth")
         
     def load(self, path, name):
+        """
+        Load the PPO model from a specified path with a given name.
+
+        Parameters:
+            path (str): The directory path from which to load the model.
+            name (str): The name of the model files.
+
+        Returns:
+            None
+        """
         self.actor.load_state_dict(torch.load(path + "/" + name + "_actor.pth"))
         self.critic.load_state_dict(torch.load(path + "/" + name + "_critic.pth"))
 
 
     def _log_summary(self, env=None):
             """
-                Print to stdout what we've logged so far in the most recent batch.
+                Print a summary of the logged information for the most recent batch.
 
                 Parameters:
-                    None
+                    env: The environment instance.
 
                 Return:
                     None
             """
-            # Calculate logging values. I use a few python shortcuts to calculate each value
-            # without explaining since it's not too important to PPO; feel free to look it over,
-            # and if you have any questions you can email me (look at bottom of README)
             delta_t = self.logger_dict['delta_t']
             self.logger_dict['delta_t'] = time.time_ns()
             delta_t = (self.logger_dict['delta_t'] - delta_t) / 1e9
@@ -521,8 +604,6 @@ class PPO(Agent):
            
             rew_dict_list = self.logger_dict["batch_rew_count_dicts"]
 
-            # ill_move_factor = env.reward_config['illegal_move_factor']
-            # invalid_move_count = sum(rew_dict[ill_move_factor] for rew_dict in rew_dict_list if rew_dict[ill_move_factor] in rew_dict.keys())
             invalid_move_count = sum(rew_dict[-0.1] for rew_dict in rew_dict_list if -0.1 in rew_dict.keys())
             invalid_move_ratio = invalid_move_count / self.timesteps_per_batch
 
