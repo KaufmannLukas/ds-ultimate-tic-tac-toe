@@ -11,14 +11,14 @@ Addtionally, we implemented an interactive interface with flask and html, as a f
 
 ## Rules of Ultimate Tic-Tac-Toe
 
-![rules](/images/slide_02_rules.png)
+![rules](/images/slide_02_rules_small.png)
 
 Ultimate Tic-Tac-Toe (U_T-T-T) is played on nine tic-tac-toe boards arranged in a 3 × 3 grid. <br>
 Playing on a field inside a board (local game), determines the next board in which the opponent must play their next move. <br>
 The goal is to win three boards (local games) in a row. <br>
 You can play your next move at any board, if you are directed to play in a full board or a board that has been won and therefore is already closed. <br>
 
-![draw](/images/slide_03_draw.png)  
+![draw](/images/slide_03_draw_small.png)  
 
 ## Interface Example
 
