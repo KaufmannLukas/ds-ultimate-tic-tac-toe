@@ -21,13 +21,23 @@ parameters = {
 
 def ucb_score(child):
     '''
-    w_i stands for the number of wins for the node considered after the i-th move
-    s_i stands for the number of simulations for the node considered after the i-th move
-    s_p stands for the total number of simulations after the i-th move run by the parent node of the one considered
-    c is the exploration parameter—theoretically equal to √2; in practice usually chosen empirically
+    Calculate the Upper Confidence Bound (UCB) score for a given child node.
+
+    Args:
+        child (Node): The child node for which to calculate the UCB score.
+
+    Returns:
+        float: The UCB score for the given child node.    
+    
+    Parameters:
+        w_i stands for the number of wins for the node considered after the i-th move
+        s_i stands for the number of simulations for the node considered after the i-th move
+        s_p stands for the total number of simulations after the i-th move run by the parent node of the one considered
+        c is the exploration parameter—theoretically equal to √2; in practice usually chosen empirically
+    
     '''
-    w = child.value_sum   # #simulations of this node wich resulted in a win
-    s = child.visit_count  # total # of simulations
+    w = child.value_sum
+    s = child.visit_count
     s_p = child.parent.visit_count
     c = parameters['C']
     return w/s + c*sqrt(log(s_p)/s)
@@ -35,10 +45,30 @@ def ucb_score(child):
 
 class Node:
     '''
-    Each node stores information such as the number of visits, the total reward, and the possible actions.
+    Class representing a node in the Monte Carlo Tree Search (MCTS).
+    
+    Each node stores information such as the number of visits, the total reward, and the possible actions (see below).
+    
+    Attributes:
+        game (Game): The game state associated with the node.
+        visit_count (int): The number of times the node has been visited.
+        value_sum (float): The sum of values obtained during visits.
+        possible_actions (list): List of possible actions in the current game state.
+        children (list): List of child nodes.
+        parent (Node): The parent node.
+        is_fully_expanded (bool): Flag indicating if the node is fully expanded.
+
     '''
 
     def __init__(self, game: Game = None, parent: 'Node' = None):
+        '''
+        Initialize a Node in the Monte Carlo Tree Search.
+
+        Args:
+            game (Game): The game state associated with the node.
+            parent (Node): The parent node.
+
+        '''    
         if game is None:
             self.game = Game()
         else:
@@ -46,21 +76,30 @@ class Node:
 
         self.visit_count = 0
         self.value_sum = 0
-        self.possible_actions = self.game.get_valid_moves()  # TODO: Hä
+        self.possible_actions = self.game.get_valid_moves()
         self.children = []
         self.parent = parent
         self.is_fully_expanded = False
 
-    # TODO: not used yet, delete later maybe?
+    # TODO: not used yet, delete later maybe? 
+    # => Still not used anywhere, recommendation: delete
     def __hash__(self) -> int:
+        '''
+        Compute the hash value for the node based on the game state.
+
+        Returns:
+            int: The hash value of the game state.
+
+        '''    
         return hash(self.game)
 
     def select_child(self) -> 'Node':
         '''
-        Develop a selection strategy (e.g., Upper Confidence Bound) to choose nodes in the tree to explore further.
-        ---
-        MCTS begins by selecting a node to expand from the root. This selection process typically involves a balance
-        between exploration and exploitation. It uses heuristics or policies to determine which child node to explore.
+        Select a child node for exploration based on the Upper Confidence Bound (UCB) score.
+
+        Returns:
+            Node: The selected child node.
+
         '''
         # checks if there are children already to choose from
         if len(self.children) == 0:
@@ -72,11 +111,13 @@ class Node:
 
     def expand(self):
         '''
-        When a selected node has unexplored actions, it expands the tree by creating child nodes for those actions.
-        ---
-        The selected node is expanded by adding one or more child nodes corresponding to possible actions
-        that can be taken from the current state. These child nodes are added to the tree.
+        Expand the node by creating child nodes for unexplored actions.
+
+        Returns:
+            Node: The newly created child node.
+
         '''
+
         # check if fully expanded already
         if self.is_fully_expanded == True:
             return None
@@ -97,6 +138,7 @@ class Node:
         self.children.append(new_child)
 
         # TODO: check if there is a better way (update unexplored moves earlier)
+        # => not necessary, recommendation: delete
         if len(unexplored_moves) == 1:
             self.is_fully_expanded = True
 
@@ -104,10 +146,13 @@ class Node:
 
     def backpropagate(self, winner):
         '''
-        Update the statistics of nodes as you backpropagate the results of rollouts to their parent nodes.
-        ---
-        The results of the rollout are backpropagated to update the values of the nodes along the path
-        from the root to the newly expanded node. This update is based on the outcomes of the simulated episodes.
+        Update the statistics of nodes during backpropagation.
+
+        Args:
+            winner (str): The winner of the game (color of the winning player).
+
+        Note: The results of the rollout are backpropagated to update the values of the nodes along the path
+        from the root to the newly expanded node - moves of the simulation are NOT updated.
         '''
         # visit_count for root node
         self.visit_count += 1
@@ -150,6 +195,8 @@ def count_leaves(node: 'Node'):
         return 1
     return sum(map(count_leaves, node.children))
 
+# TODO: implement new functions
+# could be useful, recommendation: keep it
 def deepest_path(): # counts number of moves of deepest path
     pass
 
@@ -159,20 +206,21 @@ def winner_distribution(): # value sum / visit count from root node
 
 def simulate(game: Game):
     '''
-    Rollout:
     Simulate random playouts from a node to estimate the value of unexplored states.
-    The rollout policy can be random or based on heuristics.
-    ---
-    After expansion, MCTS performs a simulation, often referred to as a "rollout."
-    During a rollout, random actions or actions determined by a simple policy are taken from
-    the newly added node to the end of the episode or until a termination condition is met.
+
+    Args:
+        game (Game): The game state to start the simulation from.
+
+    Returns:
+        str: The color of the winning player (None for a draw).
+
     '''
     # check if game is done (winner or draw)
     if game.done:
-        # check if game has a winner or not (draw = [None])
         return game.winner
 
     # TODO: maybe later play x random moves at once
+    # could be useful, recommendation: keep it
     random_move = sample(sorted(game.get_valid_moves()), 1)[0]
 
     # simulate a random game for the new child
@@ -188,6 +236,16 @@ class MCTS(Agent):
     '''
 
     def __init__(self, memory_path=None, update_memory=False, default_num_iterations = 1000, max_time=0):
+        '''
+        Initialize the MCTS agent.
+
+        Args:
+            memory_path (str): The path to the memory file for storing the MCTS tree.
+            update_memory (bool): If True, the memory file will be overwritten and updated.
+            default_num_iterations (int): The default number of iterations for MCTS.
+            max_time (float): The maximum time (in seconds) for MCTS calculations.
+
+        '''
         logger.info("MCTS agent initialized")
         super().__init__()
 
@@ -217,9 +275,11 @@ class MCTS(Agent):
             Node: The node in the memory tree that corresponds to the given game.
             Returns and creates new_child if the node is not found.
         """
+
         node = self.memory
 
         # TODO: add self.current node to find the node faster.
+        # => not sure, recommendation: n/a
         for move in game.complete_history:
             found_child = None
             for child in node.children:
@@ -237,7 +297,6 @@ class MCTS(Agent):
 
         return node
 
-    # TODO: set timer (max. 5 sec / move, etc.)
     def play(
             self,
             game: Game,
@@ -245,7 +304,19 @@ class MCTS(Agent):
             max_time=None,
             disable_progress_bar=True,
     ) -> tuple:
+        '''
+        Select the best move using Monte Carlo Tree Search (MCTS).
 
+        Args:
+            game (Game): The current game state.
+            num_iterations (int): The number of iterations for MCTS.
+            max_time (float): The maximum time (in seconds) for MCTS calculations.
+            disable_progress_bar (bool): If True, disable the progress bar.
+
+        Returns:
+            tuple: The selected move.
+
+        '''
         logger.info("Start play")
         start_time = time()
 
@@ -275,6 +346,7 @@ class MCTS(Agent):
                 break
 
         # TODO: check if better way than setting "C" to 0 before choosing best_child
+        # => think we can resolve this, recommendation: delete
         # select the best child with a c value of 0
         old_C = parameters['C']
         parameters['C'] = 0
@@ -315,6 +387,14 @@ class MCTS(Agent):
             logger.info(f"No memory file found at {self.memory_path}.")
 
     def train(self, num_iterations, max_time):
+        '''
+        Train the MCTS agent by running simulations and updating the memory.
+
+        Args:
+            num_iterations (int): The number of iterations for MCTS simulations.
+            max_time (float): The maximum time (in seconds) for MCTS calculations.
+
+        '''
         game = Game()
 
         next_move = self.play(game,
@@ -328,6 +408,7 @@ class MCTS(Agent):
         self.save_memory()
 
     # TODO: figure this out, since update_memory method is defined here.
+    # not needed, recommendation: delete
     # def __del__(self):
     #     logger.info("save memory")
     #     if self.update_memory:
