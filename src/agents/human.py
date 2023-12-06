@@ -35,6 +35,7 @@ class Human(Agent):
         """
         valid_move = False
         while not valid_move:
+            print(game)
             # (e.g., '2 3', or '23', or '2,3')
             inpt = input("Enter your move! >> ")
             nums = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]

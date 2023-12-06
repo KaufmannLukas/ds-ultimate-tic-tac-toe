@@ -5,7 +5,7 @@ from environments.uttt_env import UltimateTicTacToeEnv
 from environments.game import Game
 from agents.human import Human
 from agents.mcts import MCTS
-from ppo_playout import test_ppo, winner_table_to_dataframe
+from src.test_ppo import test_ppo, winner_table_to_dataframe
 
 import pandas as pd
 

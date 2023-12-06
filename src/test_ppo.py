@@ -32,8 +32,6 @@ def test_ppo(ppo_agent: Agent, opponent: Agent, num_of_games=100, print_stuff=Fa
 
     winner_table = []
 
-
-
     for i in tqdm(range(num_of_games)):
         
         #logger.info("Start new Game")

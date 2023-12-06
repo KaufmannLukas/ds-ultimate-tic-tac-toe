@@ -235,7 +235,7 @@ class MCTS(Agent):
     Agent class for Monte Carlo Tree Search.
     '''
 
-    def __init__(self, memory_path=None, update_memory=False, default_num_iterations = 1000, max_time=0):
+    def __init__(self, memory_path=None, update_memory=False, num_iterations = 1000, max_time=0):
         '''
         Initialize the MCTS agent.
 
@@ -249,7 +249,7 @@ class MCTS(Agent):
         logger.info("MCTS agent initialized")
         super().__init__()
 
-        self.num_iterations = default_num_iterations
+        self.num_iterations = num_iterations
         self.max_time = max_time
 
         # memory: represents the node itself, but also contains their children with their values.
