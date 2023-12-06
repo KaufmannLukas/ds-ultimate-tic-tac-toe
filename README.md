@@ -5,7 +5,7 @@
 ## Introduction
 
 The project was created during the final project phase of the Data Science Bootcamp at the Spiced Academy in Berlin in November 2023. <br>
-The project goal was to use Reinforced Learning to teach an agent how to play Ultimate Tic-Tac-Toe (U_T-T-T). <br>
+The project goal was to use Reinforcement Learning to teach an agent how to play Ultimate Tic-Tac-Toe (U_T-T-T). <br>
 In this group project, we first created a Monte Carlo Tree Search (MCTS) search algorithm from scratch. Then we used an Artificial Neural Network (ANN) to implement Proximal Policy Optimization (PPO) to improve the performance of our agent. <br>
 Addtionally, we implemented an interactive interface with flask and html, as a final product, where the user can play Ultimate Tic-Tac-Toe against our engine. <br>
 
@@ -24,14 +24,14 @@ You can play your next move at any board, if you are directed to play in a full 
 
 ![gif](/images/interface.gif) 
 
-## About Reinforced Learning
+## About Reinforcement Learning
 
-Reinforced Learning is used not only in gaming environments, but also has use cases in robotics, self-driving cars and the development of generative AI.
-We were interested in exploring this topic, since it was not part of the curriculum of our bootcamp and gained more and more importance over the years.
+Reinforcement Learning is used not only in gaming environments, but also has use cases in robotics, self-driving cars and the development of generative AI. We were interested in exploring this topic, since it was not part of the curriculum of our bootcamp and has gained more and more importance over the years.
 
 ## Model types
 
 ![mcts+ppo](/images/slide_04_mcts+ppo.png)
+
 As mentioned before, we first created a Monte Carlo Tree Search Algorithm (MCTS) from scratch and additionally implemented a memory file from former iterations that the model can load and therefore learn from. <br>
 As a second model, we created a Neural Network structure to perform Proximal Policy Optimization (PPO).
 
@@ -39,13 +39,13 @@ As a second model, we created a Neural Network structure to perform Proximal Pol
 
 ![mcts](/images/slide_05_mcts.png)
 
-The MCTS works as follows: One iteration is completed after selecting a move, expanding and exploring the game tree (all nodes in the tree are possible game states or moves that can be played) and simulating the outcome from there by random play. The outcome of this playout is than backpropagated to the top, along the path that has been played. The visit counts and reward values of these nodes are then updated. In order to access these results in the future, we implemented a memory file. This file grows large in size quickly, though.
+The MCTS works as follows: One iteration is completed after selecting a move, expanding and exploring the game tree (all nodes in the tree are possible game states or moves that can be played) and simulating the outcome from there by playing random moves. The outcome of this playout is than backpropagated to the top, along the path that has been played. The visit counts and reward values of these nodes are then updated. In order to access these results in the future, we implemented a memory function. This memory file grows large in size quickly, though.
 
 ## PPO
 
 ![ppo](/images/slide_06_ppo.png)
 
-In the PPO model, our agent performs an action (=move) in the environment (=game) and gets a new game state, as well as rewards for his actions. The actor network predicts probabilites for each move and the critic network estimates the value of the given board state.
+In the PPO model, our agent performs an action (=move) in the environment (=game) and gets a new game state, as well as rewards for his actions. The actor network predicts probabilites for each move and the critic network estimates the value of the given board state. Compared to the MCTS memory file, the file sizes for the two networks are very small and therefore more useful in uploading them into the frontend / playable gaming interface.
 
 ## Model evaluation
 
