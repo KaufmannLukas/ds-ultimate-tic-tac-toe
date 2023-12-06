@@ -1,7 +1,5 @@
 import logging
-
 import numpy as np
-
 import json
 
 logger = logging.getLogger(__name__)
@@ -96,8 +94,17 @@ class Game:
         self.last_move = None
         self.global_draw = False
 
-    # TODO: maybe implement immutable game-states later
     def __key(self):
+        """
+        Generates a hashable key representing the current state of the Ultimate Tic-Tac-Toe game.
+
+        This method creates a tuple containing hash values of critical components of the game state,
+        including the boards of both players, the winner, game completion status, and the last move made.
+        The resulting tuple is used as a key to uniquely identify the state of the game.
+
+        Returns:
+            tuple: A hashable tuple representing the key for the current state of the Ultimate Tic-Tac-Toe game.
+        """
         return (
             hash(np.ndarray.tobytes(self.white.board)),
             hash(np.ndarray.tobytes(self.black.board)),
@@ -107,9 +114,30 @@ class Game:
         )
 
     def __hash__(self) -> int:
+        """
+        Computes the hash value for the current game state.
+
+        The hash value is computed based on a combination of the hash values of
+        the boards, winner, game completion status, and the last move.
+
+        Returns:
+            int: The hash value for the current game state.
+        """
         return hash(self.__key())
 
     def __eq__(self, other):
+        """
+        Checks if two game instances are equal.
+
+        Two game instances are considered equal if they have the same key,
+        which is determined by the hash values of their respective states.
+
+        Args:
+            other: Another game instance to compare.
+
+        Returns:
+            bool: True if the two instances are equal, False otherwise.
+        """
         return self.__key() == other.__key()
 
     @property
@@ -190,10 +218,23 @@ class Game:
         return moves
 
     def copy(self):
+        """
+        Creates a deep copy of the current game instance.
+
+        Returns a new Game instance with the same state as the current instance,
+        including the state of both players (white and black), the winner, game completion
+        status, and the last move.
+
+        Returns:
+            Game: A new instance of the Game class with the same state.
+        """
         new_game = Game()
-        # Assuming _Player also has a custom copy method
+        
+        # Deep copy of player states
         new_game.white = self.white.copy()
         new_game.black = self.black.copy()
+        
+        # Copy other game attributes
         new_game.winner = self.winner
         new_game.done = self.done
         new_game.last_move = self.last_move
@@ -219,9 +260,16 @@ class Game:
         return set(map(tuple, valid_indexes))
 
     def check_valid_move(self, game_idx, field_idx):
-        '''
-        Returns True if the move (game_idx, field_idx) is valid / not blocked
-        '''
+        """
+        Checks if a move at the specified indices is valid and not blocked.
+
+        Args:
+            game_idx (int): The index of the sub-game (3x3 grid) where the move is intended.
+            field_idx (int): The index of the field within the specified sub-game where the move is intended.
+
+        Returns:
+            bool: True if the move is valid and not blocked, False otherwise.
+        """
         return not self.blocked_fields[game_idx, field_idx]
 
     def check_win(board):
@@ -300,13 +348,32 @@ class Game:
 
 
     def get_index_from_vector(index: int):
-        field_idx = index % 9 # -> field index
-        game_idx = index // 9
+        """
+        Converts a flat vector index to corresponding game and field indices.
+
+        Args:
+            index (int): The flat vector index representing a move in the 9x9 Ultimate Tic-Tac-Toe board.
+
+        Returns:
+            tuple: A tuple containing two integers, representing the game index and field index of the move.
+        """
+        field_idx = index % 9 # Field index within a sub-game
+        game_idx = index // 9 # Game index
 
         return game_idx, field_idx
     
 
     def check_draw(self):
+        """
+        Checks for global and local draws in the Ultimate Tic-Tac-Toe game.
+
+        Returns a tuple of boolean values, where the first element indicates a global draw
+        and the second element is a list of booleans indicating local draws for each sub-game.
+
+        Returns:
+            tuple: A tuple of booleans, where the first element represents a global draw,
+            and the second element is a list of booleans indicating local draws for each sub-game.
+        """
         global_draw = self.global_draw
 
         local_wins = self.white.wins | self.black.wins
@@ -345,38 +412,51 @@ class Game:
         return reshaped.transpose(0, 2, 1, 3).reshape(9, 9)
 
     def __repr__(self):
+        """
+        Returns a string representation of the current state of the Ultimate Tic-Tac-Toe game.
+
+        This method generates a visual representation of the game board, including player moves,
+        blocked fields, and the most recent move highlighted. The representation is returned as a string.
+
+        Returns:
+            str: A string representation of the current state of the Ultimate Tic-Tac-Toe game.
+        """
+        # Create a 9x9 matrix to represent the game board
         game = np.zeros((9, 9))
-        game[self.black.board] = -1
-        game[self.white.board] = 1
+        game[self.black.board] = -1   # Fill cells occupied by black player with -1
+        game[self.white.board] = 1    # Fill cells occupied by white player with 1
+        
+        # Reshape the game board for visual representation
         reshaped_board = Game._reshape_board(game)
 
+        # Reshape blocked fields for visual representation
         blocked_fields = Game._reshape_board(self.blocked_fields)
 
+        # Create a blank 9x9 matrix with the last move marked
         blank_board = np.zeros((9,9))
         blank_board[self.last_move] = True
         last_move = Game._reshape_board(blank_board)
 
-
         rows = []
         for i in range(9):
-
             row = []
             for j in range(9):
                 if j in (3, 6):
                     row.append(" ")
+                # Use a switch-like structure to determine the character for each cell
                 match int(reshaped_board[i, j]):
                     case 1:
-                        row.append("X")
+                        row.append("X")   # Character for cells occupied by white player
                     case -1:
-                        row.append("O")
+                        row.append("O")   # Character for cells occupied by black player
                     case 0:
                         if blocked_fields[i, j]:
-                            row.append("·")
+                            row.append("·")   # Blocked field character
                         else:
-                            row.append("•")
+                            row.append("•")   # Free field character
+                # Highlight the most recent move
                 if last_move[i, j]:
                     row[-1] = '\033[1m' + row[-1] + '\033[0m'
-                    #row.append('\033[0m')
             if i in (3, 6):
                 rows.append("\n")
             rows.append("  ".join(row) + "\n")
@@ -386,10 +466,12 @@ class Game:
         # reorder axis
         return repr
     
-
+    # TODO: delete the commented part below
+    # => not necessary, recommendation: delete
+    #
     # def make_json(self):
     #     json_data = {
-    #         # TODO: add draw (None can be draw or just an unfinished game currently)
+    #         # TDO: add draw (None can be draw or just an unfinished game currently)
     #         "win_global_game": "white" if self.winner == "white" else ("black" if self.winner == "black" else "None"),
     #         "black_history": self.black.history,
     #         "white_history": self.white.history,
@@ -404,7 +486,7 @@ class Game:
     #     for game_idx in range(9):
     #         json_data["game_state"]["games"][f"game_{game_idx}"] = {
     #             "won_by": "white" if self.white.wins[game_idx] else (
-    #                 "black" if self.black.wins[game_idx] else "None" # TODO: add draw
+    #                 "black" if self.black.wins[game_idx] else "None" # TDO: add draw
     #             ),
     #             "next_move": game_idx == self.last_move[1] if self.last_move else False,
     #             "fields": {}
@@ -426,6 +508,12 @@ class Game:
 
 
     def make_json(self):
+        """
+        Generates a JSON representation of the game state.
+
+        Returns:
+            dict: A dictionary representing the current state of the game in JSON-compatible format.
+        """
         global_draw, local_draws = self.check_draw()
         local_wins_white = int(sum(self.white.wins))
         local_wins_black = int(sum(self.black.wins))
@@ -465,6 +553,9 @@ class Game:
         #return json_string
         return json_data
 
+
+# TODO: delete?
+# not sure if needed, recommendation n/a
 # Example usage
 # game = Game()
 # json_string = game.make_json()
