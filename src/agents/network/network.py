@@ -13,8 +13,6 @@ class FeedForwardNN_Actor(nn.Module):
         out_dim (int): Output dimension.
 
     """
-    # get input and output dimensions from 'uttt_env.py'
-    # (TODO: true? - where do they come from? from ppo.py?)
 
     def __init__(self, in_dim, out_dim):
         """
@@ -34,7 +32,8 @@ class FeedForwardNN_Actor(nn.Module):
         '''
 
         self.layer1 = nn.Linear(in_dim, 324)
-        self.bn1 = nn.BatchNorm1d(324) # batch normalization applied after linear transformation
+        self.bn1 = nn.BatchNorm1d(324)
+        # batch normalization applied after linear transformation
         self.layer2 = nn.Linear(324, 324)
         self.bn2 = nn.BatchNorm1d(324)
         self.layer3 = nn.Linear(324, 324)

@@ -466,50 +466,11 @@ class Game:
         # reorder axis
         return repr
     
-    # TODO: delete the commented part below
-    # => not necessary, recommendation: delete
-    #
-    # def make_json(self):
-    #     json_data = {
-    #         # TDO: add draw (None can be draw or just an unfinished game currently)
-    #         "win_global_game": "white" if self.winner == "white" else ("black" if self.winner == "black" else "None"),
-    #         "black_history": self.black.history,
-    #         "white_history": self.white.history,
-    #         "combined_history": self.complete_history,
-    #         "last_move": self.last_move,
-    #         "game_state": {
-    #             "games": {}
-    #         }
-    #     }
-
-
-    #     for game_idx in range(9):
-    #         json_data["game_state"]["games"][f"game_{game_idx}"] = {
-    #             "won_by": "white" if self.white.wins[game_idx] else (
-    #                 "black" if self.black.wins[game_idx] else "None" # TDO: add draw
-    #             ),
-    #             "next_move": game_idx == self.last_move[1] if self.last_move else False,
-    #             "fields": {}
-    #         }
-
-    #         for field_idx in range(9):
-    #             field_key = f"field_{field_idx}"
-    #             json_data["game_state"]["games"][f"game_{game_idx}"]["fields"][field_key] = {
-    #                 "white": bool(self.white.board[game_idx, field_idx]),
-    #                 "black": bool(self.black.board[game_idx, field_idx]),
-    #                 "last_move": bool((game_idx, field_idx) == self.last_move) if self.last_move else False,
-    #                 "blocked_field": bool(self.blocked_fields[game_idx, field_idx]),
-    #                 "valid_move": bool(not self.blocked_fields[game_idx, field_idx])
-    #             }
-
-    #     json_string = json.dumps(json_data, indent=4, default=lambda x: bool(x))
-    #     # print(json_string)
-    #     return json_string
-
 
     def make_json(self):
         """
         Generates a JSON representation of the game state.
+        It is used in the frontend to translate the game into a visualisation of it.
 
         Returns:
             dict: A dictionary representing the current state of the game in JSON-compatible format.
@@ -548,21 +509,8 @@ class Game:
                     "valid_move": bool(not self.blocked_fields[game_idx, field_idx])
                 }
 
-        #json_string = json.dumps(json_data, indent=4, default=lambda x: bool(x))
+        # NOTE: either return a json-file or a dictionary.
+        # json_string = json.dumps(json_data, indent=4, default=lambda x: bool(x))
         # print(json_string)
-        #return json_string
+        # return json_string
         return json_data
-
-
-# TODO: delete?
-# not sure if needed, recommendation n/a
-# Example usage
-# game = Game()
-# json_string = game.make_json()
-# with open("json_test.json", "w") as file:
-#     file.write(json_string)
-
-# game = Game()
-# json_test = game.make_json()
-# json_print = json.dumps(json_test, indent=4, default=lambda x: bool(x))
-# print(json_print)

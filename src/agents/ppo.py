@@ -1,9 +1,9 @@
-
-# TODO: should we keep this? if so, should we mention the original repo & medium article as well?
 """
 The file contains the PPO class to train with.
+-
 NOTE: All "ALG STEP"s are following the numbers from the original PPO pseudocode. 
 It can be found here: https://spinningup.openai.com/en/latest/_images/math/e62a8971472597f4b014c2da064f636ffe365ba3.svg
+We followed this article from Eric Yang Yu as an inspiration: https://medium.com/@eyyu/coding-ppo-from-scratch-with-pytorch-part-1-4-613dfc1b14c8
 """
 
 import time
@@ -33,9 +33,8 @@ logger = logging.getLogger(__name__)
 
 class PPO(Agent):
     """
-        This is the PPO class we will use as our model in main.py
+        Proximal Policy Optimization Agent Class for the U_T-T-T.
     """
-    # TODO: is this first comment still true?
 
     def __init__(self, 
                  name=None, 
@@ -88,7 +87,7 @@ class PPO(Agent):
             'batch_lens': [],       # episodic lengths in batch
             'batch_rews': [],       # episodic returns in batch
             'actor_losses': [],     # losses of actor network in current iteration
-            'help_count': [0, 0],   # TODO: do we use this somewhere yet?
+            'help_count': [0, 0],   # NOTE: we do not use this yet
         }
 
         self.reward_history = []
@@ -101,7 +100,6 @@ class PPO(Agent):
 
 
         # ALG STEP 1
-        # TODO: do we keep this structure? (ALG STEPS?)
 
         # Initialize actor and critic networks
         self.actor = FeedForwardNN_Actor(self.obs_dim, self.act_dim)
@@ -123,6 +121,7 @@ class PPO(Agent):
             logger.warn(f"unable to load, create new files")
             print("oh cannot load :(")
             self.save(self.path, self.name)
+
 
     def _init_hyperparameters(self, hyperparameters):
         """
@@ -191,9 +190,6 @@ class PPO(Agent):
             pbar.n = t_so_far
             pbar.refresh()  # Refresh the progress bar to show the updated value
 
-            # TODO: for loop makes more sense?
-            # maybe useful, recommendation: keep it
-            
 
             # ALG STEP 3
             
@@ -216,7 +212,6 @@ class PPO(Agent):
             
             
             # ALG STEP 5
-            # TODO: STEP 4 is missing..
             
             # Calculate advantage
             A_k = batch_rtgs - V.detach()
@@ -302,14 +297,8 @@ class PPO(Agent):
             obs, _ = env.reset()
             done = False
 
-            # TODO: make a while loop instead because max_timesteps_per_episode will never be reached
-            # still necessary? recommendation: delete it
             ep_t = 0
             for ep_t in range(self.max_timesteps_per_episode):
-
-                # TODO: delete?
-                # not sure, recommendation: n/a
-                #self.env.render()
 
                 # Increment timesteps ran this batch so far
                 t += 1
@@ -344,17 +333,12 @@ class PPO(Agent):
             batch_acts = torch.tensor(batch_acts, dtype=torch.float)
         else:
             batch_acts = batch_acts.clone().detach()
-        # Reshape data as tensors in the shape specified before returning
         
-        #TODO: delete?
-        # think it's not necessary, recommendation: delete it 
-        #batch_obs = torch.tensor(batch_obs, dtype=torch.float)
-        #batch_acts = torch.tensor(batch_acts, dtype=torch.float)
+        # Reshape data as tensors in the shape specified before returning
         batch_log_probs = torch.tensor(batch_log_probs, dtype=torch.float)
         
         
-        # ALG STEP #4
-        # TODO: okay here it is, haha. -> change order possible? (move up?)
+        # ALG STEP 4
         
         against_itself = True if env.opponent is not None else False
         batch_rtgs = self.compute_rtgs(batch_rews, against_itself=against_itself)
@@ -433,60 +417,8 @@ class PPO(Agent):
             action = m.sample()
             log_prob = m.log_prob(action)
 
-        # TODO: delete all below until <return>?
-        # not sure if we need it, recommendation n/a
-        #probs = self.actor(flat_obs)
-
-        # if mode == "play":
-            # print("probs: ")
-            # print(probs)
-            # print("log_prob")
-            # print(log_prob)
-            # print("action: ")
-            # print(action)
-            # print("")
-
-        '''putting probs for invalid moves to X manually'''
-        #blocked_fields = obs[0:81]
-        # probs[blocked_fields == 1] = torch.finfo(torch.float64).eps
-
-        '''Normalisation of the probs'''
-        #print("Probs before normalization:", probs)
-        #probs[blocked_fields == 1] = 0
-        #probs /= (probs.sum() + 1e-8)  # Adding a small epsilon to avoid division by zero
-        #print("Probs after normalization:", probs)
-
-        # if mode == "play":
-        #     print("probs: ")
-        #     print(probs)
-
-        # Create our Multivariate Normal Distribution
-        #dist = MultivariateNormal(mean, self.cov_mat)
-
-
-        #m = Categorical(probs)
-        # Sample an action from the distribution and get its log prob
-
-        
-        #action = m.sample() # assuming this sample is NOT random ???
-
-        # print("action: ", action)
-
-        # next_state, reward = env.step(action)
-        # loss = -m.log_prob(action) * reward
-        # loss.backward()
-
-        # Log probability calculation
-        # log_prob = m.log_prob(action) if m is not None else None
-
-        # Return the sampled action and the log prob of that action
-        # Note that I'm calling detach() since the action and log_prob
-        # are tensors with computation graphs, so I want to get rid
-        # of the graph and just convert the action to numpy array.
-        # log prob as tensor is fine. Our computation graph will
-        # start later down the line.
-
         return action.detach().numpy(), log_prob.detach()
+
 
     def evaluate(self, batch_obs, batch_acts):
         """
@@ -678,7 +610,6 @@ class PPO(Agent):
                 logger.info(f"illegal_move_factor: {env.reward_config['illegal_move_factor']}")
                 logger.info(f"------------------------------------------------------" )
                     
-
             # Reset batch-specific logging data
             self.logger_dict['batch_lens'] = []
             self.logger_dict['batch_rews'] = []
