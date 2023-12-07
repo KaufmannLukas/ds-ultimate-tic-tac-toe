@@ -135,5 +135,4 @@ dmypy.json
 .vscode
 
 # folders
-_research_references/
-data/
+data/local/
