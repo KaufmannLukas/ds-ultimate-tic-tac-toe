@@ -21,6 +21,7 @@ class Agent(ABC):
         super().__init__()
 
 
+    # TODO: do we need this decorator?
     @abstractmethod
     def play(self, game: Game) -> tuple:
         """
@@ -35,3 +36,4 @@ class Agent(ABC):
 
         """
         pass
+
