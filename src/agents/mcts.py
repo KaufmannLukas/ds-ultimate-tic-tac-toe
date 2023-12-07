@@ -317,7 +317,7 @@ class MCTS(Agent):
             tuple: The selected move.
 
         '''
-        logger.info("Start play")
+        #logger.info("Start play")
         start_time = time()
 
         # find the current game state in memory

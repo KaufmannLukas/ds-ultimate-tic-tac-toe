@@ -546,8 +546,8 @@ class PPO(Agent):
             move = self.helper_agent.play(game=game, **helper_parameters)
 
         moves_without_help, moves_with_help = self.logger_dict['help_count']
-        logger.info(f"played {moves_without_help} moves without help")
-        logger.info(f"played {moves_with_help} moves with help")
+        #logger.info(f"played {moves_without_help} moves without help")
+        #logger.info(f"played {moves_with_help} moves with help")
 
         return move
 
