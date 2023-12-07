@@ -71,6 +71,8 @@ The following tree-like folder structure diagram provides orientation over our r
 
 ![folders](/images/slide_11_folders.png)
 
+
+
 ## Setup Environment
 
 To set up with anaconda / mamba:
