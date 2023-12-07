@@ -1,3 +1,4 @@
+from collections import defaultdict
 from itertools import permutations
 import logging
 import time
@@ -22,7 +23,7 @@ print(formatted_date_time)
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    filename=f"playout_{formatted_date_time}.log",
+                    filename=f"logs/playout_{formatted_date_time}.log",
                     filemode='w'
                     )
 
@@ -45,9 +46,31 @@ def play(white: Agent, black: Agent):
     return game
 
 
+# def tournament(agents, names, rounds=10):
+#     perms = permutations(zip(agents, names), r=2)
+#     results = []
+
+#     for agent_1, agent_2 in perms:
+#         logger.info("-" * 20)
+#         logger.info(f"{agent_1[1]} as white vs. {agent_2[1]} as black")
+#         for i in range(rounds):
+#             res = play(agent_1[0], agent_2[0])
+#             logger.info(f"round {i}: {res.winner}")
+#             results.append([agent_1[1], agent_2[1], i, res.winner])
+
+#     # TODO: implement summary in log
+
+#     # Writing results to CSV
+#     with open(f'data/playouts/tournament_results_{formatted_date_time}.csv', 'w', newline='') as file:
+#         writer = csv.writer(file)
+#         writer.writerow(['White', 'Black', 'Round', 'Winner'])
+#         writer.writerows(results)
+
+
 def tournament(agents, names, rounds=10):
     perms = permutations(zip(agents, names), r=2)
     results = []
+    summary = defaultdict(lambda: {'wins': 0, 'losses': 0, 'draws': 0})
 
     for agent_1, agent_2 in perms:
         logger.info("-" * 20)
@@ -55,22 +78,39 @@ def tournament(agents, names, rounds=10):
         for i in range(rounds):
             res = play(agent_1[0], agent_2[0])
             logger.info(f"round {i}: {res.winner}")
+
+            # Update results
             results.append([agent_1[1], agent_2[1], i, res.winner])
 
-    # TODO: implement summary in log
+            # Update summary
+            if res.winner == "white (X)":
+                summary[(agent_1[1], agent_2[1])]['wins'] += 1
+                #summary[(agent_2[1], agent_1[1])]['losses'] += 1
+            elif res.winner == "black (O)":
+                summary[(agent_1[1], agent_2[1])]['losses'] += 1
+                #summary[(agent_2[1], agent_1[1])]['wins'] += 1
+            else:  # Draw
+                summary[(agent_1[1], agent_2[1])]['draws'] += 1
+                #summary[(agent_2[1], agent_1[1])]['draws'] += 1
+
+    # Logging the summary
+    logger.info("Tournament Summary:")
+    for agents, result in summary.items():
+        logger.info(f"{agents[0]} vs {agents[1]}: Wins: {result['wins']}, Losses: {result['losses']}, Draws: {result['draws']}")
 
     # Writing results to CSV
-    with open(f'tournament_results_{formatted_date_time}.csv', 'w', newline='') as file:
+    with open(f'data/playouts/tournament_results_{formatted_date_time}.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['White', 'Black', 'Round', 'Winner'])
         writer.writerows(results)
+
 
 
 if __name__ == "__main__":
     # create agents
     agent_1 = Human()
     agent_2 = Random()
-    agent_3 = MCTS(num_iterations=10, memory_path="data/models/mcts/test.pkl")
+    agent_3 = MCTS(num_iterations=5, memory_path="data/models/mcts/test.pkl")
 
     model = "ppo_test"
     path = "./data/models/ppo/"
