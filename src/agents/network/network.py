@@ -13,8 +13,8 @@ class FeedForwardNN_Actor(nn.Module):
         out_dim (int): Output dimension.
 
     """
-    # get input and output dimensions from 'uttt_env.py'
-    # (currently: 4x9x9, TODO: check if has to change)
+    # get input and output dimensions from 'uttt_env.py' (TODO: true?)
+
     def __init__(self, in_dim, out_dim):
         """
         Initialize the FeedForwardNN_Actor.
