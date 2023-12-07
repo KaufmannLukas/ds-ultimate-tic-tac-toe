@@ -1,5 +1,5 @@
 
-
+# TODO: should we keep this? if so, should we mention the original repo & medium article as well?
 """
 The file contains the PPO class to train with.
 NOTE: All "ALG STEP"s are following the numbers from the original PPO pseudocode. 
@@ -35,6 +35,7 @@ class PPO(Agent):
     """
         This is the PPO class we will use as our model in main.py
     """
+    # TODO: is this first comment still true?
 
     def __init__(self, 
                  name=None, 
@@ -87,7 +88,7 @@ class PPO(Agent):
             'batch_lens': [],       # episodic lengths in batch
             'batch_rews': [],       # episodic returns in batch
             'actor_losses': [],     # losses of actor network in current iteration
-            'help_count': [0, 0],
+            'help_count': [0, 0],   # TODO: do we use this somewhere yet?
         }
 
         self.reward_history = []
@@ -100,6 +101,7 @@ class PPO(Agent):
 
 
         # ALG STEP 1
+        # TODO: do we keep this structure? (ALG STEPS?)
 
         # Initialize actor and critic networks
         self.actor = FeedForwardNN_Actor(self.obs_dim, self.act_dim)
@@ -214,6 +216,7 @@ class PPO(Agent):
             
             
             # ALG STEP 5
+            # TODO: STEP 4 is missing..
             
             # Calculate advantage
             A_k = batch_rtgs - V.detach()
@@ -351,6 +354,7 @@ class PPO(Agent):
         
         
         # ALG STEP #4
+        # TODO: okay here it is, haha. -> change order possible? (move up?)
         
         against_itself = True if env.opponent is not None else False
         batch_rtgs = self.compute_rtgs(batch_rews, against_itself=against_itself)
