@@ -81,8 +81,7 @@ class Node:
         self.parent = parent
         self.is_fully_expanded = False
 
-    # TODO: not used yet, delete later maybe? 
-    # => Still not used anywhere, recommendation: delete
+
     def __hash__(self) -> int:
         '''
         Compute the hash value for the node based on the game state.
@@ -92,6 +91,7 @@ class Node:
 
         '''    
         return hash(self.game)
+
 
     def select_child(self) -> 'Node':
         '''
@@ -108,6 +108,7 @@ class Node:
         # returns child with highest ucb-score
         best_child = max(self.children, key=ucb_score)
         return best_child
+
 
     def expand(self):
         '''
@@ -137,12 +138,11 @@ class Node:
         new_child = Node(game=new_game, parent=self)
         self.children.append(new_child)
 
-        # TODO: check if there is a better way (update unexplored moves earlier)
-        # => not necessary, recommendation: delete
         if len(unexplored_moves) == 1:
             self.is_fully_expanded = True
 
         return new_child
+
 
     def backpropagate(self, winner):
         '''
@@ -195,14 +195,6 @@ def count_leaves(node: 'Node'):
         return 1
     return sum(map(count_leaves, node.children))
 
-# TODO: implement new functions
-# could be useful, recommendation: keep it
-def deepest_path(): # counts number of moves of deepest path
-    pass
-
-def winner_distribution(): # value sum / visit count from root node
-    pass
-
 
 def simulate(game: Game):
     '''
@@ -219,15 +211,12 @@ def simulate(game: Game):
     if game.done:
         return game.winner
 
-    # TODO: maybe later play x random moves at once
-    # could be useful, recommendation: keep it
     random_move = sample(sorted(game.get_valid_moves()), 1)[0]
 
     # simulate a random game for the new child
     new_game = game.copy()
     new_game.play(*random_move)
     return simulate(new_game)
-
 
 
 class MCTS(Agent):
@@ -264,6 +253,7 @@ class MCTS(Agent):
             if os.path.exists(memory_path):
                 self.load_memory()
 
+
     def find_node_by_game(self, game: Game):
         """
         Find the node in the memory tree corresponding to the given game.
@@ -278,8 +268,6 @@ class MCTS(Agent):
 
         node = self.memory
 
-        # TODO: add self.current node to find the node faster.
-        # => not sure, recommendation: n/a
         for move in game.complete_history:
             found_child = None
             for child in node.children:
@@ -296,6 +284,7 @@ class MCTS(Agent):
                 node = new_child
 
         return node
+
 
     def play(
             self,
@@ -345,8 +334,6 @@ class MCTS(Agent):
             if (max_time or self.max_time) and (time() - start_time) > (max_time or self.max_time):
                 break
 
-        # TODO: check if better way than setting "C" to 0 before choosing best_child
-        # => think we can resolve this, recommendation: delete
         # select the best child with a c value of 0
         old_C = parameters['C']
         parameters['C'] = 0
@@ -355,6 +342,7 @@ class MCTS(Agent):
         parameters['C'] = old_C
 
         return next_move
+
 
     def save_memory(self, memory_path=None):
         """
@@ -375,6 +363,7 @@ class MCTS(Agent):
         else:
             logger.warn("No memory to save.")
 
+
     def load_memory(self):
         """
         Load the MCTS tree state from a pickle file.
@@ -385,6 +374,7 @@ class MCTS(Agent):
                 logger.info(f"Memory loaded from {self.memory_path}")
         else:
             logger.info(f"No memory file found at {self.memory_path}.")
+
 
     def train(self, num_iterations, max_time):
         '''
@@ -406,13 +396,3 @@ class MCTS(Agent):
         logger.info(f"next move: {next_move}")
 
         self.save_memory()
-
-    # TODO: figure this out, since update_memory method is defined here.
-    # not needed, recommendation: delete
-    # def __del__(self):
-    #     logger.info("save memory")
-    #     if self.update_memory:
-    #         if self.memory_path is not None:
-    #             self.save_memory()
-    #         else:
-    #             logger.warn("no memory path to store the memory!!!")

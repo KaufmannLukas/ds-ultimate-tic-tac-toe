@@ -34,15 +34,3 @@ class Random(Agent):
             print(game) 
         
         return move
-
-        # TODO: include better feedback
-        # my recommendation includes a print for the error and the game state, too.
-        # except ValueError:
-        #     # Handle the case where there are no valid moves
-        #     print("No valid moves available.")
-        #     print("Valid moves:", valid_moves)
-        #     print("Current game state:")
-        #     print(game)
-        #     raise ValueError("No valid moves available.")
-
-        # return move
