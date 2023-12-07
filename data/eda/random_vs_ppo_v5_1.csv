@@ -1,0 +1,1001 @@
+,game_nr,ppo_color,winner
+0,0,white (X),
+1,1,black (O),
+2,2,white (X),
+3,3,black (O),
+4,4,white (X),black (O)
+5,5,black (O),
+6,6,white (X),white (X)
+7,7,black (O),white (X)
+8,8,white (X),
+9,9,black (O),
+10,10,white (X),white (X)
+11,11,black (O),white (X)
+12,12,white (X),white (X)
+13,13,black (O),
+14,14,white (X),
+15,15,black (O),
+16,16,white (X),white (X)
+17,17,black (O),white (X)
+18,18,white (X),white (X)
+19,19,black (O),
+20,20,white (X),white (X)
+21,21,black (O),
+22,22,white (X),
+23,23,black (O),black (O)
+24,24,white (X),white (X)
+25,25,black (O),
+26,26,white (X),
+27,27,black (O),
+28,28,white (X),white (X)
+29,29,black (O),white (X)
+30,30,white (X),white (X)
+31,31,black (O),
+32,32,white (X),white (X)
+33,33,black (O),
+34,34,white (X),white (X)
+35,35,black (O),white (X)
+36,36,white (X),white (X)
+37,37,black (O),black (O)
+38,38,white (X),white (X)
+39,39,black (O),
+40,40,white (X),white (X)
+41,41,black (O),
+42,42,white (X),
+43,43,black (O),
+44,44,white (X),
+45,45,black (O),
+46,46,white (X),
+47,47,black (O),
+48,48,white (X),white (X)
+49,49,black (O),black (O)
+50,50,white (X),
+51,51,black (O),
+52,52,white (X),white (X)
+53,53,black (O),
+54,54,white (X),white (X)
+55,55,black (O),
+56,56,white (X),white (X)
+57,57,black (O),
+58,58,white (X),white (X)
+59,59,black (O),
+60,60,white (X),white (X)
+61,61,black (O),
+62,62,white (X),
+63,63,black (O),
+64,64,white (X),white (X)
+65,65,black (O),
+66,66,white (X),white (X)
+67,67,black (O),
+68,68,white (X),
+69,69,black (O),
+70,70,white (X),white (X)
+71,71,black (O),black (O)
+72,72,white (X),
+73,73,black (O),white (X)
+74,74,white (X),
+75,75,black (O),
+76,76,white (X),white (X)
+77,77,black (O),
+78,78,white (X),
+79,79,black (O),
+80,80,white (X),
+81,81,black (O),black (O)
+82,82,white (X),white (X)
+83,83,black (O),
+84,84,white (X),
+85,85,black (O),
+86,86,white (X),white (X)
+87,87,black (O),
+88,88,white (X),white (X)
+89,89,black (O),black (O)
+90,90,white (X),white (X)
+91,91,black (O),
+92,92,white (X),
+93,93,black (O),black (O)
+94,94,white (X),
+95,95,black (O),
+96,96,white (X),
+97,97,black (O),
+98,98,white (X),white (X)
+99,99,black (O),white (X)
+100,100,white (X),black (O)
+101,101,black (O),
+102,102,white (X),
+103,103,black (O),
+104,104,white (X),white (X)
+105,105,black (O),
+106,106,white (X),
+107,107,black (O),
+108,108,white (X),white (X)
+109,109,black (O),
+110,110,white (X),white (X)
+111,111,black (O),
+112,112,white (X),
+113,113,black (O),
+114,114,white (X),white (X)
+115,115,black (O),
+116,116,white (X),white (X)
+117,117,black (O),
+118,118,white (X),
+119,119,black (O),
+120,120,white (X),white (X)
+121,121,black (O),
+122,122,white (X),white (X)
+123,123,black (O),
+124,124,white (X),white (X)
+125,125,black (O),
+126,126,white (X),white (X)
+127,127,black (O),
+128,128,white (X),white (X)
+129,129,black (O),
+130,130,white (X),white (X)
+131,131,black (O),
+132,132,white (X),
+133,133,black (O),
+134,134,white (X),white (X)
+135,135,black (O),
+136,136,white (X),
+137,137,black (O),
+138,138,white (X),
+139,139,black (O),white (X)
+140,140,white (X),white (X)
+141,141,black (O),
+142,142,white (X),white (X)
+143,143,black (O),
+144,144,white (X),
+145,145,black (O),
+146,146,white (X),white (X)
+147,147,black (O),
+148,148,white (X),white (X)
+149,149,black (O),
+150,150,white (X),white (X)
+151,151,black (O),
+152,152,white (X),white (X)
+153,153,black (O),
+154,154,white (X),white (X)
+155,155,black (O),
+156,156,white (X),
+157,157,black (O),
+158,158,white (X),white (X)
+159,159,black (O),
+160,160,white (X),
+161,161,black (O),
+162,162,white (X),white (X)
+163,163,black (O),
+164,164,white (X),white (X)
+165,165,black (O),
+166,166,white (X),
+167,167,black (O),
+168,168,white (X),
+169,169,black (O),black (O)
+170,170,white (X),
+171,171,black (O),black (O)
+172,172,white (X),
+173,173,black (O),
+174,174,white (X),white (X)
+175,175,black (O),
+176,176,white (X),white (X)
+177,177,black (O),
+178,178,white (X),white (X)
+179,179,black (O),
+180,180,white (X),
+181,181,black (O),
+182,182,white (X),white (X)
+183,183,black (O),
+184,184,white (X),white (X)
+185,185,black (O),black (O)
+186,186,white (X),white (X)
+187,187,black (O),
+188,188,white (X),white (X)
+189,189,black (O),black (O)
+190,190,white (X),
+191,191,black (O),
+192,192,white (X),white (X)
+193,193,black (O),
+194,194,white (X),white (X)
+195,195,black (O),
+196,196,white (X),white (X)
+197,197,black (O),white (X)
+198,198,white (X),white (X)
+199,199,black (O),
+200,200,white (X),
+201,201,black (O),
+202,202,white (X),
+203,203,black (O),black (O)
+204,204,white (X),
+205,205,black (O),
+206,206,white (X),
+207,207,black (O),
+208,208,white (X),
+209,209,black (O),
+210,210,white (X),
+211,211,black (O),
+212,212,white (X),white (X)
+213,213,black (O),
+214,214,white (X),white (X)
+215,215,black (O),
+216,216,white (X),white (X)
+217,217,black (O),black (O)
+218,218,white (X),
+219,219,black (O),black (O)
+220,220,white (X),white (X)
+221,221,black (O),
+222,222,white (X),white (X)
+223,223,black (O),
+224,224,white (X),
+225,225,black (O),black (O)
+226,226,white (X),white (X)
+227,227,black (O),
+228,228,white (X),white (X)
+229,229,black (O),
+230,230,white (X),white (X)
+231,231,black (O),
+232,232,white (X),
+233,233,black (O),
+234,234,white (X),white (X)
+235,235,black (O),
+236,236,white (X),white (X)
+237,237,black (O),
+238,238,white (X),white (X)
+239,239,black (O),
+240,240,white (X),white (X)
+241,241,black (O),
+242,242,white (X),white (X)
+243,243,black (O),
+244,244,white (X),
+245,245,black (O),black (O)
+246,246,white (X),white (X)
+247,247,black (O),white (X)
+248,248,white (X),white (X)
+249,249,black (O),black (O)
+250,250,white (X),white (X)
+251,251,black (O),
+252,252,white (X),
+253,253,black (O),
+254,254,white (X),
+255,255,black (O),
+256,256,white (X),
+257,257,black (O),
+258,258,white (X),white (X)
+259,259,black (O),
+260,260,white (X),
+261,261,black (O),
+262,262,white (X),white (X)
+263,263,black (O),
+264,264,white (X),black (O)
+265,265,black (O),
+266,266,white (X),
+267,267,black (O),
+268,268,white (X),white (X)
+269,269,black (O),white (X)
+270,270,white (X),white (X)
+271,271,black (O),
+272,272,white (X),
+273,273,black (O),white (X)
+274,274,white (X),white (X)
+275,275,black (O),
+276,276,white (X),
+277,277,black (O),
+278,278,white (X),white (X)
+279,279,black (O),
+280,280,white (X),white (X)
+281,281,black (O),
+282,282,white (X),
+283,283,black (O),
+284,284,white (X),white (X)
+285,285,black (O),
+286,286,white (X),white (X)
+287,287,black (O),
+288,288,white (X),
+289,289,black (O),
+290,290,white (X),white (X)
+291,291,black (O),
+292,292,white (X),white (X)
+293,293,black (O),black (O)
+294,294,white (X),white (X)
+295,295,black (O),
+296,296,white (X),white (X)
+297,297,black (O),
+298,298,white (X),white (X)
+299,299,black (O),
+300,300,white (X),
+301,301,black (O),
+302,302,white (X),
+303,303,black (O),
+304,304,white (X),
+305,305,black (O),black (O)
+306,306,white (X),white (X)
+307,307,black (O),
+308,308,white (X),
+309,309,black (O),
+310,310,white (X),white (X)
+311,311,black (O),black (O)
+312,312,white (X),black (O)
+313,313,black (O),
+314,314,white (X),white (X)
+315,315,black (O),
+316,316,white (X),
+317,317,black (O),
+318,318,white (X),white (X)
+319,319,black (O),
+320,320,white (X),white (X)
+321,321,black (O),white (X)
+322,322,white (X),white (X)
+323,323,black (O),
+324,324,white (X),
+325,325,black (O),
+326,326,white (X),white (X)
+327,327,black (O),
+328,328,white (X),white (X)
+329,329,black (O),
+330,330,white (X),white (X)
+331,331,black (O),
+332,332,white (X),
+333,333,black (O),
+334,334,white (X),white (X)
+335,335,black (O),
+336,336,white (X),
+337,337,black (O),
+338,338,white (X),white (X)
+339,339,black (O),white (X)
+340,340,white (X),white (X)
+341,341,black (O),black (O)
+342,342,white (X),white (X)
+343,343,black (O),
+344,344,white (X),
+345,345,black (O),
+346,346,white (X),
+347,347,black (O),
+348,348,white (X),
+349,349,black (O),
+350,350,white (X),
+351,351,black (O),
+352,352,white (X),white (X)
+353,353,black (O),
+354,354,white (X),white (X)
+355,355,black (O),
+356,356,white (X),black (O)
+357,357,black (O),white (X)
+358,358,white (X),white (X)
+359,359,black (O),
+360,360,white (X),white (X)
+361,361,black (O),
+362,362,white (X),
+363,363,black (O),
+364,364,white (X),white (X)
+365,365,black (O),
+366,366,white (X),white (X)
+367,367,black (O),
+368,368,white (X),white (X)
+369,369,black (O),
+370,370,white (X),
+371,371,black (O),
+372,372,white (X),white (X)
+373,373,black (O),
+374,374,white (X),
+375,375,black (O),black (O)
+376,376,white (X),
+377,377,black (O),white (X)
+378,378,white (X),white (X)
+379,379,black (O),
+380,380,white (X),white (X)
+381,381,black (O),
+382,382,white (X),white (X)
+383,383,black (O),
+384,384,white (X),
+385,385,black (O),
+386,386,white (X),black (O)
+387,387,black (O),black (O)
+388,388,white (X),white (X)
+389,389,black (O),
+390,390,white (X),white (X)
+391,391,black (O),white (X)
+392,392,white (X),
+393,393,black (O),
+394,394,white (X),white (X)
+395,395,black (O),
+396,396,white (X),white (X)
+397,397,black (O),
+398,398,white (X),white (X)
+399,399,black (O),black (O)
+400,400,white (X),white (X)
+401,401,black (O),
+402,402,white (X),white (X)
+403,403,black (O),
+404,404,white (X),white (X)
+405,405,black (O),
+406,406,white (X),white (X)
+407,407,black (O),
+408,408,white (X),black (O)
+409,409,black (O),
+410,410,white (X),white (X)
+411,411,black (O),black (O)
+412,412,white (X),white (X)
+413,413,black (O),
+414,414,white (X),
+415,415,black (O),
+416,416,white (X),white (X)
+417,417,black (O),
+418,418,white (X),
+419,419,black (O),black (O)
+420,420,white (X),white (X)
+421,421,black (O),
+422,422,white (X),white (X)
+423,423,black (O),
+424,424,white (X),
+425,425,black (O),
+426,426,white (X),
+427,427,black (O),
+428,428,white (X),white (X)
+429,429,black (O),
+430,430,white (X),
+431,431,black (O),
+432,432,white (X),white (X)
+433,433,black (O),black (O)
+434,434,white (X),white (X)
+435,435,black (O),
+436,436,white (X),black (O)
+437,437,black (O),
+438,438,white (X),white (X)
+439,439,black (O),
+440,440,white (X),
+441,441,black (O),
+442,442,white (X),
+443,443,black (O),
+444,444,white (X),white (X)
+445,445,black (O),
+446,446,white (X),
+447,447,black (O),
+448,448,white (X),
+449,449,black (O),
+450,450,white (X),
+451,451,black (O),
+452,452,white (X),white (X)
+453,453,black (O),white (X)
+454,454,white (X),
+455,455,black (O),
+456,456,white (X),white (X)
+457,457,black (O),
+458,458,white (X),white (X)
+459,459,black (O),
+460,460,white (X),white (X)
+461,461,black (O),
+462,462,white (X),
+463,463,black (O),
+464,464,white (X),
+465,465,black (O),black (O)
+466,466,white (X),
+467,467,black (O),
+468,468,white (X),
+469,469,black (O),
+470,470,white (X),
+471,471,black (O),white (X)
+472,472,white (X),white (X)
+473,473,black (O),
+474,474,white (X),white (X)
+475,475,black (O),
+476,476,white (X),white (X)
+477,477,black (O),
+478,478,white (X),
+479,479,black (O),black (O)
+480,480,white (X),white (X)
+481,481,black (O),
+482,482,white (X),
+483,483,black (O),
+484,484,white (X),white (X)
+485,485,black (O),
+486,486,white (X),
+487,487,black (O),
+488,488,white (X),white (X)
+489,489,black (O),
+490,490,white (X),
+491,491,black (O),black (O)
+492,492,white (X),white (X)
+493,493,black (O),
+494,494,white (X),
+495,495,black (O),
+496,496,white (X),
+497,497,black (O),
+498,498,white (X),white (X)
+499,499,black (O),
+500,500,white (X),white (X)
+501,501,black (O),
+502,502,white (X),
+503,503,black (O),white (X)
+504,504,white (X),white (X)
+505,505,black (O),
+506,506,white (X),white (X)
+507,507,black (O),
+508,508,white (X),white (X)
+509,509,black (O),white (X)
+510,510,white (X),
+511,511,black (O),white (X)
+512,512,white (X),white (X)
+513,513,black (O),
+514,514,white (X),white (X)
+515,515,black (O),
+516,516,white (X),white (X)
+517,517,black (O),
+518,518,white (X),white (X)
+519,519,black (O),black (O)
+520,520,white (X),
+521,521,black (O),
+522,522,white (X),white (X)
+523,523,black (O),
+524,524,white (X),
+525,525,black (O),white (X)
+526,526,white (X),black (O)
+527,527,black (O),
+528,528,white (X),
+529,529,black (O),black (O)
+530,530,white (X),white (X)
+531,531,black (O),white (X)
+532,532,white (X),black (O)
+533,533,black (O),
+534,534,white (X),white (X)
+535,535,black (O),black (O)
+536,536,white (X),white (X)
+537,537,black (O),
+538,538,white (X),white (X)
+539,539,black (O),
+540,540,white (X),white (X)
+541,541,black (O),black (O)
+542,542,white (X),white (X)
+543,543,black (O),
+544,544,white (X),white (X)
+545,545,black (O),
+546,546,white (X),
+547,547,black (O),
+548,548,white (X),white (X)
+549,549,black (O),
+550,550,white (X),white (X)
+551,551,black (O),black (O)
+552,552,white (X),white (X)
+553,553,black (O),
+554,554,white (X),
+555,555,black (O),
+556,556,white (X),
+557,557,black (O),
+558,558,white (X),
+559,559,black (O),
+560,560,white (X),white (X)
+561,561,black (O),
+562,562,white (X),white (X)
+563,563,black (O),
+564,564,white (X),
+565,565,black (O),
+566,566,white (X),white (X)
+567,567,black (O),
+568,568,white (X),
+569,569,black (O),
+570,570,white (X),white (X)
+571,571,black (O),
+572,572,white (X),white (X)
+573,573,black (O),black (O)
+574,574,white (X),
+575,575,black (O),
+576,576,white (X),
+577,577,black (O),
+578,578,white (X),white (X)
+579,579,black (O),
+580,580,white (X),white (X)
+581,581,black (O),
+582,582,white (X),white (X)
+583,583,black (O),
+584,584,white (X),white (X)
+585,585,black (O),black (O)
+586,586,white (X),
+587,587,black (O),
+588,588,white (X),white (X)
+589,589,black (O),
+590,590,white (X),white (X)
+591,591,black (O),
+592,592,white (X),white (X)
+593,593,black (O),
+594,594,white (X),
+595,595,black (O),
+596,596,white (X),
+597,597,black (O),
+598,598,white (X),
+599,599,black (O),white (X)
+600,600,white (X),
+601,601,black (O),
+602,602,white (X),white (X)
+603,603,black (O),
+604,604,white (X),white (X)
+605,605,black (O),
+606,606,white (X),white (X)
+607,607,black (O),white (X)
+608,608,white (X),black (O)
+609,609,black (O),
+610,610,white (X),
+611,611,black (O),black (O)
+612,612,white (X),
+613,613,black (O),
+614,614,white (X),black (O)
+615,615,black (O),black (O)
+616,616,white (X),white (X)
+617,617,black (O),
+618,618,white (X),
+619,619,black (O),
+620,620,white (X),white (X)
+621,621,black (O),
+622,622,white (X),white (X)
+623,623,black (O),
+624,624,white (X),white (X)
+625,625,black (O),
+626,626,white (X),white (X)
+627,627,black (O),
+628,628,white (X),white (X)
+629,629,black (O),
+630,630,white (X),
+631,631,black (O),
+632,632,white (X),white (X)
+633,633,black (O),
+634,634,white (X),
+635,635,black (O),black (O)
+636,636,white (X),white (X)
+637,637,black (O),
+638,638,white (X),white (X)
+639,639,black (O),
+640,640,white (X),
+641,641,black (O),
+642,642,white (X),white (X)
+643,643,black (O),
+644,644,white (X),white (X)
+645,645,black (O),
+646,646,white (X),
+647,647,black (O),
+648,648,white (X),
+649,649,black (O),black (O)
+650,650,white (X),
+651,651,black (O),black (O)
+652,652,white (X),white (X)
+653,653,black (O),
+654,654,white (X),
+655,655,black (O),
+656,656,white (X),white (X)
+657,657,black (O),
+658,658,white (X),white (X)
+659,659,black (O),
+660,660,white (X),white (X)
+661,661,black (O),black (O)
+662,662,white (X),
+663,663,black (O),black (O)
+664,664,white (X),white (X)
+665,665,black (O),
+666,666,white (X),
+667,667,black (O),
+668,668,white (X),white (X)
+669,669,black (O),
+670,670,white (X),
+671,671,black (O),black (O)
+672,672,white (X),
+673,673,black (O),
+674,674,white (X),white (X)
+675,675,black (O),
+676,676,white (X),
+677,677,black (O),
+678,678,white (X),
+679,679,black (O),black (O)
+680,680,white (X),
+681,681,black (O),
+682,682,white (X),white (X)
+683,683,black (O),
+684,684,white (X),white (X)
+685,685,black (O),
+686,686,white (X),white (X)
+687,687,black (O),
+688,688,white (X),white (X)
+689,689,black (O),black (O)
+690,690,white (X),white (X)
+691,691,black (O),black (O)
+692,692,white (X),
+693,693,black (O),
+694,694,white (X),
+695,695,black (O),
+696,696,white (X),white (X)
+697,697,black (O),black (O)
+698,698,white (X),
+699,699,black (O),
+700,700,white (X),white (X)
+701,701,black (O),
+702,702,white (X),
+703,703,black (O),
+704,704,white (X),
+705,705,black (O),
+706,706,white (X),
+707,707,black (O),
+708,708,white (X),
+709,709,black (O),
+710,710,white (X),white (X)
+711,711,black (O),
+712,712,white (X),white (X)
+713,713,black (O),
+714,714,white (X),white (X)
+715,715,black (O),
+716,716,white (X),
+717,717,black (O),black (O)
+718,718,white (X),
+719,719,black (O),
+720,720,white (X),
+721,721,black (O),
+722,722,white (X),
+723,723,black (O),black (O)
+724,724,white (X),white (X)
+725,725,black (O),
+726,726,white (X),
+727,727,black (O),
+728,728,white (X),
+729,729,black (O),
+730,730,white (X),white (X)
+731,731,black (O),black (O)
+732,732,white (X),white (X)
+733,733,black (O),
+734,734,white (X),
+735,735,black (O),
+736,736,white (X),white (X)
+737,737,black (O),black (O)
+738,738,white (X),
+739,739,black (O),white (X)
+740,740,white (X),white (X)
+741,741,black (O),
+742,742,white (X),
+743,743,black (O),
+744,744,white (X),white (X)
+745,745,black (O),
+746,746,white (X),white (X)
+747,747,black (O),
+748,748,white (X),
+749,749,black (O),
+750,750,white (X),
+751,751,black (O),
+752,752,white (X),white (X)
+753,753,black (O),
+754,754,white (X),white (X)
+755,755,black (O),black (O)
+756,756,white (X),
+757,757,black (O),
+758,758,white (X),
+759,759,black (O),
+760,760,white (X),
+761,761,black (O),
+762,762,white (X),
+763,763,black (O),
+764,764,white (X),white (X)
+765,765,black (O),
+766,766,white (X),white (X)
+767,767,black (O),white (X)
+768,768,white (X),
+769,769,black (O),
+770,770,white (X),white (X)
+771,771,black (O),
+772,772,white (X),white (X)
+773,773,black (O),
+774,774,white (X),
+775,775,black (O),
+776,776,white (X),white (X)
+777,777,black (O),
+778,778,white (X),
+779,779,black (O),
+780,780,white (X),white (X)
+781,781,black (O),
+782,782,white (X),white (X)
+783,783,black (O),
+784,784,white (X),
+785,785,black (O),
+786,786,white (X),
+787,787,black (O),
+788,788,white (X),
+789,789,black (O),
+790,790,white (X),
+791,791,black (O),
+792,792,white (X),
+793,793,black (O),
+794,794,white (X),
+795,795,black (O),
+796,796,white (X),white (X)
+797,797,black (O),
+798,798,white (X),white (X)
+799,799,black (O),
+800,800,white (X),white (X)
+801,801,black (O),
+802,802,white (X),
+803,803,black (O),black (O)
+804,804,white (X),white (X)
+805,805,black (O),black (O)
+806,806,white (X),
+807,807,black (O),
+808,808,white (X),white (X)
+809,809,black (O),
+810,810,white (X),black (O)
+811,811,black (O),
+812,812,white (X),white (X)
+813,813,black (O),white (X)
+814,814,white (X),black (O)
+815,815,black (O),
+816,816,white (X),white (X)
+817,817,black (O),black (O)
+818,818,white (X),white (X)
+819,819,black (O),
+820,820,white (X),white (X)
+821,821,black (O),
+822,822,white (X),white (X)
+823,823,black (O),white (X)
+824,824,white (X),white (X)
+825,825,black (O),
+826,826,white (X),
+827,827,black (O),
+828,828,white (X),
+829,829,black (O),
+830,830,white (X),white (X)
+831,831,black (O),white (X)
+832,832,white (X),white (X)
+833,833,black (O),
+834,834,white (X),
+835,835,black (O),black (O)
+836,836,white (X),white (X)
+837,837,black (O),
+838,838,white (X),white (X)
+839,839,black (O),
+840,840,white (X),white (X)
+841,841,black (O),
+842,842,white (X),white (X)
+843,843,black (O),
+844,844,white (X),white (X)
+845,845,black (O),
+846,846,white (X),
+847,847,black (O),white (X)
+848,848,white (X),
+849,849,black (O),
+850,850,white (X),white (X)
+851,851,black (O),
+852,852,white (X),white (X)
+853,853,black (O),
+854,854,white (X),white (X)
+855,855,black (O),
+856,856,white (X),
+857,857,black (O),black (O)
+858,858,white (X),white (X)
+859,859,black (O),
+860,860,white (X),
+861,861,black (O),
+862,862,white (X),white (X)
+863,863,black (O),
+864,864,white (X),white (X)
+865,865,black (O),
+866,866,white (X),white (X)
+867,867,black (O),black (O)
+868,868,white (X),white (X)
+869,869,black (O),
+870,870,white (X),
+871,871,black (O),white (X)
+872,872,white (X),
+873,873,black (O),white (X)
+874,874,white (X),white (X)
+875,875,black (O),
+876,876,white (X),
+877,877,black (O),
+878,878,white (X),
+879,879,black (O),
+880,880,white (X),
+881,881,black (O),
+882,882,white (X),white (X)
+883,883,black (O),black (O)
+884,884,white (X),
+885,885,black (O),
+886,886,white (X),white (X)
+887,887,black (O),
+888,888,white (X),white (X)
+889,889,black (O),
+890,890,white (X),white (X)
+891,891,black (O),black (O)
+892,892,white (X),white (X)
+893,893,black (O),white (X)
+894,894,white (X),white (X)
+895,895,black (O),white (X)
+896,896,white (X),white (X)
+897,897,black (O),
+898,898,white (X),white (X)
+899,899,black (O),
+900,900,white (X),white (X)
+901,901,black (O),
+902,902,white (X),white (X)
+903,903,black (O),
+904,904,white (X),
+905,905,black (O),black (O)
+906,906,white (X),white (X)
+907,907,black (O),
+908,908,white (X),
+909,909,black (O),
+910,910,white (X),white (X)
+911,911,black (O),
+912,912,white (X),white (X)
+913,913,black (O),
+914,914,white (X),
+915,915,black (O),
+916,916,white (X),white (X)
+917,917,black (O),
+918,918,white (X),
+919,919,black (O),
+920,920,white (X),white (X)
+921,921,black (O),
+922,922,white (X),
+923,923,black (O),
+924,924,white (X),white (X)
+925,925,black (O),black (O)
+926,926,white (X),
+927,927,black (O),
+928,928,white (X),white (X)
+929,929,black (O),
+930,930,white (X),
+931,931,black (O),
+932,932,white (X),
+933,933,black (O),
+934,934,white (X),
+935,935,black (O),
+936,936,white (X),
+937,937,black (O),
+938,938,white (X),
+939,939,black (O),
+940,940,white (X),white (X)
+941,941,black (O),
+942,942,white (X),white (X)
+943,943,black (O),white (X)
+944,944,white (X),black (O)
+945,945,black (O),
+946,946,white (X),white (X)
+947,947,black (O),
+948,948,white (X),white (X)
+949,949,black (O),black (O)
+950,950,white (X),
+951,951,black (O),
+952,952,white (X),white (X)
+953,953,black (O),
+954,954,white (X),
+955,955,black (O),
+956,956,white (X),white (X)
+957,957,black (O),
+958,958,white (X),white (X)
+959,959,black (O),
+960,960,white (X),white (X)
+961,961,black (O),
+962,962,white (X),white (X)
+963,963,black (O),
+964,964,white (X),white (X)
+965,965,black (O),
+966,966,white (X),white (X)
+967,967,black (O),
+968,968,white (X),white (X)
+969,969,black (O),
+970,970,white (X),white (X)
+971,971,black (O),
+972,972,white (X),
+973,973,black (O),black (O)
+974,974,white (X),white (X)
+975,975,black (O),
+976,976,white (X),white (X)
+977,977,black (O),white (X)
+978,978,white (X),
+979,979,black (O),
+980,980,white (X),white (X)
+981,981,black (O),white (X)
+982,982,white (X),white (X)
+983,983,black (O),
+984,984,white (X),white (X)
+985,985,black (O),black (O)
+986,986,white (X),white (X)
+987,987,black (O),
+988,988,white (X),
+989,989,black (O),
+990,990,white (X),white (X)
+991,991,black (O),black (O)
+992,992,white (X),white (X)
+993,993,black (O),
+994,994,white (X),white (X)
+995,995,black (O),
+996,996,white (X),white (X)
+997,997,black (O),
+998,998,white (X),
+999,999,black (O),

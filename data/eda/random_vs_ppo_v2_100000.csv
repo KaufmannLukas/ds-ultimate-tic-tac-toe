@@ -1,0 +1,101 @@
+,game_nr,ppo_color,winner
+0,0,white (X),black (O)
+1,1,black (O),white (X)
+2,2,white (X),
+3,3,black (O),black (O)
+4,4,white (X),white (X)
+5,5,black (O),black (O)
+6,6,white (X),
+7,7,black (O),
+8,8,white (X),black (O)
+9,9,black (O),white (X)
+10,10,white (X),white (X)
+11,11,black (O),white (X)
+12,12,white (X),
+13,13,black (O),black (O)
+14,14,white (X),white (X)
+15,15,black (O),black (O)
+16,16,white (X),
+17,17,black (O),
+18,18,white (X),black (O)
+19,19,black (O),white (X)
+20,20,white (X),black (O)
+21,21,black (O),
+22,22,white (X),black (O)
+23,23,black (O),white (X)
+24,24,white (X),black (O)
+25,25,black (O),
+26,26,white (X),white (X)
+27,27,black (O),white (X)
+28,28,white (X),white (X)
+29,29,black (O),
+30,30,white (X),black (O)
+31,31,black (O),black (O)
+32,32,white (X),black (O)
+33,33,black (O),
+34,34,white (X),
+35,35,black (O),black (O)
+36,36,white (X),
+37,37,black (O),black (O)
+38,38,white (X),black (O)
+39,39,black (O),white (X)
+40,40,white (X),
+41,41,black (O),
+42,42,white (X),
+43,43,black (O),white (X)
+44,44,white (X),white (X)
+45,45,black (O),black (O)
+46,46,white (X),
+47,47,black (O),white (X)
+48,48,white (X),white (X)
+49,49,black (O),black (O)
+50,50,white (X),white (X)
+51,51,black (O),black (O)
+52,52,white (X),black (O)
+53,53,black (O),black (O)
+54,54,white (X),black (O)
+55,55,black (O),black (O)
+56,56,white (X),white (X)
+57,57,black (O),white (X)
+58,58,white (X),black (O)
+59,59,black (O),black (O)
+60,60,white (X),black (O)
+61,61,black (O),white (X)
+62,62,white (X),white (X)
+63,63,black (O),black (O)
+64,64,white (X),white (X)
+65,65,black (O),black (O)
+66,66,white (X),black (O)
+67,67,black (O),white (X)
+68,68,white (X),
+69,69,black (O),black (O)
+70,70,white (X),white (X)
+71,71,black (O),white (X)
+72,72,white (X),white (X)
+73,73,black (O),white (X)
+74,74,white (X),
+75,75,black (O),black (O)
+76,76,white (X),black (O)
+77,77,black (O),white (X)
+78,78,white (X),
+79,79,black (O),white (X)
+80,80,white (X),white (X)
+81,81,black (O),
+82,82,white (X),white (X)
+83,83,black (O),black (O)
+84,84,white (X),white (X)
+85,85,black (O),black (O)
+86,86,white (X),white (X)
+87,87,black (O),black (O)
+88,88,white (X),black (O)
+89,89,black (O),white (X)
+90,90,white (X),black (O)
+91,91,black (O),white (X)
+92,92,white (X),white (X)
+93,93,black (O),
+94,94,white (X),black (O)
+95,95,black (O),black (O)
+96,96,white (X),white (X)
+97,97,black (O),
+98,98,white (X),black (O)
+99,99,black (O),
