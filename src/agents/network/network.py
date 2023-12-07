@@ -14,7 +14,7 @@ class FeedForwardNN_Actor(nn.Module):
 
     """
     # get input and output dimensions from 'uttt_env.py'
-    # (TODO: true? - where do they come from?)
+    # (TODO: true? - where do they come from? from ppo.py?)
 
     def __init__(self, in_dim, out_dim):
         """
