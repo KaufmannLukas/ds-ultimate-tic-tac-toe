@@ -110,7 +110,7 @@ if __name__ == "__main__":
     # create agents
     agent_1 = Human()
     agent_2 = Random()
-    agent_3 = MCTS(num_iterations=5, memory_path="data/models/mcts/test.pkl")
+    agent_3 = MCTS(num_iterations=5, memory_path="data/models/mcts/mcts_memory_small.pkl")
 
     model = "ppo_test"
     path = "./data/models/ppo/"
