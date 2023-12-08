@@ -109,6 +109,9 @@ TO RUN GAME (frontend):
 5. The game should be running in your browser.
 (Note: if you experience some graphical issues, try another browser)
 
+## Training Manual / Guides
+
+... explain how to train and play models
 
 ## Docker file
 

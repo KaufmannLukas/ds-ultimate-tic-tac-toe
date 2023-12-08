@@ -84,7 +84,7 @@ def get_agent_state():
     id = request.args.get('id')
     return jsonify({"agent_is_busy": bool(computer_agent_state[int(id)])}), 200
 
-# agent plays a move
+# agent plays a moves
 def move_agent_T(game_id):
     global games
     global computer_agent_state
