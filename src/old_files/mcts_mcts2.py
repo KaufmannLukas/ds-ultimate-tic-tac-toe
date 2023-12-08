@@ -1,4 +1,5 @@
 
+import datetime
 from environments.game import Game
 from agents.mcts import MCTS
 from agents.random import Random
@@ -9,10 +10,13 @@ import pandas as pd
 from tqdm import tqdm
 
 
+# Format the date and time as a string with seconds precision and no spaces
+formatted_date_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    filename="log_mcts_random.log",
-                    filemode='w+'
+                    filename=f"logs/mcts_mcts2_{formatted_date_time}.log",
+                    filemode='w'
                     )
 
 
@@ -73,7 +77,7 @@ if __name__ == "__main__":
 
         winner_dataframe = pd.DataFrame(
             winner_table, columns=["game_nr", "num_iter", "mcts_color", "winner"])
-        winner_dataframe.to_csv(f"data/mcts_no_mem_vs_mcts_agent_02_4_{num_iterations}.csv")
+        winner_dataframe.to_csv(f"data/local/mcts_mcts2_winner_table_01_{num_iterations}.csv")
         winner_table = []
 
     mcts_agent_02.save_memory()

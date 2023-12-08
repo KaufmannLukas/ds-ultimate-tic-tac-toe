@@ -1,3 +1,4 @@
+import datetime
 from agents.ppo import PPO
 from agents.random import  Random
 from agents.human import Agent
@@ -11,16 +12,17 @@ import pandas as pd
 
 import logging
 
+# Format the date and time as a string with seconds precision and no spaces
+formatted_date_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    filename="PPO_test_main.log",
-                    filemode='w+'
+                    filename=f"logs/train_ppo_{formatted_date_time}.log",
+                    filemode='w'
                     )
-
 
 logger = logging.getLogger(__name__)
 
-#from agents.network import FeedForwardNN
 
 def train(model_name, model_path,
           ppo_hyperparameters,
@@ -65,7 +67,7 @@ def train(model_name, model_path,
             print("Start test vs random")
             winner_table = test_ppo(ppo, opponent=test_opponent, num_of_games=num_of_test_games)
             winner_df = winner_table_to_dataframe(winner_table=winner_table)
-            winner_df.to_csv("winner_table_ppo_v_ppo.csv")
+            winner_df.to_csv("data/local/train_ppo_winner_table_01.csv")
             win_count = winner_df["ppo_wins"].sum()
             loose_count = winner_df["ppo_loose"].sum()
             draw_count = winner_df["draw"].sum()

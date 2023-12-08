@@ -1,3 +1,4 @@
+import datetime
 from agents.ppo import PPO
 from agents.random import  Random
 from agents.human import Agent
@@ -9,10 +10,13 @@ import pandas as pd
 
 import logging
 
+# Format the date and time as a string with seconds precision and no spaces
+formatted_date_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    filename="PPO_test_main.log",
-                    filemode='w+'
+                    filename=f"logs/PPO_train_{formatted_date_time}.log",
+                    filemode='w'
                     )
 
 

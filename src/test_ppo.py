@@ -1,4 +1,5 @@
 
+import datetime
 from agents.agent import Agent
 from environments.game import Game
 from agents.ppo import PPO
@@ -8,13 +9,17 @@ from agents.human import Human
 
 import logging
 
+
 import pandas as pd
 from tqdm import tqdm
 
 
+# Format the date and time as a string with seconds precision and no spaces
+formatted_date_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    filename="log_ppo_random.log",
+                    filename=f"logs/test_ppo_{formatted_date_time}.log",
                     filemode='w'
                     )
 
@@ -114,7 +119,7 @@ if __name__ == "__main__":
     
     winner_df = winner_table_to_dataframe(winner_table)
 
-    winner_df.to_csv(f"data/random_vs_ppo_with_mcts_5000.csv")
+    winner_df.to_csv(f"data/local/test_ppo_vs_random.csv")
 
     win_count = winner_df["ppo_wins"].sum()
     loose_count = winner_df["ppo_loose"].sum()

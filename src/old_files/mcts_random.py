@@ -1,4 +1,5 @@
 
+import datetime
 from environments.game import Game
 from agents.mcts import MCTS, count_nodes, count_leaves
 from agents.random import Random
@@ -9,9 +10,12 @@ import pandas as pd
 from tqdm import tqdm
 
 
+# Format the date and time as a string with seconds precision and no spaces
+formatted_date_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    filename="log_mcts_random.log",
+                    filename=f"logs/mcts_random_{formatted_date_time}.log",
                     filemode='w'
                     )
 
