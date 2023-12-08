@@ -136,4 +136,4 @@ dmypy.json
 
 # folders
 data/local/
-#logs/
+logs/
