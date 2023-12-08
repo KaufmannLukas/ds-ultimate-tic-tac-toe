@@ -3,15 +3,14 @@ from flask_cors import CORS
 from agents.mcts import MCTS
 from agents.ppo import PPO
 import threading
-import time
 import os
 
 from environments.game import Game
+
 games = {}
 game_counter = 0
 computer_agent_state = {}
 computer_agent_model = {}
-
 
 print(os.getcwd())
 
@@ -24,9 +23,11 @@ cors = CORS(app, resources={r"*": {"origins": "*"}})
 def hello_world():
     return "<h1>Hello, World!</h1>"
 
-# this route starts a new game
 @app.route("/new_game")
 def new_game():
+    '''
+    This route starts a new game.
+    '''
     global game_counter
     global games
     global computer_agent_state
@@ -41,9 +42,12 @@ def new_game():
     
     return jsonify({"game_state": game.make_json(), "game_id": game_id}), 200
 
-# gets the updated game state
+
 @app.route("/get_game_state", methods=['GET'])
 def get_game_state():
+    '''
+    Gets the current game state.
+    '''
     global games
     global computer_agent_state
     id = request.args.get('id')
@@ -53,9 +57,12 @@ def get_game_state():
     else:
         return jsonify({"game_state": game.make_json(), "agent_is_busy": False}), 200
 
-# to play a move
+
 @app.route("/play", methods=['POST'])
 def play_game():
+    '''
+    To play a move.
+    '''
     global games
     # Parse JSON data
     data = request.get_json()  
@@ -67,6 +74,7 @@ def play_game():
 
     current_game = games[game_id]
     current_game.play(*move)
+    # use threading to enable parallel / simultaneous games
     x = threading.Thread(target=move_agent_T, kwargs={'game_id': game_id})
     x.start()
 
@@ -77,15 +85,22 @@ def play_game():
 
     return response, 200
 
-# see if agent is busy making a move or not
+
 @app.route("/get_agent_state", methods=['GET'])
 def get_agent_state():
+    '''
+    See if agent is busy making a move or not.
+    '''
     global computer_agent_state
     id = request.args.get('id')
     return jsonify({"agent_is_busy": bool(computer_agent_state[int(id)])}), 200
 
-# agent plays a moves
+
 def move_agent_T(game_id):
+    '''
+    Agent plays a move.
+    T stands for Thread.
+    '''
     global games
     global computer_agent_state
     global computer_agent_model
@@ -97,9 +112,3 @@ def move_agent_T(game_id):
     game.play(*next_move)
     computer_agent_state[game_id] = 0
     return True
-
-
-# TO RUN GAME:
-# 1. "flask --debug --app main_flask run"
-# 2. new terminal: go to /frontend/ds-uttt
-# 3. "npm run dev"

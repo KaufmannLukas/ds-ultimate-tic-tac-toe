@@ -16,17 +16,26 @@ from environments.game import Game
 # Format the date and time as a string with seconds precision and no spaces
 formatted_date_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
+# Configure the logging system
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     filename=f"logs/playout_{formatted_date_time}.log",
                     filemode='w'
                     )
-
-
 logger = logging.getLogger(__name__)
 
 
-def play(white: Agent, black: Agent):
+def play(white: Agent, black: Agent) -> Game:
+    """
+    Simulate a game between two agents.
+
+    Parameters:
+    - white (Agent): The first player agent.
+    - black (Agent): The second player agent.
+
+    Returns:
+    - Game: The result of the game.
+    """
     game = Game()
 
     counter = 0
@@ -42,6 +51,16 @@ def play(white: Agent, black: Agent):
 
 
 def tournament(agents, names, rounds=10):
+    """
+    Conduct a tournament between agents.
+
+    Parameters:
+    - agents (list): List of agent instances participating in the tournament.
+    - names (list): List of names corresponding to the agents.
+    - rounds (int): Number of rounds for each matchup.
+
+    Writes results to logs and a CSV file.
+    """
     perms = permutations(zip(agents, names), r=2)
     results = []
     summary = defaultdict(lambda: {'wins': 0, 'losses': 0, 'draws': 0})
@@ -59,13 +78,10 @@ def tournament(agents, names, rounds=10):
             # Update summary
             if res.winner == "white (X)":
                 summary[(agent_1[1], agent_2[1])]['wins'] += 1
-                #summary[(agent_2[1], agent_1[1])]['losses'] += 1
             elif res.winner == "black (O)":
                 summary[(agent_1[1], agent_2[1])]['losses'] += 1
-                #summary[(agent_2[1], agent_1[1])]['wins'] += 1
             else:  # Draw
                 summary[(agent_1[1], agent_2[1])]['draws'] += 1
-                #summary[(agent_2[1], agent_1[1])]['draws'] += 1
 
     # Logging the summary
     logger.info("Tournament Summary:")
@@ -79,20 +95,21 @@ def tournament(agents, names, rounds=10):
         writer.writerows(results)
 
 
-
 if __name__ == "__main__":
-    # create agents
+    # Create agents
     agent_1 = Human()
     agent_2 = Random()
     agent_3 = MCTS(num_iterations=5, memory_path="data/models/mcts/mcts_memory_small.pkl")
 
-    model = "ppo_test"
+    model = "ppo_v1"
     path = "./data/models/ppo/"
     agent_4 = PPO(name=model, path=path, helper=agent_2)
 
-
-    #play(agent_1, agent_3)
-
+    # Tournament with specified agents
     tournament([agent_2, agent_3, agent_4], 
                names=["random", "mcts", "ppo"], 
-               rounds=5)
+               rounds=2)
+    
+
+    # NOTE: if you want to play, here is an example:
+    # play(agent_1, agent_3)

@@ -540,6 +540,7 @@ class PPO(Agent):
            
             rew_dict_list = self.logger_dict["batch_rew_count_dicts"]
 
+            # NOTE: change manually here, if illegal_move_factor has been changed.
             invalid_move_count = sum(rew_dict[-0.1] for rew_dict in rew_dict_list if -0.1 in rew_dict.keys())
             invalid_move_ratio = invalid_move_count / self.timesteps_per_batch
 

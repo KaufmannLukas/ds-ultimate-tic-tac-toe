@@ -1,5 +1,4 @@
-
-import datetime
+from datetime import datetime
 from environments.game import Game
 from agents.mcts import MCTS, count_nodes, count_leaves
 from agents.random import Random

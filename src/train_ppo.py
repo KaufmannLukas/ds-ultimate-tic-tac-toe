@@ -1,20 +1,16 @@
-import datetime
+from datetime import datetime
 from agents.ppo import PPO
 from agents.random import  Random
-from agents.human import Agent
 from environments.uttt_env import UltimateTicTacToeEnv
-from environments.game import Game
-from agents.human import Human
 from agents.mcts import MCTS
 from src.test_ppo import test_ppo, winner_table_to_dataframe
-
-import pandas as pd
 
 import logging
 
 # Format the date and time as a string with seconds precision and no spaces
 formatted_date_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
+# Configure the logging system
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     filename=f"logs/train_ppo_{formatted_date_time}.log",
@@ -36,12 +32,28 @@ def train(model_name, model_path,
           opponent = None,
           reward_config = None
           ):
+    
+    """
+    Train a Proximal Policy Optimization (PPO) agent.
+
+    Parameters:
+    - model_name (str): Name of the PPO agent.
+    - model_path (str): Path to save the PPO model.
+    - ppo_hyperparameters (dict): Dictionary containing PPO hyperparameters.
+    - load_name (str): Name of the model to load (optional).
+    - load_path (str): Path from which to load the model (optional).
+    - total_timesteps (int): Total number of training timesteps.
+    - num_generations (int): Number of training generations.
+    - save_generations (bool): Whether to save models after each generation.
+    - test_generations (bool): Whether to test the agent against a random opponent after each generation.
+    - num_of_test_games (int): Number of test games against a random opponent.
+    - opponent (Agent): Opponent agent for testing.
+    - reward_config (dict): Configuration for reward factors.
+    """
 
     logger.info("Start training...")
-
-    # Agent = Agent / Random ?
-    # TODO: load a model first 
     logger.info("Init PPO ...")
+
     ppo = PPO(name=model_name,
               path=model_path,
               load_name=load_name,
@@ -77,8 +89,6 @@ def train(model_name, model_path,
             print(f"Played {num_of_test_games} games against Random:")
             print(f"winns: {win_count}\t looses: {loose_count}\t draws: {draw_count}")
         
-
-
     logger.info("End training...")
 
 
@@ -113,9 +123,12 @@ if __name__ == "__main__":
         "local_draw_factor": 2,
 
         "legal_move_factor": 1,
-        # WAIT!!!!! READ BELOW
-        "illegal_move_factor": -0.1,         # !!!!! CHANGE THE INVALID MOVE COUNT TO THE NUMBER !!!!!
+        # NOTE: !!!!
+        # change the invalid_move_count "here",
+        # if you change the following illegal_move_factor!!!!!
+        "illegal_move_factor": -0.1,
         # dont forget to change the other number you IDIOTS!!!!!!
+        # TODO: automate this!
     }
 
     # SET STARTING OPPONENT HERE

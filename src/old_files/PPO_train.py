@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from agents.ppo import PPO
 from agents.random import  Random
 from agents.human import Agent
