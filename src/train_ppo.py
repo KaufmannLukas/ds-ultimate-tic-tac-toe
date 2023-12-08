@@ -124,7 +124,7 @@ if __name__ == "__main__":
 
         "legal_move_factor": 1,
         # NOTE: !!!!
-        # change the invalid_move_count "here",
+        # change the invalid_move_count "https://vscode.dev/github/KaufmannLukas/ds-ultimate-tic-tac-toe/blob/main/src/agents/ppo.py#L544",
         # if you change the following illegal_move_factor!!!!!
         "illegal_move_factor": -0.1,
         # dont forget to change the other number you IDIOTS!!!!!!
@@ -136,6 +136,7 @@ if __name__ == "__main__":
     # op_model = "ppo_v1"
     # op_path = "./data/models/ppo"
     # opponent = PPO(name=op_model, path=op_path, hyperparameters=ppo_hyperparameters)
+    
     # NOTE: comment out the next line if you train ppo vs. ppo
     opponent = Random()
 

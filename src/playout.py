@@ -108,7 +108,7 @@ if __name__ == "__main__":
     # Tournament with specified agents
     tournament([agent_2, agent_3, agent_4], 
                names=["random", "mcts", "ppo"], 
-               rounds=2)
+               rounds=10)
     
 
     # NOTE: if you want to play, here is an example:

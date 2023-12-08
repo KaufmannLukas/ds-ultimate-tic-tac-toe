@@ -115,7 +115,7 @@ if __name__ == "__main__":
     path = "./data/models/ppo"
     ppo_agent = PPO(name=model, path=path)
 
-    num_of_games = 10
+    num_of_games = 100
 
     random_agent = Random()
     human_agent = Human()

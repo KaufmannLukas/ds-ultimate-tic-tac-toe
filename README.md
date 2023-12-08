@@ -69,7 +69,51 @@ It is therefore our current strongest agent and connected with the interface.
 
 The following tree-like folder structure diagram provides orientation over our repository:
 
-![folders](/images/slide_11_folders.png)
+```
+.
+├── data/
+│   ├── eda/
+│   │   └── ... ->  files for 'model_analysis.ipynb'
+│   ├── local/
+│   │   └── ... ->  local files, will not be uploaded to repository
+│   └── models/
+│       ├── mcts/
+│       │   └── mcts_memory_small.pkl
+│       └── ppo/
+│           ├── ppo_v1_actor.pth
+│           └── ppo_v1_critic.pth
+├── frontend/
+│   └── ds-uttt/
+│       └── ... ->  interface setup
+├── images/
+│   └── ... ->  files for 'README.md'
+├── logs
+├── src/
+│   ├── agents/
+│   │   ├── network/
+│   │   │   └── network.py
+│   │   ├── agent.py
+│   │   ├── human.py
+│   │   ├── mcts.py
+│   │   ├── ppo.py
+│   │   └── random.py
+│   ├── environments/
+│   │   ├── game
+│   │   └── uttt_env
+│   ├── old_files/
+│   │   └── ... ->  outdated files for comprehension purposes
+│   ├── tests/
+│   │   ├── test_game.py
+│   │   └── test_mcts.py
+│   ├── main_flask.py
+│   ├── playout.py
+│   ├── test_ppo.py
+│   ├── train_mcts.py
+│   └── train_ppo.py
+├── environment.yml
+├── model_analysis.ipynb
+└── README.md
+```
 
 
 
@@ -108,11 +152,3 @@ TO RUN GAME (frontend):
 
 5. The game should be running in your browser.
 (Note: if you experience some graphical issues, try another browser)
-
-## Training Manual / Guides
-
-... explain how to train and play models
-
-## Docker file
-
-...
