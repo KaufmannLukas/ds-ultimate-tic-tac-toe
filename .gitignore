@@ -136,5 +136,4 @@ dmypy.json
 
 # folders
 data/local/
-src/logs/
-"empty folder test"/
+logs/

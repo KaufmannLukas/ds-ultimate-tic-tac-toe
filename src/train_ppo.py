@@ -84,13 +84,13 @@ if __name__ == "__main__":
     total_timesteps = 500_000
     num_generations = 5
 
-    model_name = "ppo_v_ppo_v7_random"
-    model_path = "./data/ppo/ppo_vs_ppo"
+    model_name = "ppo_v2"
+    model_path = "./data/models/ppo"
 
     # load_name = None
     # load_path = None
-    load_name = "ppo_v_ppo_v1_7"
-    load_path = "./data/ppo/ppo_vs_ppo"
+    load_name = "ppo_v1"
+    load_path = "./data/models/ppo"
 
 
     ppo_hyperparameters = {
@@ -117,9 +117,11 @@ if __name__ == "__main__":
     }
 
     # SET STARTING OPPONENT HERE
-    op_model = "ppo_v_ppo_v1_7"
-    op_path = "./data/ppo/ppo_vs_ppo"
-    #opponent = PPO(name=op_model, path=op_path, hyperparameters=ppo_hyperparameters)
+    # NOTE: if you want to train ppo vs. ppo, uncomment the following lines:
+    # op_model = "ppo_v1"
+    # op_path = "./data/models/ppo"
+    # opponent = PPO(name=op_model, path=op_path, hyperparameters=ppo_hyperparameters)
+    # NOTE: comment out the next line if you train ppo vs. ppo
     opponent = Random()
 
     train(total_timesteps=total_timesteps,

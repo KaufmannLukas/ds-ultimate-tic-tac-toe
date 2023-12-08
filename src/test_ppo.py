@@ -96,8 +96,8 @@ def winner_table_to_dataframe(winner_table):
 if __name__ == "__main__":
     # Load model values saved so far 
 
-    model = "ppo_v_ppo_v1_7"
-    path = "./data/ppo/ppo_vs_ppo"
+    model = "ppo_v1"
+    path = "./data/models/ppo"
     ppo_agent = PPO(name=model, path=path)
     #ppo_agent.load(path, model)
 
