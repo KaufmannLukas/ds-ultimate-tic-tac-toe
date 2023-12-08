@@ -19,10 +19,12 @@ app = Flask(__name__)
 
 cors = CORS(app, resources={r"*": {"origins": "*"}})
 
+# this is an example of a route in flask
 @app.route("/")
 def hello_world():
     return "<h1>Hello, World!</h1>"
 
+# this route starts a new game
 @app.route("/new_game")
 def new_game():
     global game_counter
@@ -39,7 +41,7 @@ def new_game():
     
     return jsonify({"game_state": game.make_json(), "game_id": game_id}), 200
 
-
+# gets the updated game state
 @app.route("/get_game_state", methods=['GET'])
 def get_game_state():
     global games
@@ -51,12 +53,13 @@ def get_game_state():
     else:
         return jsonify({"game_state": game.make_json(), "agent_is_busy": False}), 200
 
+# to play a move
 @app.route("/play", methods=['POST'])
 def play_game():
-    # get game id from request body
     global games
-
-    data = request.get_json()  # Parse JSON data
+    # Parse JSON data
+    data = request.get_json()  
+    # get game id from request body
     game_id = int(data['game_id'])
     move_game_idx = int(data['game_idx'])
     move_field_idx = int(data['field_idx'])
@@ -74,12 +77,14 @@ def play_game():
 
     return response, 200
 
+# see if agent is busy making a move or not
 @app.route("/get_agent_state", methods=['GET'])
 def get_agent_state():
     global computer_agent_state
     id = request.args.get('id')
     return jsonify({"agent_is_busy": bool(computer_agent_state[int(id)])}), 200
 
+# agent plays a move
 def move_agent_T(game_id):
     global games
     global computer_agent_state
