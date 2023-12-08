@@ -175,13 +175,13 @@ class Game:
         """
         if self.last_move is None:
             return np.zeros((9, 9), dtype=bool)
-
+        
+        # create blocked fields from history and local wins
         blocked_fields = self.white.board | self.black.board
         finished_games = (self.white.wins | self.black.wins)[
             :, np.newaxis] * np.ones((9, 9), dtype=bool)
         blocked_fields = blocked_fields | finished_games
     
-
         # if a whole game is blocked, return the rest of the games as free
         if all(blocked_fields[self.last_move[1]]):
             return blocked_fields
@@ -211,7 +211,7 @@ class Game:
         """
         white_moves = self.white.history
         black_moves = self.black.history
-        # Interleave the moves, assuming white starts first
+        # Combine all moves, assuming white starts first
         moves = [None]*81  # Initialize a list with 81 moves
         moves[:len(white_moves)*2:2] = white_moves
         moves[1:len(black_moves)*2:2] = black_moves
@@ -384,8 +384,6 @@ class Game:
 
         return global_draw, local_draws
         
-
-
 
     def _reshape_board(board):
         """

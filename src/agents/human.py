@@ -44,6 +44,7 @@ class Human(Agent):
             for c in inpt:
                 if c in nums:
                     counter += 1
+                    # NOTE: move -1 because python moves are from 0-8.
                     move.append(int(c)-1)
             if counter < 2:
                 continue

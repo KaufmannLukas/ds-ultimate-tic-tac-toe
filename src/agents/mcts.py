@@ -257,6 +257,7 @@ class MCTS(Agent):
     def find_node_by_game(self, game: Game):
         """
         Find the node in the memory tree corresponding to the given game.
+        Relevant when loading a memory file.
 
         Args:
             game (Game): The game instance for which to find the corresponding node.
@@ -293,6 +294,7 @@ class MCTS(Agent):
             max_time=None,
             disable_progress_bar=True,
     ) -> tuple:
+        
         '''
         Select the best move using Monte Carlo Tree Search (MCTS).
 
@@ -303,7 +305,7 @@ class MCTS(Agent):
             disable_progress_bar (bool): If True, disable the progress bar.
 
         Returns:
-            tuple: The selected move.
+            tuple: The selected move (game_idx, field_idx) (e.g. 2,3).
 
         '''
         #logger.info("Start play")

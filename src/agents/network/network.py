@@ -63,6 +63,11 @@ class FeedForwardNN_Actor(nn.Module):
         if isinstance(obs, np.ndarray):
             obs = torch.tensor(obs, dtype=torch.float)
         
+
+        # NOTE: If using Batch Normalization, then activation1 would be:
+        # activation1 = F.relu(self.bn1(self.layer1(obs))) # Linear transformation + batch normalization + Activation function
+        # similar for subsequent layers
+
         activation1 = F.relu(self.layer1(obs)) # Linear transformation + Activation function
         activation2 = F.relu(self.layer2(activation1))
         activation3 = F.relu(self.layer3(activation2))
@@ -70,12 +75,6 @@ class FeedForwardNN_Actor(nn.Module):
         # activation5 = F.relu(self.layer5(activation4))
         output = F.softmax(self.layer6(activation3), dim=-1)
         return output
-        
-        '''
-        If using Batch Normalization, then activation1 would be:
-        # activation1 = F.relu(self.bn1(self.layer1(obs))) # Linear transformation + batch normalization + Activation function
-        similar for subsequent layers
-        '''
 
 
 class FeedForwardNN_Critic(nn.Module):

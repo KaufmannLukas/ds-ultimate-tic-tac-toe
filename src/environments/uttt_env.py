@@ -1,15 +1,13 @@
-from random import choice
 import logging
-from anyio import open_process
 import gymnasium as gym
 import numpy as np
 from gymnasium import spaces
-from matplotlib.pylab import get_state
 
 from environments.game import Game
 from agents.agent import Agent
 
 from typing import Optional
+
 
 logger = logging.getLogger(__name__)
 
@@ -53,9 +51,9 @@ class UltimateTicTacToeEnv(gym.Env):
         Returns:
             tuple: Initial observation and additional information.
         """
+        # reset reward history after reset of environment
         self.full_reward_history.append(self.single_reward_history)
         self.single_reward_history = []
-        #logger.info("reset env")
         self.game = Game()
         if self.opponent is not None and self.opponent_starts:
                 opponent_move = self.opponent.play(self.game)
@@ -80,7 +78,7 @@ class UltimateTicTacToeEnv(gym.Env):
             local_draw_factor = self.reward_config["local_draw_factor"]
             legal_move_factor = self.reward_config["legal_move_factor"]
             illegal_move_factor = self.reward_config["illegal_move_factor"]
-        else:
+        else: # default reward configuration
             global_win_factor = 100
             global_draw_factor = 10
             local_win_factor = 5
@@ -103,6 +101,7 @@ class UltimateTicTacToeEnv(gym.Env):
             if self.opponent is not None and not self.game.done:
                 counter_action = self.opponent.play(self.game)
                 for i in range(100):
+                    # reset game after oppoonent plays 100 invalid moves in a row
                     if self.game.check_valid_move(*counter_action):
                         self.game.play(*counter_action)
                         break
@@ -110,7 +109,7 @@ class UltimateTicTacToeEnv(gym.Env):
                         counter_action = self.opponent.play(self.game)
                 else:
                     self.game = Game()
-                    logger.warn("opponent is not making valid moves. Restart the Game!!!")
+                    logger.warn("Opponent is not making valid moves. Restart the Game!!!")
         else:
             reward += 1 * illegal_move_factor
             self.game = Game()
@@ -134,6 +133,7 @@ class UltimateTicTacToeEnv(gym.Env):
         """
         print(self.game)
 
+
 def game2tensor(game: Game):
     """
     Converts the game state to a tensor for observation.
@@ -146,8 +146,10 @@ def game2tensor(game: Game):
     """
     wb = game.white.board
     bb = game.black.board
+    # NOTE: use either bf or vm(=valid_moves):
     bf = game.blocked_fields
     vm = ~game.blocked_fields
+    # lm = last_move
     lm = np.zeros(shape=(9, 9), dtype=bool)
     if game.last_move:
         lm[*game.last_move] = True

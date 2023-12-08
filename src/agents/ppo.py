@@ -10,9 +10,7 @@ import time
 import logging
 import traceback
 import random
-from typing import Optional
 
-import gymnasium as gym
 import numpy as np
 import torch
 import torch.nn as nn
@@ -21,14 +19,11 @@ from torch.optim import Adam
 import torch.nn.functional as F
 from tqdm import tqdm
 
-
 from agents.agent import Agent
-from agents.mcts import MCTS
 from agents.network.network import FeedForwardNN_Actor, FeedForwardNN_Critic
 from environments.uttt_env import game2tensor
 
 logger = logging.getLogger(__name__)
-
 
 
 class PPO(Agent):
@@ -53,7 +48,8 @@ class PPO(Agent):
             load_name (str): The name to use when loading the PPO model.
             load_path (str): The path from which to load the PPO model.
             hyperparameters (dict): Hyperparameters for PPO training.
-            helper (Agent): Helper agent for playing moves.
+            helper (Agent): Helper agent for playing moves. Prevents the
+            ppo agent from playing invalid moves.
 
         Returns:
             None
@@ -87,15 +83,17 @@ class PPO(Agent):
             'batch_lens': [],       # episodic lengths in batch
             'batch_rews': [],       # episodic returns in batch
             'actor_losses': [],     # losses of actor network in current iteration
-            'help_count': [0, 0],   # NOTE: we do not use this yet
+            'help_count': [0, 0],   # NOTE: we do not use this (yet)
         }
 
         self.reward_history = []
 
         # Extract environment information
         # For a 4x9x9 observation space, this should be 324
-        self.obs_dim = 324
-        self.act_dim = 81 # env.action_space.shape
+        # 4: own_moves, opponent_moves, valid_moves, last_move, for each field (9x9 array).
+        # 9x9: 81, for each field on the board
+        self.obs_dim = 324 
+        self.act_dim = 81 
         self.critic_dim = 1
 
 
@@ -405,6 +403,7 @@ class PPO(Agent):
             noise = torch.randn_like(probs) * noise_scale
             noisy_probs = probs + noise
             probs = F.softmax(noisy_probs, dim=-1)  # Re-normalize
+            # NOTE: noisy probs is a great band name.
 
         # Epsilon-greedy exploration
         if random.random() < epsilon and mode == "learn":
@@ -464,11 +463,11 @@ class PPO(Agent):
         for i in range(num_of_tries):
             action, _ = self.get_action(obs, mode="play")
         
+            # convert action (int from 0 to 80) into game_idx and field_idx
             game_idx = action // 9
             field_idx = action % 9
 
             move = (game_idx, field_idx)
-
 
             if game.check_valid_move(*move) or self.helper_agent is None:
                 self.logger_dict["help_count"][0] += 1
@@ -484,6 +483,7 @@ class PPO(Agent):
         moves_without_help, moves_with_help = self.logger_dict['help_count']
         #logger.info(f"played {moves_without_help} moves without help")
         #logger.info(f"played {moves_with_help} moves with help")
+        # NOTE: we do not use this yet..
 
         return move
 
