@@ -9,6 +9,12 @@ The project goal was to use Reinforcement Learning to teach an agent how to play
 In this group project, we first created a Monte Carlo Tree Search (MCTS) search algorithm from scratch. Then we used an Artificial Neural Network (ANN) to implement Proximal Policy Optimization (PPO) to improve the performance of our agent. <br>
 Addtionally, we implemented an interactive interface with flask and html, as a final product, where the user can play Ultimate Tic-Tac-Toe against our engine. <br>
 
+Project members: <br>
+[Lukas Kaufmann](https://github.com/KaufmannLukas), [Paul Kotyrba](https://github.com/PaulZbigniew), [Nils Schillmann](https://github.com/nilsschillmann), [Sreejith Thamban](https://github.com/thamban15).
+<br> Thanks to [Jannes Brunner](https://github.com/jannesbrunner).
+
+
+
 ## Rules of Ultimate Tic-Tac-Toe
 
 ![rules](/images/slide_02_rules_small.png)
